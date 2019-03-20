@@ -9,16 +9,6 @@ export class Event extends Entity {
   id?: number;
 
   @property({
-    type: 'string',
-  })
-  eventId?: string;
-
-  @property({
-    type: 'string',
-  })
-  type?: string;
-
-  @property({
     type: 'number',
   })
   timestamp?: number;
@@ -29,11 +19,33 @@ export class Event extends Entity {
   sender?: string;
 
   @property({
+    type: 'string',
+  })
+  eventId?: string;
+
+  @property({
+    type: 'object',
+  })
+  unsigned?: object;
+
+  @property({
+    type: 'string',
+  })
+  stateKey?: string;
+
+  @property({
     type: 'object',
   })
   content?: object;
 
-  @property()
+  @property({
+    type: 'string',
+  })
+  type?: string;
+
+  @property({
+    type: 'number',
+  })
   roomId: number;
 
   constructor(data?: Partial<Event>) {

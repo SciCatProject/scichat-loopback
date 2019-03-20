@@ -12,12 +12,17 @@ export class Room extends Entity {
   @property({
     type: 'string',
   })
-  name?: string;
+  canonicalAlias?: string;
 
   @property({
     type: 'string',
   })
-  roomId?: string;
+  name?: string;
+
+  @property({
+    type: 'boolean',
+  })
+  worldReadable?: boolean;
 
   @property({
     type: 'string',
@@ -25,9 +30,29 @@ export class Room extends Entity {
   topic?: string;
 
   @property({
+    type: 'number',
+  })
+  numberOfJoinedMembers?: number;
+
+  @property({
+    type: 'false',
+  })
+  federate?: boolean;
+
+  @property({
     type: 'string',
   })
-  canonicalAlias?: string;
+  roomId?: string;
+
+  @property({
+    type: 'false',
+  })
+  guestCanJoin?: boolean;
+
+  @property({
+    type: 'array',
+  })
+  aliases?: string[];
 
   @hasMany(() => Event)
   events?: Event[];

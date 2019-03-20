@@ -16,7 +16,6 @@ import {
 } from '@loopback/rest';
 import {Event} from '../models';
 import {RoomRepository} from '../repositories';
-import {filter} from 'minimatch';
 
 export class RoomEventController {
   constructor(@repository(RoomRepository) protected roomRepo: RoomRepository) {}
