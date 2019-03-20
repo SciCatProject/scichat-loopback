@@ -1,6 +1,7 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Event} from './event.model';
 import {Member} from './member.model';
+import {Message} from './message.model';
 
 @model()
 export class Room extends Entity {
@@ -61,6 +62,9 @@ export class Room extends Entity {
 
   @hasMany(() => Member)
   members?: Member[];
+
+  @hasMany(() => Message)
+  messages?: Message[];
 
   constructor(data?: Partial<Room>) {
     super(data);

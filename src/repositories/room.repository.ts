@@ -6,9 +6,10 @@ import {
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';
 import {Getter, inject} from '@loopback/core';
-import {Event, Member, Room} from '../models';
+import {Event, Member, Message, Room} from '../models';
 import {EventRepository} from './event.repository';
 import {MemberRepository} from './member.repository';
+import {MessageRepository} from './message.repository';
 
 export class RoomRepository extends DefaultCrudRepository<
   Room,
@@ -22,6 +23,10 @@ export class RoomRepository extends DefaultCrudRepository<
     Member,
     typeof Room.prototype.id
   >;
+  public readonly messages: HasManyRepositoryFactory<
+    Message,
+    typeof Room.prototype.id
+  >;
 
   constructor(
     @inject('datasources.mongo') dataSource: MongoDataSource,
@@ -29,6 +34,8 @@ export class RoomRepository extends DefaultCrudRepository<
     protected eventRepositoryGetter: Getter<EventRepository>,
     @repository.getter(MemberRepository)
     protected memberRepositoryGetter: Getter<MemberRepository>,
+    @repository.getter(MessageRepository)
+    protected messageRepositoryGetter: Getter<MessageRepository>,
   ) {
     super(Room, dataSource);
     this.events = this.createHasManyRepositoryFactoryFor(
@@ -38,6 +45,10 @@ export class RoomRepository extends DefaultCrudRepository<
     this.members = this.createHasManyRepositoryFactoryFor(
       'members',
       memberRepositoryGetter,
+    );
+    this.messages = this.createHasManyRepositoryFactoryFor(
+      'messages',
+      messageRepositoryGetter,
     );
   }
 }
