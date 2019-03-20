@@ -23,7 +23,7 @@ export class Room extends Entity {
   @property({
     type: 'boolean',
   })
-  worldReadable?: boolean;
+  worldReadable?: boolean = false;
 
   @property({
     type: 'string',
@@ -38,7 +38,7 @@ export class Room extends Entity {
   @property({
     type: 'boolean',
   })
-  federate?: boolean;
+  federate?: boolean = false;
 
   @property({
     type: 'string',
@@ -48,7 +48,7 @@ export class Room extends Entity {
   @property({
     type: 'boolean',
   })
-  guestCanJoin?: boolean;
+  guestCanJoin?: boolean = false;
 
   @property.array(String)
   aliases?: string[];
