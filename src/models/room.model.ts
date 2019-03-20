@@ -1,5 +1,6 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Event} from './event.model';
+import {Member} from './member.model';
 
 @model()
 export class Room extends Entity {
@@ -35,7 +36,7 @@ export class Room extends Entity {
   numberOfJoinedMembers?: number;
 
   @property({
-    type: 'false',
+    type: 'boolean',
   })
   federate?: boolean;
 
@@ -45,17 +46,18 @@ export class Room extends Entity {
   roomId?: string;
 
   @property({
-    type: 'false',
+    type: 'boolean',
   })
   guestCanJoin?: boolean;
 
-  @property({
-    type: 'array',
-  })
+  @property.array(String)
   aliases?: string[];
 
   @hasMany(() => Event)
   events?: Event[];
+
+  @hasMany(() => Member)
+  members?: Member[];
 
   constructor(data?: Partial<Room>) {
     super(data);
