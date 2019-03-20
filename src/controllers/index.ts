@@ -6,3 +6,5 @@ export * from './member.controller';
 export * from './room-member.controller';
 export * from './message.controller';
 export * from './room-message.controller';
+export * from './image.controller';
+export * from './room-image.controller';

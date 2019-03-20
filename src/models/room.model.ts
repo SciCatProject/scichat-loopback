@@ -1,5 +1,6 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Event} from './event.model';
+import {Image} from './image.model';
 import {Member} from './member.model';
 import {Message} from './message.model';
 
@@ -65,6 +66,9 @@ export class Room extends Entity {
 
   @hasMany(() => Message)
   messages?: Message[];
+
+  @hasMany(() => Image)
+  images?: Image[];
 
   constructor(data?: Partial<Room>) {
     super(data);

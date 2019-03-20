@@ -6,8 +6,9 @@ import {
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';
 import {Getter, inject} from '@loopback/core';
-import {Event, Member, Message, Room} from '../models';
+import {Event, Image, Member, Message, Room} from '../models';
 import {EventRepository} from './event.repository';
+import {ImageRepository} from './image.repository';
 import {MemberRepository} from './member.repository';
 import {MessageRepository} from './message.repository';
 
@@ -17,6 +18,10 @@ export class RoomRepository extends DefaultCrudRepository<
 > {
   public readonly events: HasManyRepositoryFactory<
     Event,
+    typeof Room.prototype.id
+  >;
+  public readonly images: HasManyRepositoryFactory<
+    Image,
     typeof Room.prototype.id
   >;
   public readonly members: HasManyRepositoryFactory<
@@ -32,6 +37,8 @@ export class RoomRepository extends DefaultCrudRepository<
     @inject('datasources.mongo') dataSource: MongoDataSource,
     @repository.getter(EventRepository)
     protected eventRepositoryGetter: Getter<EventRepository>,
+    @repository.getter(ImageRepository)
+    protected imageRepositoryGetter: Getter<ImageRepository>,
     @repository.getter(MemberRepository)
     protected memberRepositoryGetter: Getter<MemberRepository>,
     @repository.getter(MessageRepository)
@@ -41,6 +48,10 @@ export class RoomRepository extends DefaultCrudRepository<
     this.events = this.createHasManyRepositoryFactoryFor(
       'events',
       eventRepositoryGetter,
+    );
+    this.images = this.createHasManyRepositoryFactoryFor(
+      'images',
+      imageRepositoryGetter,
     );
     this.members = this.createHasManyRepositoryFactoryFor(
       'members',
