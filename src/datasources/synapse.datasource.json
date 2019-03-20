@@ -1,0 +1,6 @@
+{
+  "name": "Synapse",
+  "connector": "rest",
+  "baseURL": "scicat03.esss.lu.se",
+  "crud": false
+}
