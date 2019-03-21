@@ -7,10 +7,10 @@ import {Message} from './message.model';
 @model()
 export class Room extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'string',

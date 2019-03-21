@@ -29,7 +29,7 @@ export class RoomMessageController {
     },
   })
   async create(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() message: Message,
   ): Promise<Message> {
     return await this.roomRepo.messages(id).create(message);
@@ -48,7 +48,7 @@ export class RoomMessageController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Message[]> {
     return await this.roomRepo.messages(id).find(filter);
@@ -63,7 +63,7 @@ export class RoomMessageController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() message: Partial<Message>,
     @param.query.object('where', getWhereSchemaFor(Message)) where?: Where,
   ): Promise<Count> {
@@ -79,7 +79,7 @@ export class RoomMessageController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Message)) where?: Where,
   ): Promise<Count> {
     return await this.roomRepo.messages(id).delete(where);

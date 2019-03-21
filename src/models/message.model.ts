@@ -40,9 +40,9 @@ export class Message extends Entity {
   type?: string;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  roomId: number;
+  roomId: string;
 
   constructor(data?: Partial<Message>) {
     super(data);

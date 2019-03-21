@@ -22,7 +22,7 @@ import {EventRepository} from '../repositories';
 export class EventController {
   constructor(
     @repository(EventRepository)
-    public eventRepository : EventRepository,
+    public eventRepository: EventRepository,
   ) {}
 
   @post('/events', {

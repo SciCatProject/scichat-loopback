@@ -29,7 +29,7 @@ export class RoomImageController {
     },
   })
   async create(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() image: Image,
   ): Promise<Image> {
     return await this.roomRepo.images(id).create(image);
@@ -48,7 +48,7 @@ export class RoomImageController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Image[]> {
     return await this.roomRepo.images(id).find(filter);
@@ -63,7 +63,7 @@ export class RoomImageController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() image: Partial<Image>,
     @param.query.object('where', getWhereSchemaFor(Image)) where?: Where,
   ): Promise<Count> {
@@ -79,7 +79,7 @@ export class RoomImageController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Image)) where?: Where,
   ): Promise<Count> {
     return await this.roomRepo.images(id).delete(where);

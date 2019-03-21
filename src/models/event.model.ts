@@ -44,9 +44,9 @@ export class Event extends Entity {
   type?: string;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  roomId: number;
+  roomId: string;
 
   constructor(data?: Partial<Event>) {
     super(data);

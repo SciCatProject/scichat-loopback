@@ -22,7 +22,7 @@ import {RoomRepository} from '../repositories';
 export class RoomController {
   constructor(
     @repository(RoomRepository)
-    public roomRepository : RoomRepository,
+    public roomRepository: RoomRepository,
   ) {}
 
   @post('/rooms', {
@@ -92,7 +92,7 @@ export class RoomController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Room> {
+  async findById(@param.path.string('id') id: string): Promise<Room> {
     return await this.roomRepository.findById(id);
   }
 
@@ -104,7 +104,7 @@ export class RoomController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() room: Room,
   ): Promise<void> {
     await this.roomRepository.updateById(id, room);
@@ -118,7 +118,7 @@ export class RoomController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() room: Room,
   ): Promise<void> {
     await this.roomRepository.replaceById(id, room);
@@ -131,7 +131,7 @@ export class RoomController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.roomRepository.deleteById(id);
   }
 }

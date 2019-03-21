@@ -69,9 +69,9 @@ export class Member extends Entity {
   type?: string;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  roomId: number;
+  roomId: string;
 
   constructor(data?: Partial<Member>) {
     super(data);

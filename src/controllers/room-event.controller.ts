@@ -29,7 +29,7 @@ export class RoomEventController {
     },
   })
   async create(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() event: Event,
   ): Promise<Event> {
     return await this.roomRepo.events(id).create(event);
@@ -48,7 +48,7 @@ export class RoomEventController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Event[]> {
     return await this.roomRepo.events(id).find(filter);
@@ -63,7 +63,7 @@ export class RoomEventController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() event: Partial<Event>,
     @param.query.object('where', getWhereSchemaFor(Event)) where?: Where,
   ): Promise<Count> {
@@ -79,7 +79,7 @@ export class RoomEventController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Event)) where?: Where,
   ): Promise<Count> {
     return await this.roomRepo.events(id).delete(where);

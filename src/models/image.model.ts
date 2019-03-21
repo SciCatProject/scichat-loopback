@@ -45,9 +45,9 @@ export class Image extends Entity {
   synapseRoomId?: string;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  roomId: number;
+  roomId: string;
 
   constructor(data?: Partial<Image>) {
     super(data);
