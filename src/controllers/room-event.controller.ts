@@ -20,7 +20,7 @@ import {RoomRepository} from '../repositories';
 export class RoomEventController {
   constructor(@repository(RoomRepository) protected roomRepo: RoomRepository) {}
 
-  @post('/room/{id}/events', {
+  @post('/rooms/{id}/events', {
     responses: {
       '200': {
         description: 'Room.Event model instance',
@@ -35,7 +35,7 @@ export class RoomEventController {
     return await this.roomRepo.events(id).create(event);
   }
 
-  @get('/room/{id}/events', {
+  @get('/rooms/{id}/events', {
     responses: {
       '200': {
         description: 'Array of Events belonging to Room',
@@ -54,7 +54,7 @@ export class RoomEventController {
     return await this.roomRepo.events(id).find(filter);
   }
 
-  @patch('/room/{id}/events', {
+  @patch('/rooms/{id}/events', {
     responses: {
       '200': {
         description: 'Room.Event PATCH success count',
@@ -70,7 +70,7 @@ export class RoomEventController {
     return await this.roomRepo.events(id).patch(event, where);
   }
 
-  @del('/room/{id}/events', {
+  @del('/rooms/{id}/events', {
     responses: {
       '200': {
         description: 'Room.Event DELETE success count',

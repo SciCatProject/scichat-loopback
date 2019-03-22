@@ -20,7 +20,7 @@ import {RoomRepository} from '../repositories';
 export class RoomMessageController {
   constructor(@repository(RoomRepository) protected roomRepo: RoomRepository) {}
 
-  @post('/room/{id}/messages', {
+  @post('/rooms/{id}/messages', {
     responses: {
       '200': {
         description: 'Room.Message model instance',
@@ -35,7 +35,7 @@ export class RoomMessageController {
     return await this.roomRepo.messages(id).create(message);
   }
 
-  @get('/room/{id}/messages', {
+  @get('/rooms/{id}/messages', {
     responses: {
       '200': {
         description: 'Array of Messages belonging to Room',
@@ -54,7 +54,7 @@ export class RoomMessageController {
     return await this.roomRepo.messages(id).find(filter);
   }
 
-  @patch('/room/{id}/messages', {
+  @patch('/rooms/{id}/messages', {
     responses: {
       '200': {
         description: 'Room.Message PATCH success count',
@@ -70,7 +70,7 @@ export class RoomMessageController {
     return await this.roomRepo.messages(id).patch(message, where);
   }
 
-  @del('/room/{id}/messages', {
+  @del('/rooms/{id}/messages', {
     responses: {
       '200': {
         description: 'Room.Message DELETE success count',

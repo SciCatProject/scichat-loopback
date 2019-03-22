@@ -20,7 +20,7 @@ import {RoomRepository} from '../repositories';
 export class RoomImageController {
   constructor(@repository(RoomRepository) protected roomRepo: RoomRepository) {}
 
-  @post('/room/{id}/images', {
+  @post('/rooms/{id}/images', {
     responses: {
       '200': {
         description: 'Room.Image model instance',
@@ -35,7 +35,7 @@ export class RoomImageController {
     return await this.roomRepo.images(id).create(image);
   }
 
-  @get('/room/{id}/images', {
+  @get('/rooms/{id}/images', {
     responses: {
       '200': {
         description: 'Array of Images belonging to Room',
@@ -54,7 +54,7 @@ export class RoomImageController {
     return await this.roomRepo.images(id).find(filter);
   }
 
-  @patch('/room/{id}/images', {
+  @patch('/rooms/{id}/images', {
     responses: {
       '200': {
         description: 'Room.Image PATCH success count',
@@ -70,7 +70,7 @@ export class RoomImageController {
     return await this.roomRepo.images(id).patch(image, where);
   }
 
-  @del('/room/{id}/images', {
+  @del('/rooms/{id}/images', {
     responses: {
       '200': {
         description: 'Room.Image DELETE success count',
