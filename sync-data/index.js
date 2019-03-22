@@ -4,27 +4,40 @@ const client = new MatrixRestClient();
 
 const loopbackBaseUrl = 'http://localhost:3000';
 
-client.findAllRooms().then(synapseRooms => {
-  getRooms().then(rooms => {
-    if (rooms.length === 0) {
-      synapseRooms.forEach(synapseRoom => {
-        console.log('Adding new room: ' + synapseRoom.name);
-        addRoom(synapseRoom);
-      });
-    } else {
-      synapseRooms.forEach(synapseRoom => {
-        rooms.forEach(room => {
-          if (synapseRoom.room_id !== room.roomId) {
-            console.log('Adding new room: ' + synapseRoom.name);
-            addRoom(synapseRoom);
-          }
-        });
-      });
-    }
-  });
-});
+let synapseRoomList;
 
-function addRoom(room) {
+client
+  .findAllRooms()
+  .then(synapseRooms => {
+    synapseRoomList = synapseRooms;
+    return getRooms();
+  })
+  .then(dbRooms => {
+    let dbRoomIds = [];
+    dbRooms.forEach(dbRoom => {
+      dbRoomIds.push(dbRoom.roomId);
+    });
+    synapseRoomList.forEach(synapseRoom => {
+      if (!dbRoomIds.includes(synapseRoom.room_id)) {
+        console.log('Adding new room: ' + synapseRoom.name);
+        postRoom(synapseRoom);
+      }
+    });
+  });
+
+// let syncResponse;
+
+// client
+//   .sync()
+//   .then(response => {
+//     syncResponse = response;
+//     return getRooms();
+//   })
+//   .then(rooms => {
+//     rooms.forEach(room => {});
+//   });
+
+function postRoom(room) {
   let newRoom = {
     canonicalAlias: room.canonical_alias,
     name: room.name,
@@ -53,6 +66,15 @@ function getRooms() {
         resolve(response.body);
       });
     })
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+function postRoomEvent(room, event) {
+  return superagent
+    .post(loopbackBaseUrl + `/rooms/${room.id}/events`)
+    .send(newEvent)
     .catch(err => {
       console.error(err);
     });
