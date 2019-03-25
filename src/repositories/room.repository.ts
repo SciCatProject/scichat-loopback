@@ -1,7 +1,6 @@
 import {
   DefaultCrudRepository,
   HasManyRepositoryFactory,
-  juggler,
   repository,
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';

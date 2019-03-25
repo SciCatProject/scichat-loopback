@@ -4,6 +4,7 @@ const client = new MatrixRestClient();
 
 const loopbackBaseUrl = 'http://localhost:3000';
 
+syncRooms();
 syncRoomEvents();
 
 function syncRooms() {
@@ -217,3 +218,8 @@ function createDbEventIdList(dbRoomEvents) {
   });
   return dbEventIds;
 }
+
+module.exports = {
+  syncRooms: syncRooms,
+  symcRoomEvents: syncRoomEvents,
+};
