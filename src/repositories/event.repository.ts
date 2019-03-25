@@ -2,7 +2,6 @@ import {Getter, inject} from '@loopback/core';
 import {
   BelongsToAccessor,
   DefaultCrudRepository,
-  juggler,
   repository,
 } from '@loopback/repository';
 import {MongoDataSource} from '../datasources';
