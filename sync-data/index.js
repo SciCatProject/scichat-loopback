@@ -4,7 +4,6 @@ const client = new MatrixRestClient();
 
 const loopbackBaseUrl = 'http://localhost:3000';
 
-syncRooms();
 syncRoomEvents();
 
 function syncRooms() {
@@ -22,23 +21,34 @@ function syncRooms() {
 
 function syncRoomEvents() {
   let syncResponse;
+  let dbRooms;
+  let dbEventIds;
   client
     .sync()
     .then(response => {
       syncResponse = response.rooms.join;
       return getRooms();
     })
-    .then(dbRooms => {
+    .then(dbRoomList => {
+      dbRooms = dbRoomList;
       let dbRoomEvents = createRoomEventMap('db', dbRooms);
-      setTimeout(() => {
-        let dbEventIds = createDbEventIdList(dbRoomEvents);
-        let synapseRoomEvents = createRoomEventMap(
-          'synapse',
-          dbRooms,
-          syncResponse,
-        );
-        compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
-      }, 200);
+      return new Promise((resolve, reject) => {
+        resolve(dbRoomEvents);
+      });
+    })
+    .then(dbRoomEvents => {
+      dbEventIds = createDbEventIdList(dbRoomEvents);
+      let synapseRoomEvents = createRoomEventMap(
+        'synapse',
+        dbRooms,
+        syncResponse,
+      );
+      return new Promise((resolve, reject) => {
+        resolve(synapseRoomEvents);
+      });
+    })
+    .then(synapseRoomEvents => {
+      compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
     });
 }
 
@@ -86,6 +96,19 @@ function getRooms() {
     });
 }
 
+function getEvents() {
+  return superagent
+    .get(loopbackBaseUrl + '/events')
+    .then(response => {
+      return new Promise((resolve, reject) => {
+        resolve(response.body);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}
+
 function postRoomEvent(dbRoomId, event) {
   let newEvent = {
     timestamp: event.origin_server_ts,
@@ -117,19 +140,6 @@ function compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
   });
 }
 
-function getRoomEvents(dbId) {
-  return superagent
-    .get(loopbackBaseUrl + `/rooms/${dbId}/events`)
-    .then(response => {
-      return new Promise((resolve, reject) => {
-        resolve(response.body);
-      });
-    })
-    .catch(err => {
-      console.error(err);
-    });
-}
-
 function createDbRoomIdList(rooms) {
   let dbRoomIds = [];
   rooms.forEach(room => {
@@ -139,23 +149,35 @@ function createDbRoomIdList(rooms) {
 }
 
 function createRoomEventMap(source, rooms, syncResponse) {
-  let roomEvents = [];
-  rooms.forEach(async room => {
-    let roomEventMap = {};
-    roomEventMap.dbId = room.id;
-    roomEventMap.roomId = room.roomId;
-    roomEventMap.name = room.name;
-    if (source === 'db') {
-      roomEventMap.events = await getRoomEvents(room.dbId);
-    } else if (source === 'synapse' && syncResponse) {
-      replaceNonallowedObjectKeyCharacters(room, syncResponse);
-      roomEventMap.events = syncResponse[room.roomId].timeline.events;
-    } else {
-      console.log(`Source '${source}' not recognized. Use 'db' or 'synapse'.`);
-    }
-    roomEvents.push(roomEventMap);
+  return getEvents().then(events => {
+    let roomEvents = [];
+    rooms.forEach(room => {
+      let roomEventMap = {};
+      roomEventMap.dbId = room.id;
+      roomEventMap.roomId = room.roomId;
+      roomEventMap.name = room.name;
+      if (source === 'db') {
+        let eventList = [];
+        events.forEach(event => {
+          if (event.roomId === room.id) {
+            eventList.push(event);
+          }
+        });
+        roomEventMap.events = eventList;
+      } else if (source === 'synapse' && syncResponse) {
+        replaceNonallowedObjectKeyCharacters(room, syncResponse);
+        roomEventMap.events = syncResponse[room.roomId].timeline.events;
+      } else {
+        console.log(
+          `Source '${source}' not recognized. Use 'db' or 'synapse'.`,
+        );
+      }
+      roomEvents.push(roomEventMap);
+    });
+    return new Promise((resolve, reject) => {
+      resolve(roomEvents);
+    });
   });
-  return roomEvents;
 }
 
 function replaceNonallowedObjectKeyCharacters(room, syncResponse) {
