@@ -22,7 +22,7 @@ import {MessageRepository} from '../repositories';
 export class MessageController {
   constructor(
     @repository(MessageRepository)
-    public messageRepository : MessageRepository,
+    public messageRepository: MessageRepository,
   ) {}
 
   @post('/messages', {
@@ -92,7 +92,7 @@ export class MessageController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Message> {
+  async findById(@param.path.string('id') id: string): Promise<Message> {
     return await this.messageRepository.findById(id);
   }
 
@@ -104,7 +104,7 @@ export class MessageController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() message: Message,
   ): Promise<void> {
     await this.messageRepository.updateById(id, message);
@@ -118,7 +118,7 @@ export class MessageController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() message: Message,
   ): Promise<void> {
     await this.messageRepository.replaceById(id, message);
@@ -131,7 +131,7 @@ export class MessageController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.messageRepository.deleteById(id);
   }
 }

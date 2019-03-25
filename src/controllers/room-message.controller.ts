@@ -51,7 +51,9 @@ export class RoomMessageController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Message[]> {
-    return await this.roomRepo.messages(id).find(filter);
+    return await this.roomRepo
+      .messages(id)
+      .find(filter, {strictObjectIDCoercion: true});
   }
 
   @patch('/rooms/{id}/messages', {

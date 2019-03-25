@@ -1,12 +1,13 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Room} from './room.model';
 
 @model()
 export class Image extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'object',
@@ -44,9 +45,7 @@ export class Image extends Entity {
   })
   synapseRoomId?: string;
 
-  @property({
-    type: 'string',
-  })
+  @belongsTo(() => Room)
   roomId: string;
 
   constructor(data?: Partial<Image>) {

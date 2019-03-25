@@ -51,7 +51,9 @@ export class RoomEventController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Event[]> {
-    return await this.roomRepo.events(id).find(filter);
+    return await this.roomRepo
+      .events(id)
+      .find(filter, {strictObjectIDCoercion: true});
   }
 
   @patch('/rooms/{id}/events', {

@@ -4,52 +4,46 @@ const client = new MatrixRestClient();
 
 const loopbackBaseUrl = 'http://localhost:3000';
 
+syncRooms();
+syncRoomEvents();
+
 function syncRooms() {
-  let synapseRoomList;
+  let synapseRooms;
   client
     .findAllRooms()
-    .then(synapseRooms => {
-      synapseRoomList = synapseRooms;
+    .then(allSynapseRooms => {
+      synapseRooms = allSynapseRooms;
       return getRooms();
     })
     .then(dbRooms => {
-      let dbRoomIds = [];
-      dbRooms.forEach(dbRoom => {
-        dbRoomIds.push(dbRoom.roomId);
-      });
-      synapseRoomList.forEach(synapseRoom => {
-        if (!dbRoomIds.includes(synapseRoom.room_id)) {
-          console.log('Adding new room: ' + synapseRoom.name);
-          postRoom(synapseRoom);
-        }
-      });
+      compareAndPostRooms(dbRooms, synapseRooms);
     });
 }
 
-let syncResponse;
-
-client
-  .sync()
-  .then(response => {
-    syncResponse = response;
-    return getRooms();
-  })
-  .then(dbRooms => {
-    let dbIds = [];
-    let dbRoomIds = [];
-    dbRooms.forEach(dbRoom => {
-      dbIds.push(dbRoom.id);
-      dbRoomIds.push(dbRoom.roomId);
+function syncRoomEvents() {
+  let syncResponse;
+  client
+    .sync()
+    .then(response => {
+      syncResponse = response.rooms.join;
+      return getRooms();
+    })
+    .then(dbRooms => {
+      let dbRoomEvents = createRoomEventMap('db', dbRooms);
+      setTimeout(() => {
+        let dbEventIds = createDbEventIdList(dbRoomEvents);
+        let synapseRoomEvents = createRoomEventMap(
+          'synapse',
+          dbRooms,
+          syncResponse,
+        );
+        compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
+      }, 200);
     });
-    console.log(dbIds);
-    let dbRoomEvents = [];
-    dbIds.forEach(async dbId => {
-      dbRoomEvents.push(await getRoomEvents(dbId));
-    });
-    console.log(dbRoomEvents);
-  });
+}
 
 function postRoom(room) {
+  console.log('Adding new room: ' + room.name);
   let newRoom = {
     canonicalAlias: room.canonical_alias,
     name: room.name,
@@ -70,6 +64,15 @@ function postRoom(room) {
     });
 }
 
+function compareAndPostRooms(dbRooms, synapseRooms) {
+  let dbRoomIds = createDbRoomIdList(dbRooms);
+  synapseRooms.forEach(room => {
+    if (!dbRoomIds.includes(room.room_id)) {
+      postRoom(room);
+    }
+  });
+}
+
 function getRooms() {
   return superagent
     .get(loopbackBaseUrl + '/rooms')
@@ -83,13 +86,35 @@ function getRooms() {
     });
 }
 
-function postRoomEvent(room, event) {
+function postRoomEvent(dbRoomId, event) {
+  let newEvent = {
+    timestamp: event.origin_server_ts,
+    sender: event.sender,
+    eventId: event.event_id,
+    unsigned: event.unsigned,
+    stateKey: event.state_key,
+    content: event.content,
+    type: event.type,
+  };
   return superagent
-    .post(loopbackBaseUrl + `/rooms/${room.id}/events`)
+    .post(loopbackBaseUrl + `/rooms/${dbRoomId}/events`)
     .send(newEvent)
     .catch(err => {
       console.error(err);
     });
+}
+
+function compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
+  synapseRoomEvents.forEach(synapseRoomEvent => {
+    synapseRoomEvent.events.forEach(event => {
+      if (!dbEventIds.includes(event.event_id)) {
+        console.log(
+          `Adding event '${event.event_id}' to room '${synapseRoomEvent.name}'`,
+        );
+        postRoomEvent(synapseRoomEvent.dbId, event);
+      }
+    });
+  });
 }
 
 function getRoomEvents(dbId) {
@@ -103,4 +128,70 @@ function getRoomEvents(dbId) {
     .catch(err => {
       console.error(err);
     });
+}
+
+function createDbRoomIdList(rooms) {
+  let dbRoomIds = [];
+  rooms.forEach(room => {
+    dbRoomIds.push(room.roomId);
+  });
+  return dbRoomIds;
+}
+
+function createRoomEventMap(source, rooms, syncResponse) {
+  let roomEvents = [];
+  rooms.forEach(async room => {
+    let roomEventMap = {};
+    roomEventMap.dbId = room.id;
+    roomEventMap.roomId = room.roomId;
+    roomEventMap.name = room.name;
+    if (source === 'db') {
+      roomEventMap.events = await getRoomEvents(room.dbId);
+    } else if (source === 'synapse' && syncResponse) {
+      replaceNonallowedObjectKeyCharacters(room, syncResponse);
+      roomEventMap.events = syncResponse[room.roomId].timeline.events;
+    } else {
+      console.log(`Source '${source}' not recognized. Use 'db' or 'synapse'.`);
+    }
+    roomEvents.push(roomEventMap);
+  });
+  return roomEvents;
+}
+
+function replaceNonallowedObjectKeyCharacters(room, syncResponse) {
+  let keys;
+  syncResponse[room.roomId].timeline.events.forEach(event => {
+    if (event.type === 'm.room.power_levels') {
+      keys = Object.keys(event.content.users);
+      for (let i = 0; i < keys.length; i++) {
+        event.content.users[keys[i].replace(/[^\w\@]/g, '_')] =
+          event.content.users[keys[i]];
+        delete event.content.users[keys[i]];
+      }
+      keys = Object.keys(event.content.events);
+      for (let i = 0; i < keys.length; i++) {
+        event.content.events[keys[i].replace(/\W/g, '_')] =
+          event.content.events[keys[i]];
+        delete event.content.events[keys[i]];
+      }
+    } else if (event.type === 'm.room.create') {
+      keys = Object.keys(event.content);
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i].indexOf('m.') == 0) {
+          event.content[keys[i].replace(/\W/g, '_')] = event.content[keys[i]];
+          delete event.content[keys[i]];
+        }
+      }
+    }
+  });
+}
+
+function createDbEventIdList(dbRoomEvents) {
+  let dbEventIds = [];
+  dbRoomEvents.forEach(dbRoomEvent => {
+    dbRoomEvent.events.forEach(dbEvent => {
+      dbEventIds.push(dbEvent.eventId);
+    });
+  });
+  return dbEventIds;
 }

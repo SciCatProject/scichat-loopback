@@ -92,7 +92,7 @@ export class EventController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Event> {
+  async findById(@param.path.string('id') id: string): Promise<Event> {
     return await this.eventRepository.findById(id);
   }
 
@@ -104,7 +104,7 @@ export class EventController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() event: Event,
   ): Promise<void> {
     await this.eventRepository.updateById(id, event);
@@ -118,7 +118,7 @@ export class EventController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() event: Event,
   ): Promise<void> {
     await this.eventRepository.replaceById(id, event);
@@ -131,7 +131,7 @@ export class EventController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.eventRepository.deleteById(id);
   }
 }

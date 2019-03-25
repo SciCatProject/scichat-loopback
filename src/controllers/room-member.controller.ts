@@ -51,7 +51,9 @@ export class RoomMemberController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Member[]> {
-    return await this.roomRepo.members(id).find(filter);
+    return await this.roomRepo
+      .members(id)
+      .find(filter, {strictObjectIDCoercion: true});
   }
 
   @patch('/rooms/{id}/members', {

@@ -51,7 +51,9 @@ export class RoomImageController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter,
   ): Promise<Image[]> {
-    return await this.roomRepo.images(id).find(filter);
+    return await this.roomRepo
+      .images(id)
+      .find(filter, {strictObjectIDCoercion: true});
   }
 
   @patch('/rooms/{id}/images', {

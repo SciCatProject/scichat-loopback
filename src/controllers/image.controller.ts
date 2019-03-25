@@ -22,7 +22,7 @@ import {ImageRepository} from '../repositories';
 export class ImageController {
   constructor(
     @repository(ImageRepository)
-    public imageRepository : ImageRepository,
+    public imageRepository: ImageRepository,
   ) {}
 
   @post('/images', {
@@ -92,7 +92,7 @@ export class ImageController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Image> {
+  async findById(@param.path.string('id') id: string): Promise<Image> {
     return await this.imageRepository.findById(id);
   }
 
@@ -104,7 +104,7 @@ export class ImageController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() image: Image,
   ): Promise<void> {
     await this.imageRepository.updateById(id, image);
@@ -118,7 +118,7 @@ export class ImageController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() image: Image,
   ): Promise<void> {
     await this.imageRepository.replaceById(id, image);
@@ -131,7 +131,7 @@ export class ImageController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.imageRepository.deleteById(id);
   }
 }

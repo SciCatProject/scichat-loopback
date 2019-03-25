@@ -1,12 +1,13 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Room} from './room.model';
 
 @model()
 export class Message extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'number',
@@ -39,9 +40,7 @@ export class Message extends Entity {
   })
   type?: string;
 
-  @property({
-    type: 'string',
-  })
+  @belongsTo(() => Room)
   roomId: string;
 
   constructor(data?: Partial<Message>) {

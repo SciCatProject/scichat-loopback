@@ -22,7 +22,7 @@ import {MemberRepository} from '../repositories';
 export class MemberController {
   constructor(
     @repository(MemberRepository)
-    public memberRepository : MemberRepository,
+    public memberRepository: MemberRepository,
   ) {}
 
   @post('/members', {
@@ -92,7 +92,7 @@ export class MemberController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Member> {
+  async findById(@param.path.string('id') id: string): Promise<Member> {
     return await this.memberRepository.findById(id);
   }
 
@@ -104,7 +104,7 @@ export class MemberController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() member: Member,
   ): Promise<void> {
     await this.memberRepository.updateById(id, member);
@@ -118,7 +118,7 @@ export class MemberController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() member: Member,
   ): Promise<void> {
     await this.memberRepository.replaceById(id, member);
@@ -131,7 +131,7 @@ export class MemberController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.memberRepository.deleteById(id);
   }
 }
