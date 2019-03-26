@@ -150,22 +150,20 @@ module.exports = class SyncData {
   compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
     return Promise.all(
       synapseRoomEvents.map(synapseRoomEvent => {
-        return Promise.resolve(
-          synapseRoomEvent.events.map(event => {
-            if (!dbEventIds.includes(event.event_id)) {
-              console.log(
-                `Adding event '${event.event_id}' to room '${
-                  synapseRoomEvent.name
-                }'`,
-              );
-              return this.postRoomEvent(synapseRoomEvent.dbId, event);
-            } else {
-              return new Promise((resolve, reject) => {
-                resolve({});
-              });
-            }
-          }),
-        );
+        return synapseRoomEvent.events.map(event => {
+          if (!dbEventIds.includes(event.event_id)) {
+            console.log(
+              `Adding event '${event.event_id}' to room '${
+                synapseRoomEvent.name
+              }'`,
+            );
+            return this.postRoomEvent(synapseRoomEvent.dbId, event);
+          } else {
+            return new Promise((resolve, reject) => {
+              resolve({});
+            });
+          }
+        });
       }),
     );
   }

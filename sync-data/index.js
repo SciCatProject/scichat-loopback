@@ -8,3 +8,7 @@ sync.syncRooms().then(response => {
 sync.syncRoomEvents().then(response => {
   console.log(response);
 });
+
+sync.getRooms().then(response => {
+  console.log(response);
+});

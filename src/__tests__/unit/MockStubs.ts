@@ -1,36 +1,14 @@
 let findAllRoomsResponse: any = [
   {
-    canonical_alias: '#ERIC:scicat03.esss.lu.se',
-    name: 'ERIC',
+    canonical_alias: 'string',
+    name: 'string',
     world_readable: false,
-    topic: 'Chat log for ESS ERIC',
-    num_joined_members: 2,
-    'm.federate': false,
-    room_id: '!MuqtjGUIpjdcDgtDtv:scicat03.esss.lu.se',
-    guest_can_join: false,
-    aliases: ['#ERIC:scicat03.esss.lu.se'],
-  },
-  {
-    canonical_alias: '#Proposal01:scicat03.esss.lu.se',
-    name: 'Proposal01',
-    world_readable: false,
-    topic: 'Logbook for Proposal01',
+    topic: 'string',
     num_joined_members: 1,
     'm.federate': false,
-    room_id: '!egqxdtaULWuaqnbAJe:scicat03.esss.lu.se',
+    room_id: '!string',
     guest_can_join: false,
-    aliases: ['#Proposal01:scicat03.esss.lu.se'],
-  },
-  {
-    canonical_alias: '#Proposal02:scicat03.esss.lu.se',
-    name: 'Proposal02',
-    world_readable: false,
-    topic: 'Logbook for Proposal02',
-    num_joined_members: 1,
-    'm.federate': false,
-    room_id: '!hedJnkXsgKVYxLJbal:scicat03.esss.lu.se',
-    guest_can_join: false,
-    aliases: ['#Proposal02:scicat03.esss.lu.se'],
+    aliases: ['#string'],
   },
 ];
 
@@ -323,6 +301,30 @@ let postRoomResponse: any = {
   aliases: ['#string'],
 };
 
-let getRoomsResponse: any = [];
+let emptyArray: any = [];
 
-export {findAllRoomsResponse, syncResponse, postRoomResponse, getRoomsResponse};
+let emptyObject: any = {};
+
+let getRoomsResponse: any = [
+  {
+    id: 'string',
+    canonicalAlias: 'string',
+    name: 'string',
+    worldReadable: false,
+    topic: 'string',
+    numberOfJoinedMembers: 1,
+    federate: false,
+    roomId: '!string',
+    guestCanJoin: false,
+    aliases: ['#string'],
+  },
+];
+
+export {
+  findAllRoomsResponse,
+  syncResponse,
+  postRoomResponse,
+  emptyArray,
+  emptyObject,
+  getRoomsResponse,
+};
