@@ -56,6 +56,7 @@
     "@loopback/rest": "^1.8.0",
     "@loopback/rest-explorer": "^1.1.11",
     "@loopback/service-proxy": "^1.0.10",
+    "@types/chai": "^4.1.7",
     "loopback-connector-mongodb": "^4.0.0",
     "loopback-connector-rest": "^3.4.1",
     "mongodb": "^3.1.13",
