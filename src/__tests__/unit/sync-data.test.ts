@@ -24,7 +24,7 @@ afterEach(function(done) {
 
 describe('Unit tests for sync-data', function() {
   describe('#syncRooms()', function() {
-    it('should return an array of synced Room objects', function() {
+    it('should return an array of synced Room objects when roomId is not in db', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findAllRooms')
         .resolves(findAllRoomsResponse);
@@ -38,7 +38,7 @@ describe('Unit tests for sync-data', function() {
       });
     });
 
-    it('should return an array of empty objects', function() {
+    it('should return an array of empty objects when roomId is already in db', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findAllRooms')
         .resolves(findAllRoomsResponse);
@@ -53,7 +53,7 @@ describe('Unit tests for sync-data', function() {
   });
 
   describe('#syncRoomEvents()', function() {
-    it('should return an array of synced Room Event objects', function() {
+    it('should return an array of synced Room Event objects when eventId is not in db', function() {
       sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
       sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox.stub(SyncData.prototype, 'getEvents').resolves(emptyArray);
@@ -70,7 +70,7 @@ describe('Unit tests for sync-data', function() {
         });
       });
     });
-    it('should return an array of empty objects', function() {
+    it('should return an array of empty objects when eventId is already in db', function() {
       sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
       sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox.stub(SyncData.prototype, 'getEvents').resolves(getEventsResponse);
