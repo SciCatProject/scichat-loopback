@@ -85,16 +85,17 @@ module.exports = class SyncData {
 
   compareAndPostRooms(dbRooms, synapseRooms) {
     let dbRoomIds = this.createDbRoomIdList(dbRooms);
-    synapseRooms.forEach(room => {
-      if (!dbRoomIds.includes(room.room_id)) {
-        return this.postRoom(room);
-      } else {
-        return new Promise((resolve, reject) => {
-          console.log(`Room ${room.name} already in db.`);
-          resolve({});
-        });
-      }
-    });
+    return Promise.all(
+      synapseRooms.map(room => {
+        if (!dbRoomIds.includes(room.room_id)) {
+          return this.postRoom(room);
+        } else {
+          return new Promise((resolve, reject) => {
+            resolve({});
+          });
+        }
+      }),
+    );
   }
 
   getRooms() {
@@ -147,23 +148,26 @@ module.exports = class SyncData {
   }
 
   compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
-    synapseRoomEvents.forEach(synapseRoomEvent => {
-      synapseRoomEvent.events.forEach(event => {
-        if (!dbEventIds.includes(event.event_id)) {
-          console.log(
-            `Adding event '${event.event_id}' to room '${
-              synapseRoomEvent.name
-            }'`,
-          );
-          return this.postRoomEvent(synapseRoomEvent.dbId, event);
-        } else {
-          console.log(`Event ${event.event_id} already in db.`);
-          return new Promise((resolve, reject) => {
-            resolve({});
-          });
-        }
-      });
-    });
+    return Promise.all(
+      synapseRoomEvents.map(synapseRoomEvent => {
+        return Promise.resolve(
+          synapseRoomEvent.events.map(event => {
+            if (!dbEventIds.includes(event.event_id)) {
+              console.log(
+                `Adding event '${event.event_id}' to room '${
+                  synapseRoomEvent.name
+                }'`,
+              );
+              return this.postRoomEvent(synapseRoomEvent.dbId, event);
+            } else {
+              return new Promise((resolve, reject) => {
+                resolve({});
+              });
+            }
+          }),
+        );
+      }),
+    );
   }
 
   createDbRoomIdList(rooms) {

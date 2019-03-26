@@ -323,4 +323,6 @@ let postRoomResponse: any = {
   aliases: ['#string'],
 };
 
-export {findAllRoomsResponse, syncResponse, postRoomResponse};
+let getRoomsResponse: any = [];
+
+export {findAllRoomsResponse, syncResponse, postRoomResponse, getRoomsResponse};

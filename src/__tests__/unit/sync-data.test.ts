@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {createSandbox} from 'sinon';
 import {
   findAllRoomsResponse,
+  getRoomsResponse,
   postRoomResponse,
   syncResponse,
 } from './MockStubs';
@@ -23,10 +24,13 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findAllRooms')
         .resolves(findAllRoomsResponse);
+      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox.stub(SyncData.prototype, 'postRoom').resolves(postRoomResponse);
-      console.log('Testing');
-      return sync.syncRooms().then((response: any) => {
-        console.log(response);
+      return sync.syncRooms().then((rooms: any) => {
+        expect(rooms).to.be.an('array');
+        rooms.forEach((room: any) => {
+          expect(room).to.be.an('object');
+        });
       });
     });
   });
