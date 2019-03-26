@@ -124,7 +124,10 @@ module.exports = class SyncData {
       });
   }
 
-  postRoomEvent(dbRoomId, event) {
+  postRoomEvent(synapseRoomEvent, event) {
+    console.log(
+      `Adding event '${event.event_id}' to room '${synapseRoomEvent.name}'`,
+    );
     let newEvent = {
       timestamp: event.origin_server_ts,
       sender: event.sender,
@@ -135,7 +138,7 @@ module.exports = class SyncData {
       type: event.type,
     };
     return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${dbRoomId}/events`)
+      .post(this._loopbackBaseUrl + `/rooms/${synapseRoomEvent.dbId}/events`)
       .send(newEvent)
       .then(response => {
         return new Promise((resolve, reject) => {
@@ -153,12 +156,7 @@ module.exports = class SyncData {
         return Promise.all(
           synapseRoomEvent.events.map(event => {
             if (!dbEventIds.includes(event.event_id)) {
-              console.log(
-                `Adding event '${event.event_id}' to room '${
-                  synapseRoomEvent.name
-                }'`,
-              );
-              return this.postRoomEvent(synapseRoomEvent.dbId, event);
+              return this.postRoomEvent(synapseRoomEvent, event);
             } else {
               return new Promise((resolve, reject) => {
                 resolve({});
