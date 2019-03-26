@@ -7,6 +7,8 @@ import {
   syncResponse,
   emptyArray,
   emptyObject,
+  postRoomEventResponse,
+  getEventsResponse,
 } from './MockStubs';
 
 const sandbox = createSandbox();
@@ -31,7 +33,7 @@ describe('Unit tests for sync-data', function() {
       return sync.syncRooms().then((rooms: any) => {
         expect(rooms).to.be.an('array');
         rooms.forEach((room: any) => {
-          expect(room).to.be.an('object');
+          expect(room).to.be.an('object').that.is.not.empty;
         });
       });
     });
@@ -45,6 +47,40 @@ describe('Unit tests for sync-data', function() {
         expect(rooms).to.be.an('array');
         rooms.forEach((room: any) => {
           expect(room).to.be.an('object').that.is.empty;
+        });
+      });
+    });
+  });
+
+  describe('#syncRoomEvents()', function() {
+    it('should return an array of synced Room Event objects', function() {
+      sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
+      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
+      sandbox.stub(SyncData.prototype, 'getEvents').resolves(emptyArray);
+      sandbox
+        .stub(SyncData.prototype, 'postRoomEvent')
+        .resolves(postRoomEventResponse);
+      return sync.syncRoomEvents().then((roomEvents: any) => {
+        expect(roomEvents).to.be.an('array');
+        roomEvents.forEach((events: any) => {
+          expect(events).to.be.an('array');
+          events.forEach((event: any) => {
+            expect(event).to.be.an('object').that.is.not.empty;
+          });
+        });
+      });
+    });
+    it('should return an array of empty objects', function() {
+      sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
+      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
+      sandbox.stub(SyncData.prototype, 'getEvents').resolves(getEventsResponse);
+      return sync.syncRoomEvents().then((roomEvents: any) => {
+        expect(roomEvents).to.be.an('array');
+        roomEvents.forEach((events: any) => {
+          expect(events).to.be.an('array');
+          events.forEach((event: any) => {
+            expect(event).to.be.an('object').that.is.empty;
+          });
         });
       });
     });
