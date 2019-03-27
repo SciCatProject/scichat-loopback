@@ -1,6 +1,8 @@
 const superagent = require('superagent');
 const MatrixRestClient = require('./matrix-rest-client');
 const client = new MatrixRestClient();
+const Utils = require('./Utils');
+const util = new Utils();
 
 module.exports = class SyncData {
   constructor() {
@@ -33,7 +35,7 @@ module.exports = class SyncData {
         return this.createDbRoomEventMap(dbRooms);
       })
       .then(dbRoomEvents => {
-        dbEventIds = this.createDbEventIdList(dbRoomEvents);
+        dbEventIds = util.createDbEventIdList(dbRoomEvents);
         return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
@@ -51,7 +53,7 @@ module.exports = class SyncData {
         return this.createDbRoomMessageMap(dbRooms);
       })
       .then(dbRoomMessages => {
-        dbMessageIds = this.createDbMessageIdList(dbRoomMessages);
+        dbMessageIds = util.createDbMessageIdList(dbRoomMessages);
         return this.createSynapseRoomMessageMap(dbRooms);
       })
       .then(synapseRoomMessages => {
@@ -252,7 +254,7 @@ module.exports = class SyncData {
     };
 
     return superagent
-      .post(this._loopbackBaseUrl + `/${dbId}/members`)
+      .post(this._loopbackBaseUrl + `/rooms/${dbId}/members`)
       .send(newMember)
       .then(response => {
         return new Promise((resolve, reject) => {
@@ -289,7 +291,7 @@ module.exports = class SyncData {
     };
 
     return superagent
-      .post(this._loopbackBaseUrl + `/${dbId}/images`)
+      .post(this._loopbackBaseUrl + `/rooms/${dbId}/images`)
       .send(newImage)
       .then(response => {
         return new Promise((resolve, reject) => {
@@ -359,6 +361,7 @@ module.exports = class SyncData {
           roomEventMap.name = room.name;
           synapseRoomEvents.forEach(roomEvent => {
             if (roomEvent.roomId === room.roomId) {
+              util.replaceNonallowedObjectKeyCharacters(roomEvent.events);
               roomEventMap.events = roomEvent.events;
             }
           });
@@ -418,53 +421,5 @@ module.exports = class SyncData {
       .catch(err => {
         console.error(err);
       });
-  }
-
-  replaceNonallowedObjectKeyCharacters(room, syncResponse) {
-    let keys;
-    syncResponse[room.roomId].timeline.events.forEach(event => {
-      if (event.type === 'm.room.power_levels') {
-        keys = Object.keys(event.content.users);
-        for (let i = 0; i < keys.length; i++) {
-          event.content.users[keys[i].replace(/[^\w\@]/g, '_')] =
-            event.content.users[keys[i]];
-          delete event.content.users[keys[i]];
-        }
-        keys = Object.keys(event.content.events);
-        for (let i = 0; i < keys.length; i++) {
-          event.content.events[keys[i].replace(/\W/g, '_')] =
-            event.content.events[keys[i]];
-          delete event.content.events[keys[i]];
-        }
-      } else if (event.type === 'm.room.create') {
-        keys = Object.keys(event.content);
-        for (let i = 0; i < keys.length; i++) {
-          if (keys[i].indexOf('m.') == 0) {
-            event.content[keys[i].replace(/\W/g, '_')] = event.content[keys[i]];
-            delete event.content[keys[i]];
-          }
-        }
-      }
-    });
-  }
-
-  createDbEventIdList(dbRoomEvents) {
-    let dbEventIds = [];
-    dbRoomEvents.forEach(dbRoomEvent => {
-      dbRoomEvent.events.forEach(dbEvent => {
-        dbEventIds.push(dbEvent.eventId);
-      });
-    });
-    return dbEventIds;
-  }
-
-  createDbMessageIdList(dbRoomMessages) {
-    let dbMessageIds = [];
-    dbRoomMessages.forEach(dbRoomMessage => {
-      dbRoomMessage.messages.forEach(dbMessage => {
-        dbMessageIds.push(dbMessage.eventId);
-      });
-    });
-    return dbMessageIds;
   }
 };
