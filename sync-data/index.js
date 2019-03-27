@@ -5,6 +5,10 @@ const sync = new SyncData();
 //   console.log(response);
 // });
 
-sync.syncRoomEvents().then(response => {
+// sync.syncRoomEvents().then(response => {
+//   console.log(response);
+// });
+
+sync.syncRoomMessages().then(response => {
   console.log(response);
 });

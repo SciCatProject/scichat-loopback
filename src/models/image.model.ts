@@ -17,7 +17,7 @@ export class Image extends Entity {
   @property({
     type: 'string',
   })
-  synapseEventId?: string;
+  eventId?: string;
 
   @property({
     type: 'number',

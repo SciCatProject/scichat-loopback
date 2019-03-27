@@ -43,7 +43,7 @@ module.exports = class SyncData {
 
   syncRoomMessages() {
     let dbRooms;
-    let dbEventIds;
+    let dbMessageIds;
 
     return this.getRooms()
       .then(getRoomsResponse => {
@@ -51,11 +51,14 @@ module.exports = class SyncData {
         return this.createDbRoomMessageMap(dbRooms);
       })
       .then(dbRoomMessages => {
-        dbEventIds = this.createDbEventIdList(dbRoomMessages);
+        dbMessageIds = this.createDbMessageIdList(dbRoomMessages);
         return this.createSynapseRoomMessageMap(dbRooms);
       })
       .then(synapseRoomMessages => {
-        return this.compareAndPostRoomMessages(dbEventIds, synapseRoomMessages);
+        return this.compareAndPostRoomMessages(
+          dbMessageIds,
+          synapseRoomMessages,
+        );
       });
   }
 
@@ -171,18 +174,23 @@ module.exports = class SyncData {
       });
   }
 
-  postMessage() {
+  postRoomMessage(synapseRoomMessage, message) {
+    console.log(
+      `Adding event '${message.event_id}' to room '${synapseRoomMessage.name}'`,
+    );
     let newMessage = {
-      timestamp: 0,
-      sender: 'string',
-      synapseEventId: 'string',
-      unsigned: {},
-      content: {},
-      type: 'string',
+      timestamp: message.origin_server_ts,
+      sender: message.sender,
+      eventId: message.event_id,
+      unsigned: message.unsigned,
+      content: message.content,
+      type: message.type,
     };
 
     return superagent
-      .post(this._loopbackBaseUrl + `/${dbId}/messages`)
+      .post(
+        this._loopbackBaseUrl + `/rooms/${synapseRoomMessage.dbId}/messages`,
+      )
       .send(newMessage)
       .then(response => {
         return new Promise((resolve, reject) => {
@@ -192,6 +200,24 @@ module.exports = class SyncData {
       .catch(err => {
         console.error(err);
       });
+  }
+
+  compareAndPostRoomMessages(dbMessageIds, synapseRoomMessages) {
+    return Promise.all(
+      synapseRoomMessages.map(synapseRoomMessage => {
+        return Promise.all(
+          synapseRoomMessage.messages.map(message => {
+            if (!dbMessageIds.includes(message.event_id)) {
+              return this.postRoomMessage(synapseRoomMessage, message);
+            } else {
+              return new Promise((resolve, reject) => {
+                resolve({});
+              });
+            }
+          }),
+        );
+      }),
+    );
   }
 
   getMessages() {
@@ -375,20 +401,16 @@ module.exports = class SyncData {
     )
       .then(synapseRoomMessages => {
         let roomMessages = [];
-        rooms.forEach(room => {
+        for (let i = 0; i < rooms.length; i++) {
           let roomMessageMap = {};
-          roomMessageMap.dbId = room.id;
-          roomMessageMap.roomId = room.roomId;
-          roomMessageMap.name = room.name;
-          synapseRoomMessages.forEach(roomMessage => {
-            if (roomMessage.roomId === room.roomId) {
-              roomMessageMap.messages = roomMessage.messages;
-            }
-          });
-          roomEvents.push(roomEventMap);
-        });
+          roomMessageMap.dbId = rooms[i].id;
+          roomMessageMap.roomId = rooms[i].roomId;
+          roomMessageMap.name = rooms[i].name;
+          roomMessageMap.messages = synapseRoomMessages[i];
+          roomMessages.push(roomMessageMap);
+        }
         return new Promise((resolve, reject) => {
-          resolve(roomEvents);
+          resolve(roomMessages);
         });
       })
       .catch(err => {
@@ -432,5 +454,11 @@ module.exports = class SyncData {
       });
     });
     return dbEventIds;
+  }
+
+  createDbMessageIdList(dbRoomMessages) {
+    return dbRoomMessages.map(dbMessage => {
+      return dbMessage.eventId;
+    });
   }
 };

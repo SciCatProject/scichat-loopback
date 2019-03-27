@@ -22,7 +22,7 @@ export class Message extends Entity {
   @property({
     type: 'string',
   })
-  synapseEventId?: string;
+  eventId?: string;
 
   @property({
     type: 'object',
