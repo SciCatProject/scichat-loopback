@@ -24,35 +24,38 @@ module.exports = class SyncData {
   }
 
   syncRoomEvents() {
-    let syncResponse;
     let dbRooms;
     let dbEventIds;
-    return client
-      .sync()
-      .then(response => {
-        syncResponse = response.rooms.join;
-        return this.getRooms();
-      })
-      .then(dbRoomList => {
-        dbRooms = dbRoomList;
-        let dbRoomEvents = this.createRoomEventMap('db', dbRooms);
-        return new Promise((resolve, reject) => {
-          resolve(dbRoomEvents);
-        });
+
+    return this.getRooms()
+      .then(getRoomsResponse => {
+        dbRooms = getRoomsResponse;
+        return this.createDbRoomEventMap(dbRooms);
       })
       .then(dbRoomEvents => {
         dbEventIds = this.createDbEventIdList(dbRoomEvents);
-        let synapseRoomEvents = this.createRoomEventMap(
-          'synapse',
-          dbRooms,
-          syncResponse,
-        );
-        return new Promise((resolve, reject) => {
-          resolve(synapseRoomEvents);
-        });
+        return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
         return this.compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
+      });
+  }
+
+  syncRoomMessages() {
+    let dbRooms;
+    let dbEventIds;
+
+    return this.getRooms()
+      .then(getRoomsResponse => {
+        dbRooms = getRoomsResponse;
+        return this.createDbRoomMessageMap(dbRooms);
+      })
+      .then(dbRoomMessages => {
+        dbEventIds = this.createDbEventIdList(dbRoomMessages);
+        return this.createSynapseRoomMessageMap(dbRooms);
+      })
+      .then(synapseRoomMessages => {
+        return this.compareAndPostRoomMessages(dbEventIds, synapseRoomMessages);
       });
   }
 
@@ -111,19 +114,6 @@ module.exports = class SyncData {
       });
   }
 
-  getEvents() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/events')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
   postRoomEvent(synapseRoomEvent, event) {
     console.log(
       `Adding event '${event.event_id}' to room '${synapseRoomEvent.name}'`,
@@ -168,6 +158,134 @@ module.exports = class SyncData {
     );
   }
 
+  getEvents() {
+    return superagent
+      .get(this._loopbackBaseUrl + '/events')
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  postMessage() {
+    let newMessage = {
+      timestamp: 0,
+      sender: 'string',
+      synapseEventId: 'string',
+      unsigned: {},
+      content: {},
+      type: 'string',
+    };
+
+    return superagent
+      .post(this._loopbackBaseUrl + `/${dbId}/messages`)
+      .send(newMessage)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  getMessages() {
+    return superagent
+      .get(this._loopbackBaseUrl + '/messages')
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  postMember() {
+    let newMember = {
+      previousContent: {},
+      timestamp: 0,
+      sender: 'string',
+      eventId: 'string',
+      age: 0,
+      unsigned: {},
+      stateKey: 'string',
+      content: {},
+      synapseRoomId: 'string',
+      userId: 'string',
+      replacesState: 'string',
+      type: 'string',
+    };
+
+    return superagent
+      .post(this._loopbackBaseUrl + `/${dbId}/members`)
+      .send(newMember)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  getMembers() {
+    return superagent
+      .get(this._loopbackBaseUrl + '/members')
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  postImage() {
+    let newImage = {
+      content: {},
+      synapseEventId: 'string',
+      timestamp: 0,
+      sender: 'string',
+      type: 'string',
+      unsigned: {},
+      synapseRoomId: 'string',
+    };
+
+    return superagent
+      .post(this._loopbackBaseUrl + `/${dbId}/images`)
+      .send(newImage)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  getImages() {
+    return superagent
+      .get(this._loopbackBaseUrl + '/images')
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
   createDbRoomIdList(rooms) {
     let dbRoomIds = [];
     rooms.forEach(room => {
@@ -176,36 +294,106 @@ module.exports = class SyncData {
     return dbRoomIds;
   }
 
-  createRoomEventMap(source, rooms, syncResponse) {
-    return this.getEvents().then(events => {
-      let roomEvents = [];
-      rooms.forEach(room => {
-        let roomEventMap = {};
-        roomEventMap.dbId = room.id;
-        roomEventMap.roomId = room.roomId;
-        roomEventMap.name = room.name;
-        if (source === 'db') {
-          let eventList = [];
-          events.forEach(event => {
-            if (event.roomId === room.id) {
-              eventList.push(event);
+  createDbRoomEventMap(rooms) {
+    return this.getEvents()
+      .then(events => {
+        let roomEvents = rooms.map(room => {
+          let roomEventMap = {};
+          roomEventMap.dbId = room.id;
+          roomEventMap.roomId = room.roomId;
+          roomEventMap.name = room.name;
+          roomEventMap.events = events.filter(event => {
+            return event.roomId === room.id;
+          });
+          return roomEventMap;
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomEvents);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createSynapseRoomEventMap(rooms) {
+    return Promise.all(
+      rooms.map(room => {
+        return client.findEventsByRoom(room.name);
+      }),
+    )
+      .then(synapseRoomEvents => {
+        let roomEvents = [];
+        rooms.forEach(room => {
+          let roomEventMap = {};
+          roomEventMap.dbId = room.id;
+          roomEventMap.roomId = room.roomId;
+          roomEventMap.name = room.name;
+          synapseRoomEvents.forEach(roomEvent => {
+            if (roomEvent.roomId === room.roomId) {
+              roomEventMap.events = roomEvent.events;
             }
           });
-          roomEventMap.events = eventList;
-        } else if (source === 'synapse' && syncResponse) {
-          this.replaceNonallowedObjectKeyCharacters(room, syncResponse);
-          roomEventMap.events = syncResponse[room.roomId].timeline.events;
-        } else {
-          console.log(
-            `Source '${source}' not recognized. Use 'db' or 'synapse'.`,
-          );
-        }
-        roomEvents.push(roomEventMap);
+          roomEvents.push(roomEventMap);
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomEvents);
+        });
+      })
+      .catch(err => {
+        console.error(err);
       });
-      return new Promise((resolve, reject) => {
-        resolve(roomEvents);
+  }
+
+  createDbRoomMessageMap(rooms) {
+    return this.getMessages()
+      .then(messages => {
+        let roomMessages = rooms.map(room => {
+          let roomMessageMap = {};
+          roomMessageMap.dbId = room.id;
+          roomMessageMap.roomId = room.roomId;
+          roomMessageMap.name = room.name;
+          roomMessageMap.messages = messages.filter(message => {
+            return message.roomId === room.id;
+          });
+          return roomMessageMap;
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomMessages);
+        });
+      })
+      .catch(err => {
+        console.error(err);
       });
-    });
+  }
+
+  createSynapseRoomMessageMap(rooms) {
+    return Promise.all(
+      rooms.map(room => {
+        return client.findMessagesByRoom(room.name);
+      }),
+    )
+      .then(synapseRoomMessages => {
+        let roomMessages = [];
+        rooms.forEach(room => {
+          let roomMessageMap = {};
+          roomMessageMap.dbId = room.id;
+          roomMessageMap.roomId = room.roomId;
+          roomMessageMap.name = room.name;
+          synapseRoomMessages.forEach(roomMessage => {
+            if (roomMessage.roomId === room.roomId) {
+              roomMessageMap.messages = roomMessage.messages;
+            }
+          });
+          roomEvents.push(roomEventMap);
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomEvents);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
 
   replaceNonallowedObjectKeyCharacters(room, syncResponse) {

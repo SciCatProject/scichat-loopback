@@ -2,9 +2,9 @@ import {expect} from 'chai';
 import {createSandbox} from 'sinon';
 import {
   findAllRoomsResponse,
+  findEventsByRoomResponse,
   getRoomsResponse,
   postRoomResponse,
-  syncResponse,
   emptyArray,
   emptyObject,
   postRoomEventResponse,
@@ -54,7 +54,9 @@ describe('Unit tests for sync-data', function() {
 
   describe('#syncRoomEvents()', function() {
     it('should return an array of synced Room Event objects when eventId is not in db', function() {
-      sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findEventsByRoom')
+        .resolves(findEventsByRoomResponse);
       sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox.stub(SyncData.prototype, 'getEvents').resolves(emptyArray);
       sandbox
@@ -71,7 +73,9 @@ describe('Unit tests for sync-data', function() {
       });
     });
     it('should return an array of empty objects when eventId is already in db', function() {
-      sandbox.stub(MatrixRestClient.prototype, 'sync').resolves(syncResponse);
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findEventsByRoom')
+        .resolves(findEventsByRoomResponse);
       sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox.stub(SyncData.prototype, 'getEvents').resolves(getEventsResponse);
       return sync.syncRoomEvents().then((roomEvents: any) => {

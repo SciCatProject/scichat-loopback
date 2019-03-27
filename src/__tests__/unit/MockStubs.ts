@@ -12,98 +12,37 @@ let findAllRoomsResponse: any = [
   },
 ];
 
-let syncResponse: any = {
-  next_batch: 's31_906_0_1_9_1_1_13_1',
-  device_one_time_keys_count: {},
-  account_data: {events: [[Object], [Object]]},
-  to_device: {events: []},
-  groups: {leave: {}, join: {}, invite: {}},
-  presence: {events: [[Object]]},
-  device_lists: {changed: [], left: []},
-  rooms: {
-    leave: {},
-    join: {
-      '!string': {
-        timeline: {
-          events: [
-            {
-              origin_server_ts: 1550743328530,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.join_rules',
-            },
-            {
-              origin_server_ts: 1550743328812,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.history_visibility',
-            },
-            {
-              origin_server_ts: 1550743329042,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.guest_access',
-            },
-            {
-              origin_server_ts: 1550743427888,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.name',
-            },
-            {
-              origin_server_ts: 1550743428087,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.topic',
-            },
-            {
-              origin_server_ts: 1550743436345,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'm.room.canonical_alias',
-            },
-            {
-              origin_server_ts: 1550743436382,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: 'string',
-              content: [Object],
-              type: 'm.room.aliases',
-            },
-            {
-              origin_server_ts: 1550743462381,
-              sender: '@string',
-              event_id: '$string',
-              unsigned: [Object],
-              state_key: '',
-              content: [Object],
-              type: 'org.matrix.room.preview_urls',
-            },
-          ],
-        },
-      },
+let findEventsByRoomResponse: any = {
+  roomId: '!string',
+  events: [
+    {
+      origin_server_ts: 1552488203191,
+      sender: '@string',
+      event_id: '$string',
+      unsigned: [Object],
+      state_key: '',
+      content: [Object],
+      type: 'm.room.canonical_alias',
     },
-    invite: {},
-  },
+    {
+      origin_server_ts: 1552488203239,
+      sender: '@string',
+      event_id: '$string',
+      unsigned: [Object],
+      state_key: '',
+      content: [Object],
+      type: 'm.room.join_rules',
+    },
+    {
+      origin_server_ts: 1552488203297,
+      sender: '@string',
+      event_id: '$string',
+      unsigned: [Object],
+      state_key: '',
+      content: [Object],
+      type: 'm.room.history_visibility',
+    },
+  ],
 };
 
 let postRoomResponse: any = {
@@ -166,7 +105,7 @@ let postRoomEventResponse: any = {
 
 export {
   findAllRoomsResponse,
-  syncResponse,
+  findEventsByRoomResponse,
   postRoomResponse,
   emptyArray,
   emptyObject,
