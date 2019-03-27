@@ -62,6 +62,8 @@ module.exports = class SyncData {
       });
   }
 
+  syncRoomMembers() {}
+
   postRoom(room) {
     console.log('Adding new room: ' + room.name);
     let newRoom = {
@@ -457,8 +459,12 @@ module.exports = class SyncData {
   }
 
   createDbMessageIdList(dbRoomMessages) {
-    return dbRoomMessages.map(dbMessage => {
-      return dbMessage.eventId;
+    let dbMessageIds = [];
+    dbRoomMessages.forEach(dbRoomMessage => {
+      dbRoomMessage.messages.forEach(dbMessage => {
+        dbMessageIds.push(dbMessage.eventId);
+      });
     });
+    return dbMessageIds;
   }
 };

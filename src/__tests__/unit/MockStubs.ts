@@ -103,6 +103,49 @@ let postRoomEventResponse: any = {
   roomId: 'string',
 };
 
+let findMessagesByRoomResponse: any = [
+  {
+    origin_server_ts: 1552490651040,
+    sender: '@string',
+    event_id: '$string',
+    unsigned: {age: 1200920499},
+    content: {body: 'Hello World!', msgtype: 'm.text'},
+    type: 'm.room.message',
+  },
+  {
+    origin_server_ts: 1552644874288,
+    sender: '@string',
+    event_id: '$string',
+    unsigned: {age: 1046697251},
+    content: {body: 'Hi', msgtype: 'm.text'},
+    type: 'm.room.message',
+  },
+];
+
+let postRoomMessageResponse: any = {
+  id: 'string',
+  timestamp: 0,
+  sender: '@string',
+  eventId: '$string',
+  unsigned: {},
+  content: {},
+  type: 'string',
+  roomId: 'string',
+};
+
+let getMessagesResponse: any = [
+  {
+    id: 'string',
+    timestamp: 0,
+    sender: '@string',
+    eventId: '$string',
+    unsigned: {},
+    content: {},
+    type: 'string',
+    roomId: 'string',
+  },
+];
+
 export {
   findAllRoomsResponse,
   findEventsByRoomResponse,
@@ -112,4 +155,7 @@ export {
   getRoomsResponse,
   getEventsResponse,
   postRoomEventResponse,
+  findMessagesByRoomResponse,
+  postRoomMessageResponse,
+  getMessagesResponse,
 };

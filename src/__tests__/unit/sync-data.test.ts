@@ -9,6 +9,9 @@ import {
   emptyObject,
   postRoomEventResponse,
   getEventsResponse,
+  findMessagesByRoomResponse,
+  postRoomMessageResponse,
+  getMessagesResponse,
 } from './MockStubs';
 
 const sandbox = createSandbox();
@@ -84,6 +87,45 @@ describe('Unit tests for sync-data', function() {
           expect(events).to.be.an('array');
           events.forEach((event: any) => {
             expect(event).to.be.an('object').that.is.empty;
+          });
+        });
+      });
+    });
+  });
+  describe('#syncRoomMessages', function() {
+    it('should return an array of synced Room Message objects when eventId is not in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findMessagesByRoom')
+        .resolves(findMessagesByRoomResponse);
+      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
+      sandbox.stub(SyncData.prototype, 'getMessages').resolves(emptyArray);
+      sandbox
+        .stub(SyncData.prototype, 'postRoomMessage')
+        .resolves(postRoomMessageResponse);
+      return sync.syncRoomMessages().then((roomMessages: any) => {
+        expect(roomMessages).to.be.an('array');
+        roomMessages.forEach((messages: any) => {
+          expect(messages).to.be.an('array');
+          messages.forEach((message: any) => {
+            expect(message).to.be.an('object').that.is.not.empty;
+          });
+        });
+      });
+    });
+    it('should return an array of empty objects when eventId is already in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findMessagesByRoom')
+        .resolves(findMessagesByRoomResponse);
+      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
+      sandbox
+        .stub(SyncData.prototype, 'getMessages')
+        .resolves(getMessagesResponse);
+      return sync.syncRoomMessages().then((roomMessages: any) => {
+        expect(roomMessages).to.be.an('array');
+        roomMessages.forEach((messages: any) => {
+          expect(messages).to.be.an('array');
+          messages.forEach((message: any) => {
+            expect(message).to.be.an('object').that.is.empty;
           });
         });
       });
