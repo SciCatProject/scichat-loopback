@@ -19,6 +19,7 @@ const sandbox = createSandbox();
 const SyncData = require('../../../sync-data/SyncData');
 const sync = new SyncData();
 const MatrixRestClient = require('../../../sync-data/matrix-rest-client');
+const LoopbackClient = require('../../../sync-data/LoopbackClient');
 
 afterEach(function(done) {
   sandbox.restore();
@@ -31,8 +32,10 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findAllRooms')
         .resolves(findAllRoomsResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(emptyArray);
-      sandbox.stub(SyncData.prototype, 'postRoom').resolves(postRoomResponse);
+      sandbox.stub(LoopbackClient.prototype, 'getRooms').resolves(emptyArray);
+      sandbox
+        .stub(LoopbackClient.prototype, 'postRoom')
+        .resolves(postRoomResponse);
       return sync.syncRooms().then((rooms: any) => {
         expect(rooms).to.be.an('array');
         rooms.forEach((room: any) => {
@@ -45,7 +48,9 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findAllRooms')
         .resolves(findAllRoomsResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
       return sync.syncRooms().then((rooms: any) => {
         expect(rooms).to.be.an('array');
         rooms.forEach((room: any) => {
@@ -60,10 +65,12 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findEventsByRoom')
         .resolves(findEventsByRoomResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
-      sandbox.stub(SyncData.prototype, 'getEvents').resolves(emptyArray);
       sandbox
-        .stub(SyncData.prototype, 'postRoomEvent')
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox.stub(LoopbackClient.prototype, 'getEvents').resolves(emptyArray);
+      sandbox
+        .stub(LoopbackClient.prototype, 'postRoomEvent')
         .resolves(postRoomEventResponse);
       return sync.syncRoomEvents().then((roomEvents: any) => {
         expect(roomEvents).to.be.an('array');
@@ -79,8 +86,12 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findEventsByRoom')
         .resolves(findEventsByRoomResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
-      sandbox.stub(SyncData.prototype, 'getEvents').resolves(getEventsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getEvents')
+        .resolves(getEventsResponse);
       return sync.syncRoomEvents().then((roomEvents: any) => {
         expect(roomEvents).to.be.an('array');
         roomEvents.forEach((events: any) => {
@@ -97,10 +108,14 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findMessagesByRoom')
         .resolves(findMessagesByRoomResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
-      sandbox.stub(SyncData.prototype, 'getMessages').resolves(emptyArray);
       sandbox
-        .stub(SyncData.prototype, 'postRoomMessage')
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getMessages')
+        .resolves(emptyArray);
+      sandbox
+        .stub(LoopbackClient.prototype, 'postRoomMessage')
         .resolves(postRoomMessageResponse);
       return sync.syncRoomMessages().then((roomMessages: any) => {
         expect(roomMessages).to.be.an('array');
@@ -116,9 +131,11 @@ describe('Unit tests for sync-data', function() {
       sandbox
         .stub(MatrixRestClient.prototype, 'findMessagesByRoom')
         .resolves(findMessagesByRoomResponse);
-      sandbox.stub(SyncData.prototype, 'getRooms').resolves(getRoomsResponse);
       sandbox
-        .stub(SyncData.prototype, 'getMessages')
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getMessages')
         .resolves(getMessagesResponse);
       return sync.syncRoomMessages().then((roomMessages: any) => {
         expect(roomMessages).to.be.an('array');

@@ -1,21 +1,20 @@
-const superagent = require('superagent');
 const MatrixRestClient = require('./matrix-rest-client');
-const client = new MatrixRestClient();
+const matrixClient = new MatrixRestClient();
+const LoopbackClient = require('./LoopbackClient');
+const lbClient = new LoopbackClient();
 const Utils = require('./Utils');
 const util = new Utils();
 
 module.exports = class SyncData {
-  constructor() {
-    this._loopbackBaseUrl = 'http://localhost:3000';
-  }
+  constructor() {}
 
   syncRooms() {
     let synapseRooms;
-    return client
+    return matrixClient
       .findAllRooms()
       .then(allSynapseRooms => {
         synapseRooms = allSynapseRooms;
-        return this.getRooms();
+        return lbClient.getRooms();
       })
       .then(dbRooms => {
         return this.compareAndPostRooms(dbRooms, synapseRooms);
@@ -29,7 +28,8 @@ module.exports = class SyncData {
     let dbRooms;
     let dbEventIds;
 
-    return this.getRooms()
+    return lbClient
+      .getRooms()
       .then(getRoomsResponse => {
         dbRooms = getRoomsResponse;
         return this.createDbRoomEventMap(dbRooms);
@@ -47,7 +47,8 @@ module.exports = class SyncData {
     let dbRooms;
     let dbMessageIds;
 
-    return this.getRooms()
+    return lbClient
+      .getRooms()
       .then(getRoomsResponse => {
         dbRooms = getRoomsResponse;
         return this.createDbRoomMessageMap(dbRooms);
@@ -66,39 +67,12 @@ module.exports = class SyncData {
 
   syncRoomMembers() {}
 
-  postRoom(room) {
-    console.log('Adding new room: ' + room.name);
-    let newRoom = {
-      canonicalAlias: room.canonical_alias,
-      name: room.name,
-      worldReadable: room.world_readable,
-      topic: room.topic,
-      numberOfJoinedMembers: room.num_joined_members,
-      federate: room['m.federate'],
-      roomId: room.room_id,
-      guestCanJoin: room.guest_can_join,
-      aliases: room.aliases,
-    };
-
-    return superagent
-      .post(this._loopbackBaseUrl + '/rooms')
-      .send(newRoom)
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
   compareAndPostRooms(dbRooms, synapseRooms) {
-    let dbRoomIds = this.createDbRoomIdList(dbRooms);
+    let dbRoomIds = util.createDbRoomIdList(dbRooms);
     return Promise.all(
       synapseRooms.map(room => {
         if (!dbRoomIds.includes(room.room_id)) {
-          return this.postRoom(room);
+          return lbClient.postRoom(room);
         } else {
           return new Promise((resolve, reject) => {
             resolve({});
@@ -108,52 +82,13 @@ module.exports = class SyncData {
     );
   }
 
-  getRooms() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/rooms')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  postRoomEvent(synapseRoomEvent, event) {
-    console.log(
-      `Adding event '${event.event_id}' to room '${synapseRoomEvent.name}'`,
-    );
-    let newEvent = {
-      timestamp: event.origin_server_ts,
-      sender: event.sender,
-      eventId: event.event_id,
-      unsigned: event.unsigned,
-      stateKey: event.state_key,
-      content: event.content,
-      type: event.type,
-    };
-    return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${synapseRoomEvent.dbId}/events`)
-      .send(newEvent)
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
   compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
     return Promise.all(
       synapseRoomEvents.map(synapseRoomEvent => {
         return Promise.all(
           synapseRoomEvent.events.map(event => {
             if (!dbEventIds.includes(event.event_id)) {
-              return this.postRoomEvent(synapseRoomEvent, event);
+              return lbClient.postRoomEvent(synapseRoomEvent, event);
             } else {
               return new Promise((resolve, reject) => {
                 resolve({});
@@ -163,47 +98,6 @@ module.exports = class SyncData {
         );
       }),
     );
-  }
-
-  getEvents() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/events')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  postRoomMessage(synapseRoomMessage, message) {
-    console.log(
-      `Adding event '${message.event_id}' to room '${synapseRoomMessage.name}'`,
-    );
-    let newMessage = {
-      timestamp: message.origin_server_ts,
-      sender: message.sender,
-      eventId: message.event_id,
-      unsigned: message.unsigned,
-      content: message.content,
-      type: message.type,
-    };
-
-    return superagent
-      .post(
-        this._loopbackBaseUrl + `/rooms/${synapseRoomMessage.dbId}/messages`,
-      )
-      .send(newMessage)
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
   }
 
   compareAndPostRoomMessages(dbMessageIds, synapseRoomMessages) {
@@ -212,7 +106,7 @@ module.exports = class SyncData {
         return Promise.all(
           synapseRoomMessage.messages.map(message => {
             if (!dbMessageIds.includes(message.event_id)) {
-              return this.postRoomMessage(synapseRoomMessage, message);
+              return lbClient.postRoomMessage(synapseRoomMessage, message);
             } else {
               return new Promise((resolve, reject) => {
                 resolve({});
@@ -224,108 +118,9 @@ module.exports = class SyncData {
     );
   }
 
-  getMessages() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/messages')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  postMember() {
-    let newMember = {
-      previousContent: {},
-      timestamp: 0,
-      sender: 'string',
-      eventId: 'string',
-      age: 0,
-      unsigned: {},
-      stateKey: 'string',
-      content: {},
-      synapseRoomId: 'string',
-      userId: 'string',
-      replacesState: 'string',
-      type: 'string',
-    };
-
-    return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${dbId}/members`)
-      .send(newMember)
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  getMembers() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/members')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  postImage() {
-    let newImage = {
-      content: {},
-      synapseEventId: 'string',
-      timestamp: 0,
-      sender: 'string',
-      type: 'string',
-      unsigned: {},
-      synapseRoomId: 'string',
-    };
-
-    return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${dbId}/images`)
-      .send(newImage)
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  getImages() {
-    return superagent
-      .get(this._loopbackBaseUrl + '/images')
-      .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.body);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  createDbRoomIdList(rooms) {
-    let dbRoomIds = [];
-    rooms.forEach(room => {
-      dbRoomIds.push(room.roomId);
-    });
-    return dbRoomIds;
-  }
-
   createDbRoomEventMap(rooms) {
-    return this.getEvents()
+    return lbClient
+      .getEvents()
       .then(events => {
         let roomEvents = rooms.map(room => {
           let roomEventMap = {};
@@ -349,7 +144,7 @@ module.exports = class SyncData {
   createSynapseRoomEventMap(rooms) {
     return Promise.all(
       rooms.map(room => {
-        return client.findEventsByRoom(room.name);
+        return matrixClient.findEventsByRoom(room.name);
       }),
     )
       .then(synapseRoomEvents => {
@@ -377,7 +172,8 @@ module.exports = class SyncData {
   }
 
   createDbRoomMessageMap(rooms) {
-    return this.getMessages()
+    return lbClient
+      .getMessages()
       .then(messages => {
         let roomMessages = rooms.map(room => {
           let roomMessageMap = {};
@@ -401,7 +197,7 @@ module.exports = class SyncData {
   createSynapseRoomMessageMap(rooms) {
     return Promise.all(
       rooms.map(room => {
-        return client.findMessagesByRoom(room.name);
+        return matrixClient.findMessagesByRoom(room.name);
       }),
     )
       .then(synapseRoomMessages => {

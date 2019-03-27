@@ -28,6 +28,14 @@ module.exports = class Utils {
     });
   }
 
+  createDbRoomIdList(rooms) {
+    let dbRoomIds = [];
+    rooms.forEach(room => {
+      dbRoomIds.push(room.roomId);
+    });
+    return dbRoomIds;
+  }
+
   createDbEventIdList(dbRoomEvents) {
     let dbEventIds = [];
     dbRoomEvents.forEach(dbRoomEvent => {
