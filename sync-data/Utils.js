@@ -28,18 +28,14 @@ module.exports = class Utils {
     });
   }
 
-  createDbRoomIdList(rooms) {
-    let dbRoomIds = [];
-    rooms.forEach(room => {
-      dbRoomIds.push(room.roomId);
-    });
-    return dbRoomIds;
-  }
-
   createIdList(type, dbMap) {
     let ids = [];
     dbMap.forEach(mapElement => {
       switch (type) {
+        case 'room': {
+          ids.push(mapElement.roomId);
+          break;
+        }
         case 'event': {
           mapElement.events.forEach(event => {
             ids.push(event.eventId);
@@ -55,6 +51,12 @@ module.exports = class Utils {
         case 'member': {
           mapElement.members.forEach(member => {
             ids.push(member.eventId);
+          });
+          break;
+        }
+        case 'image': {
+          mapElement.images.forEach(image => {
+            ids.push(image.eventId);
           });
           break;
         }

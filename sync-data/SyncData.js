@@ -116,7 +116,7 @@ module.exports = class SyncData {
   }
 
   compareAndPostRooms(dbRooms, synapseRooms) {
-    let dbRoomIds = util.createDbRoomIdList(dbRooms);
+    let dbRoomIds = util.createIdList('room', dbRooms);
     return Promise.all(
       synapseRooms.map(room => {
         if (!dbRoomIds.includes(room.room_id)) {
