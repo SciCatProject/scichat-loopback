@@ -17,7 +17,7 @@ module.exports = class SyncData {
         return lbClient.getRooms();
       })
       .then(dbRooms => {
-        return this.compareAndPostRooms(dbRooms, synapseRooms);
+        return this.postRooms(dbRooms, synapseRooms);
       })
       .catch(err => {
         console.error(err);
@@ -39,7 +39,7 @@ module.exports = class SyncData {
         return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
-        return this.compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
+        return this.postToRoom('event', dbEventIds, synapseRoomEvents);
       })
       .catch(err => {
         console.error(err);
@@ -61,10 +61,7 @@ module.exports = class SyncData {
         return this.createSynapseRoomMessageMap(dbRooms);
       })
       .then(synapseRoomMessages => {
-        return this.compareAndPostRoomMessages(
-          dbMessageIds,
-          synapseRoomMessages,
-        );
+        return this.postToRoom('message', dbMessageIds, synapseRoomMessages);
       })
       .catch(err => {
         console.error(err);
@@ -86,7 +83,7 @@ module.exports = class SyncData {
         return this.createSynapseRoomMemberMap(dbRooms);
       })
       .then(synapseRoomMembers => {
-        return this.compareAndPostRoomMembers(dbMemberIds, synapseRoomMembers);
+        return this.postToRoom('member', dbMemberIds, synapseRoomMembers);
       })
       .catch(err => {
         console.error(err);
@@ -104,18 +101,18 @@ module.exports = class SyncData {
         return this.createDbRoomImageMap(dbRooms);
       })
       .then(dbRoomImages => {
-        dbImagesIds = util.createDbImageIdList(dbRoomImages);
+        dbImagesIds = util.createIdList('image', dbRoomImages);
         return this.createSynapseRoomImageMap(dbRooms);
       })
       .then(synapseRoomImages => {
-        return this.compareAndPostImages(dbImagesIds, synapseRoomImages);
+        return this.postToRoom('image', dbImagesIds, synapseRoomImages);
       })
       .catch(err => {
         console.error(err);
       });
   }
 
-  compareAndPostRooms(dbRooms, synapseRooms) {
+  postRooms(dbRooms, synapseRooms) {
     let dbRoomIds = util.createIdList('room', dbRooms);
     return Promise.all(
       synapseRooms.map(room => {
@@ -130,56 +127,63 @@ module.exports = class SyncData {
     );
   }
 
-  compareAndPostRoomEvents(dbEventIds, synapseRoomEvents) {
+  postToRoom(type, IdList, synapseMap) {
     return Promise.all(
-      synapseRoomEvents.map(synapseRoomEvent => {
-        return Promise.all(
-          synapseRoomEvent.events.map(event => {
-            if (!dbEventIds.includes(event.event_id)) {
-              return lbClient.postRoomEvent(synapseRoomEvent, event);
-            } else {
-              return new Promise((resolve, reject) => {
-                resolve({});
-              });
-            }
-          }),
-        );
-      }),
-    );
-  }
-
-  compareAndPostRoomMessages(dbMessageIds, synapseRoomMessages) {
-    return Promise.all(
-      synapseRoomMessages.map(synapseRoomMessage => {
-        return Promise.all(
-          synapseRoomMessage.messages.map(message => {
-            if (!dbMessageIds.includes(message.event_id)) {
-              return lbClient.postRoomMessage(synapseRoomMessage, message);
-            } else {
-              return new Promise((resolve, reject) => {
-                resolve({});
-              });
-            }
-          }),
-        );
-      }),
-    );
-  }
-
-  compareAndPostRoomMembers(dbMemberIds, synapseRoomMembers) {
-    return Promise.all(
-      synapseRoomMembers.map(synapseRoomMember => {
-        return Promise.all(
-          synapseRoomMember.members.map(member => {
-            if (!dbMemberIds.includes(member.event_id)) {
-              return lbClient.postRoomMember(synapseRoomMember, member);
-            } else {
-              return new Promise((resolve, reject) => {
-                resolve({});
-              });
-            }
-          }),
-        );
+      synapseMap.map(mapElements => {
+        switch (type) {
+          case 'event': {
+            return Promise.all(
+              mapElements.events.map(event => {
+                if (!IdList.includes(event.event_id)) {
+                  return lbClient.postRoomEvent(mapElements, event);
+                } else {
+                  return new Promise((resolve, reject) => {
+                    resolve({});
+                  });
+                }
+              }),
+            );
+          }
+          case 'message': {
+            return Promise.all(
+              mapElements.messages.map(message => {
+                if (!IdList.includes(message.event_id)) {
+                  return lbClient.postRoomMessage(mapElements, message);
+                } else {
+                  return new Promise((resolve, reject) => {
+                    resolve({});
+                  });
+                }
+              }),
+            );
+          }
+          case 'member': {
+            return Promise.all(
+              mapElements.members.map(member => {
+                if (!IdList.includes(member.event_id)) {
+                  return lbClient.postRoomMember(mapElements, member);
+                } else {
+                  return new Promise((resolve, reject) => {
+                    resolve({});
+                  });
+                }
+              }),
+            );
+          }
+          case 'image': {
+            return Promise.all(
+              mapElements.images.map(image => {
+                if (!IdList.includes(image.event_id)) {
+                  return lbClient.postRoomImage(mapElements, image);
+                } else {
+                  return new Promise((resolve, reject) => {
+                    resolve({});
+                  });
+                }
+              }),
+            );
+          }
+        }
       }),
     );
   }
