@@ -55,4 +55,14 @@ module.exports = class Utils {
     });
     return dbMessageIds;
   }
+
+  createDbMemberIdList(dbRoomMembers) {
+    let dbMemberIds = [];
+    dbRoomMembers.forEach(dbRoomMember => {
+      dbRoomMember.members.forEach(dbMember => {
+        dbMemberIds.push(dbMember.eventId);
+      });
+    });
+    return dbMemberIds;
+  }
 };

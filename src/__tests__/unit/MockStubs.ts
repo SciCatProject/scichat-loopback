@@ -146,6 +146,65 @@ let getMessagesResponse: any = [
   },
 ];
 
+let findRoomMembersResponse: any = [
+  {
+    origin_server_ts: 1552644857787,
+    sender: '@string',
+    event_id: '$string',
+    age: 1111954653,
+    unsigned: {age: 1111954653},
+    state_key: '@string',
+    content: {
+      membership: 'join',
+      avatar_url: null,
+      displayname: 'string',
+    },
+    room_id: '!string',
+    user_id: '@string',
+    type: 'm.room.member',
+  },
+];
+
+let postRoomMemberResponse: any = {
+  id: 'string',
+  previousContent: {},
+  timestamp: 0,
+  sender: '@string',
+  eventId: '$string',
+  age: 0,
+  unsigned: {},
+  stateKey: '@string',
+  content: {},
+  synapseRoomId: '!string',
+  userId: '@string',
+  replacesState: '$string',
+  type: 'm.room.member',
+  roomId: 'string',
+};
+
+let getMembersResponse: any = [
+  {
+    id: 'string',
+    timestamp: 1553180922244,
+    sender: '@string',
+    eventId: '$string',
+    age: 580661678,
+    unsigned: {
+      age: 580661678,
+    },
+    stateKey: '@string',
+    content: {
+      membership: 'join',
+      avatar_url: 'mxc://string',
+      displayname: 'string',
+    },
+    synapseRoomId: '!string',
+    userId: '@string',
+    type: 'm.room.member',
+    roomId: 'string',
+  },
+];
+
 export {
   findAllRoomsResponse,
   findEventsByRoomResponse,
@@ -158,4 +217,7 @@ export {
   findMessagesByRoomResponse,
   postRoomMessageResponse,
   getMessagesResponse,
+  findRoomMembersResponse,
+  postRoomMemberResponse,
+  getMembersResponse,
 };

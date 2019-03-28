@@ -86,7 +86,9 @@ module.exports = class LoopbackClient {
 
   postRoomMessage(synapseRoomMessage, message) {
     console.log(
-      `Adding event '${message.event_id}' to room '${synapseRoomMessage.name}'`,
+      `Adding message '${message.event_id}' to room '${
+        synapseRoomMessage.name
+      }'`,
     );
     let newMessage = {
       timestamp: message.origin_server_ts,
@@ -125,24 +127,27 @@ module.exports = class LoopbackClient {
       });
   }
 
-  postMember() {
+  postRoomMember(synapseRoomMember, member) {
+    console.log(
+      `Adding member '${member.event_id}' to room '${synapseRoomMember.name}'`,
+    );
     let newMember = {
-      previousContent: {},
-      timestamp: 0,
-      sender: 'string',
-      eventId: 'string',
-      age: 0,
-      unsigned: {},
-      stateKey: 'string',
-      content: {},
-      synapseRoomId: 'string',
-      userId: 'string',
-      replacesState: 'string',
-      type: 'string',
+      previousContent: member.prev_content,
+      timestamp: member.origin_server_ts,
+      sender: member.sender,
+      eventId: member.event_id,
+      age: member.age,
+      unsigned: member.unsigned,
+      stateKey: member.state_key,
+      content: member.content,
+      synapseRoomId: member.room_id,
+      userId: member.user_id,
+      replacesState: member.replaces_state,
+      type: member.type,
     };
 
     return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${dbId}/members`)
+      .post(this._loopbackBaseUrl + `/rooms/${synapseRoomMember.dbId}/members`)
       .send(newMember)
       .then(response => {
         return new Promise((resolve, reject) => {
@@ -167,7 +172,7 @@ module.exports = class LoopbackClient {
       });
   }
 
-  postImage() {
+  postRoomImage() {
     let newImage = {
       content: {},
       synapseEventId: 'string',

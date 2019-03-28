@@ -40,6 +40,9 @@ module.exports = class SyncData {
       })
       .then(synapseRoomEvents => {
         return this.compareAndPostRoomEvents(dbEventIds, synapseRoomEvents);
+      })
+      .catch(err => {
+        console.error(err);
       });
   }
 
@@ -62,10 +65,33 @@ module.exports = class SyncData {
           dbMessageIds,
           synapseRoomMessages,
         );
+      })
+      .catch(err => {
+        console.error(err);
       });
   }
 
-  syncRoomMembers() {}
+  syncRoomMembers() {
+    let dbRooms;
+    let dbMemberIds;
+
+    return lbClient
+      .getRooms()
+      .then(getRoomsResponse => {
+        dbRooms = getRoomsResponse;
+        return this.createDbRoomMemberMap(dbRooms);
+      })
+      .then(dbRoomMembers => {
+        dbMemberIds = util.createDbMemberIdList(dbRoomMembers);
+        return this.createSynapseRoomMemberMap(dbRooms);
+      })
+      .then(synapseRoomMembers => {
+        return this.compareAndPostRoomMembers(dbMemberIds, synapseRoomMembers);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
 
   compareAndPostRooms(dbRooms, synapseRooms) {
     let dbRoomIds = util.createDbRoomIdList(dbRooms);
@@ -107,6 +133,24 @@ module.exports = class SyncData {
           synapseRoomMessage.messages.map(message => {
             if (!dbMessageIds.includes(message.event_id)) {
               return lbClient.postRoomMessage(synapseRoomMessage, message);
+            } else {
+              return new Promise((resolve, reject) => {
+                resolve({});
+              });
+            }
+          }),
+        );
+      }),
+    );
+  }
+
+  compareAndPostRoomMembers(dbMemberIds, synapseRoomMembers) {
+    return Promise.all(
+      synapseRoomMembers.map(synapseRoomMember => {
+        return Promise.all(
+          synapseRoomMember.members.map(member => {
+            if (!dbMemberIds.includes(member.event_id)) {
+              return lbClient.postRoomMember(synapseRoomMember, member);
             } else {
               return new Promise((resolve, reject) => {
                 resolve({});
@@ -212,6 +256,54 @@ module.exports = class SyncData {
         }
         return new Promise((resolve, reject) => {
           resolve(roomMessages);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createDbRoomMemberMap(rooms) {
+    return lbClient
+      .getMembers()
+      .then(members => {
+        let roomMembers = rooms.map(room => {
+          let roomMemberMap = {};
+          roomMemberMap.dbId = room.id;
+          roomMemberMap.roomId = room.roomId;
+          roomMemberMap.name = room.name;
+          roomMemberMap.members = members.filter(member => {
+            return member.roomId === room.id;
+          });
+          return roomMemberMap;
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomMembers);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createSynapseRoomMemberMap(rooms) {
+    return Promise.all(
+      rooms.map(room => {
+        return matrixClient.findRoomMembers(room.name);
+      }),
+    )
+      .then(synapseRoomMembers => {
+        let roomMembers = [];
+        for (let i = 0; i < rooms.length; i++) {
+          let roomMemberMap = {};
+          roomMemberMap.dbId = rooms[i].id;
+          roomMemberMap.roomId = rooms[i].roomId;
+          roomMemberMap.name = rooms[i].name;
+          roomMemberMap.members = synapseRoomMembers[i];
+          roomMembers.push(roomMemberMap);
+        }
+        return new Promise((resolve, reject) => {
+          resolve(roomMembers);
         });
       })
       .catch(err => {

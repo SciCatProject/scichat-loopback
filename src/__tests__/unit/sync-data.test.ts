@@ -12,6 +12,9 @@ import {
   findMessagesByRoomResponse,
   postRoomMessageResponse,
   getMessagesResponse,
+  findRoomMembersResponse,
+  postRoomMemberResponse,
+  getMembersResponse,
 } from './MockStubs';
 
 const sandbox = createSandbox();
@@ -143,6 +146,49 @@ describe('Unit tests for sync-data', function() {
           expect(messages).to.be.an('array');
           messages.forEach((message: any) => {
             expect(message).to.be.an('object').that.is.empty;
+          });
+        });
+      });
+    });
+  });
+  describe('#syncRoomMembers()', function() {
+    it('should return an array of synced Room Member objects when eventId is not in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findRoomMembers')
+        .resolves(findRoomMembersResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox.stub(LoopbackClient.prototype, 'getMembers').resolves(emptyArray);
+      sandbox
+        .stub(LoopbackClient.prototype, 'postRoomMember')
+        .resolves(postRoomMemberResponse);
+      return sync.syncRoomMembers().then((roomMembers: any) => {
+        expect(roomMembers).to.be.an('array');
+        roomMembers.forEach((members: any) => {
+          expect(members).to.be.an('array');
+          members.forEach((member: any) => {
+            expect(member).to.be.an('object').that.is.not.empty;
+          });
+        });
+      });
+    });
+    it('should return an array of empty objects when eventId is already in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findRoomMembers')
+        .resolves(findRoomMembersResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getMembers')
+        .resolves(getMembersResponse);
+      return sync.syncRoomMembers().then((roomMembers: any) => {
+        expect(roomMembers).to.be.an('array');
+        roomMembers.forEach((members: any) => {
+          expect(members).to.be.an('array');
+          members.forEach((member: any) => {
+            expect(member).to.be.an('object').that.is.empty;
           });
         });
       });

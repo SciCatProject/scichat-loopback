@@ -12,3 +12,7 @@ sync.syncRoomEvents().then(response => {
 sync.syncRoomMessages().then(response => {
   console.log(response);
 });
+
+sync.syncRoomMembers().then(response => {
+  console.log(response);
+});
