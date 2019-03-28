@@ -35,7 +35,7 @@ module.exports = class SyncData {
         return this.createDbRoomEventMap(dbRooms);
       })
       .then(dbRoomEvents => {
-        dbEventIds = util.createDbEventIdList(dbRoomEvents);
+        dbEventIds = util.createIdList('event', dbRoomEvents);
         return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
@@ -57,7 +57,7 @@ module.exports = class SyncData {
         return this.createDbRoomMessageMap(dbRooms);
       })
       .then(dbRoomMessages => {
-        dbMessageIds = util.createDbMessageIdList(dbRoomMessages);
+        dbMessageIds = util.createIdList('message', dbRoomMessages);
         return this.createSynapseRoomMessageMap(dbRooms);
       })
       .then(synapseRoomMessages => {
@@ -82,11 +82,33 @@ module.exports = class SyncData {
         return this.createDbRoomMemberMap(dbRooms);
       })
       .then(dbRoomMembers => {
-        dbMemberIds = util.createDbMemberIdList(dbRoomMembers);
+        dbMemberIds = util.createIdList('member', dbRoomMembers);
         return this.createSynapseRoomMemberMap(dbRooms);
       })
       .then(synapseRoomMembers => {
         return this.compareAndPostRoomMembers(dbMemberIds, synapseRoomMembers);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  syncRoomImages() {
+    let dbRooms;
+    let dbImagesIds;
+
+    return lbClient
+      .getRooms()
+      .then(getRoomsResponse => {
+        dbRooms = getRoomsResponse;
+        return this.createDbRoomImageMap(dbRooms);
+      })
+      .then(dbRoomImages => {
+        dbImagesIds = util.createDbImageIdList(dbRoomImages);
+        return this.createSynapseRoomImageMap(dbRooms);
+      })
+      .then(synapseRoomImages => {
+        return this.compareAndPostImages(dbImagesIds, synapseRoomImages);
       })
       .catch(err => {
         console.error(err);

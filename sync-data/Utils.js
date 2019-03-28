@@ -36,33 +36,33 @@ module.exports = class Utils {
     return dbRoomIds;
   }
 
-  createDbEventIdList(dbRoomEvents) {
-    let dbEventIds = [];
-    dbRoomEvents.forEach(dbRoomEvent => {
-      dbRoomEvent.events.forEach(dbEvent => {
-        dbEventIds.push(dbEvent.eventId);
-      });
+  createIdList(type, dbMap) {
+    let ids = [];
+    dbMap.forEach(mapElement => {
+      switch (type) {
+        case 'event': {
+          mapElement.events.forEach(event => {
+            ids.push(event.eventId);
+          });
+          break;
+        }
+        case 'message': {
+          mapElement.messages.forEach(message => {
+            ids.push(message.eventId);
+          });
+          break;
+        }
+        case 'member': {
+          mapElement.members.forEach(member => {
+            ids.push(member.eventId);
+          });
+          break;
+        }
+        default: {
+          console.log(`Type '${type}' is not a valid option.`);
+        }
+      }
     });
-    return dbEventIds;
-  }
-
-  createDbMessageIdList(dbRoomMessages) {
-    let dbMessageIds = [];
-    dbRoomMessages.forEach(dbRoomMessage => {
-      dbRoomMessage.messages.forEach(dbMessage => {
-        dbMessageIds.push(dbMessage.eventId);
-      });
-    });
-    return dbMessageIds;
-  }
-
-  createDbMemberIdList(dbRoomMembers) {
-    let dbMemberIds = [];
-    dbRoomMembers.forEach(dbRoomMember => {
-      dbRoomMember.members.forEach(dbMember => {
-        dbMemberIds.push(dbMember.eventId);
-      });
-    });
-    return dbMemberIds;
+    return ids;
   }
 };
