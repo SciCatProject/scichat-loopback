@@ -15,6 +15,9 @@ import {
   findRoomMembersResponse,
   postRoomMemberResponse,
   getMembersResponse,
+  findAllImagesByRoomResponse,
+  postImageResponse,
+  getImagesResponse,
 } from './MockStubs';
 
 const sandbox = createSandbox();
@@ -189,6 +192,49 @@ describe('Unit tests for sync-data', function() {
           expect(members).to.be.an('array');
           members.forEach((member: any) => {
             expect(member).to.be.an('object').that.is.empty;
+          });
+        });
+      });
+    });
+  });
+  describe('#syncRoomImages()', function() {
+    it('should return an array of synced Room Image objects when eventId is not in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findAllImagesByRoom')
+        .resolves(findAllImagesByRoomResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox.stub(LoopbackClient.prototype, 'getImages').resolves(emptyArray);
+      sandbox
+        .stub(LoopbackClient.prototype, 'postRoomImage')
+        .resolves(postImageResponse);
+      return sync.syncRoomImages().then((roomImages: any) => {
+        expect(roomImages).to.be.an('array');
+        roomImages.forEach((images: any) => {
+          expect(images).to.be.an('array');
+          images.forEach((image: any) => {
+            expect(image).to.be.an('object').that.is.not.empty;
+          });
+        });
+      });
+    });
+    it('should return an array of empty objects when eventId is already in db', function() {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'findAllImagesByRoom')
+        .resolves(findAllImagesByRoomResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getRooms')
+        .resolves(getRoomsResponse);
+      sandbox
+        .stub(LoopbackClient.prototype, 'getImages')
+        .resolves(getImagesResponse);
+      return sync.syncRoomImages().then((roomImages: any) => {
+        expect(roomImages).to.be.an('array');
+        roomImages.forEach((images: any) => {
+          expect(images).to.be.an('array');
+          images.forEach((image: any) => {
+            expect(image).to.be.an('object').that.is.empty;
           });
         });
       });

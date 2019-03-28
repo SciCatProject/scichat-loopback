@@ -336,4 +336,52 @@ module.exports = class SyncData {
         console.error(err);
       });
   }
+
+  createDbRoomImageMap(rooms) {
+    return lbClient
+      .getImages()
+      .then(images => {
+        let roomImages = rooms.map(room => {
+          let roomImageMap = {};
+          roomImageMap.dbId = room.id;
+          roomImageMap.roomId = room.roomId;
+          roomImageMap.name = room.name;
+          roomImageMap.images = images.filter(image => {
+            return image.roomId === room.id;
+          });
+          return roomImageMap;
+        });
+        return new Promise((resolve, reject) => {
+          resolve(roomImages);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createSynapseRoomImageMap(rooms) {
+    return Promise.all(
+      rooms.map(room => {
+        return matrixClient.findAllImagesByRoom(room.name);
+      }),
+    )
+      .then(synapseRoomImages => {
+        let roomImages = [];
+        for (let i = 0; i < rooms.length; i++) {
+          let roomImageMap = {};
+          roomImageMap.dbId = rooms[i].id;
+          roomImageMap.roomId = rooms[i].roomId;
+          roomImageMap.name = rooms[i].name;
+          roomImageMap.images = synapseRoomImages[i];
+          roomImages.push(roomImageMap);
+        }
+        return new Promise((resolve, reject) => {
+          resolve(roomImages);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
 };

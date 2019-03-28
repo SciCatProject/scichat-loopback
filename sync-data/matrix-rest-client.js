@@ -216,6 +216,16 @@ module.exports = class MatrixRestClient {
       });
   }
 
+  findAllImagesByRoom(roomName) {
+    return this.findMessagesByRoom(roomName).then(messages => {
+      return Promise.all(
+        messages.filter(message => {
+          return this.messageTypeisImage(message);
+        }),
+      );
+    });
+  }
+
   findImageByRoomAndFilename(roomName, filename) {
     return this.findMessagesByRoom(roomName).then(messages => {
       messages.forEach(message => {

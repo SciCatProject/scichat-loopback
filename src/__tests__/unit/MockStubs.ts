@@ -205,6 +205,48 @@ let getMembersResponse: any = [
   },
 ];
 
+let findAllImagesByRoomResponse: any = [
+  {
+    origin_server_ts: 1553777401018,
+    sender: '@string',
+    event_id: '$string',
+    unsigned: {age: 492711, transaction_id: 'm1553777400954.0'},
+    content: {
+      body: 'image.png',
+      info: [Object],
+      msgtype: 'm.image',
+      url: 'mxc://string',
+    },
+    type: 'm.room.message',
+  },
+];
+
+let postImageResponse: any = {
+  id: 'string',
+  content: {},
+  eventId: '$string',
+  timestamp: 0,
+  sender: '@string',
+  type: 'm.room.message',
+  unsigned: {},
+  synapseRoomId: '!string',
+  roomId: 'string',
+};
+
+let getImagesResponse: any = [
+  {
+    id: 'string',
+    content: {},
+    eventId: '$string',
+    timestamp: 0,
+    sender: '@string',
+    type: 'm.room.message',
+    unsigned: {},
+    synapseRoomId: '!string',
+    roomId: 'string',
+  },
+];
+
 export {
   findAllRoomsResponse,
   findEventsByRoomResponse,
@@ -220,4 +262,7 @@ export {
   findRoomMembersResponse,
   postRoomMemberResponse,
   getMembersResponse,
+  findAllImagesByRoomResponse,
+  postImageResponse,
+  getImagesResponse,
 };

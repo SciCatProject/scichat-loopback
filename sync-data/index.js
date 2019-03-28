@@ -16,3 +16,7 @@ sync.syncRoomMessages().then(response => {
 sync.syncRoomMembers().then(response => {
   console.log(response);
 });
+
+sync.syncRoomImages().then(response => {
+  console.log(response);
+});

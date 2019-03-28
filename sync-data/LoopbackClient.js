@@ -172,19 +172,22 @@ module.exports = class LoopbackClient {
       });
   }
 
-  postRoomImage() {
+  postRoomImage(synapseRoomImage, image) {
+    console.log(
+      `Adding member '${image.event_id}' to room '${synapseRoomImage.name}'`,
+    );
     let newImage = {
-      content: {},
-      synapseEventId: 'string',
-      timestamp: 0,
-      sender: 'string',
-      type: 'string',
-      unsigned: {},
-      synapseRoomId: 'string',
+      content: image.content,
+      eventId: image.event_id,
+      timestamp: image.origin_server_ts,
+      sender: image.sender,
+      type: image.type,
+      unsigned: image.unsigned,
+      synapseRoomId: image.room_id,
     };
 
     return superagent
-      .post(this._loopbackBaseUrl + `/rooms/${dbId}/images`)
+      .post(this._loopbackBaseUrl + `/rooms/${synapseRoomImage.dbId}/images`)
       .send(newImage)
       .then(response => {
         return new Promise((resolve, reject) => {
