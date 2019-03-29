@@ -1,4 +1,4 @@
-import {del, get, param, post, requestBody} from '@loopback/rest';
+import {get, param, post} from '@loopback/rest';
 import {serviceProxy} from '@loopback/service-proxy';
 
 import {IStorageService} from '../interfaces/storage.interface';
@@ -60,6 +60,62 @@ export class FileController {
         }
 
         return Promise.resolve(file);
+      },
+    );
+  }
+
+  @post('/containers/{container}/upload', {
+    responses: {
+      '200': {
+        description: 'Upload File to Container',
+        content: {'application/json': {schema: {'x-ts-type': Object}}},
+      },
+    },
+  })
+  async upload(
+    @param.path.string('container') container: string,
+    @param.query.object('req') req: Object,
+    @param.query.object('res') res: Object,
+  ): Promise<Object> {
+    return await this.storageService.upload(
+      container,
+      req,
+      res,
+      <Object>(err: Error, result: Object) => {
+        if (err) {
+          return Promise.reject(err);
+        }
+
+        return Promise.resolve(result);
+      },
+    );
+  }
+
+  @get('/containers/{container}/download/{file}', {
+    responses: {
+      '200': {
+        description: 'Download File from Container',
+        content: {'application/json': {schema: {'x-ts-type': Object}}},
+      },
+    },
+  })
+  async download(
+    @param.path.string('container') container: string,
+    @param.path.string('file') file: string,
+    @param.query.object('req') req: string,
+    @param.query.object('res') res: string,
+  ): Promise<Object> {
+    return await this.storageService.download(
+      container,
+      file,
+      req,
+      res,
+      <Object>(err: Error, result: Object) => {
+        if (err) {
+          return Promise.reject(err);
+        }
+
+        return Promise.resolve(result);
       },
     );
   }
