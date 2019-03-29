@@ -2,6 +2,6 @@
   "name": "Storage",
   "connector": "loopback-component-storage",
   "provider": "filesystem",
-  "root": "./path/to/dir",
+  "root": "./storage",
   "nameConflict": "makeUnique"
 }
