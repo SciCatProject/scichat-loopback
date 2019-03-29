@@ -71,6 +71,19 @@ module.exports = class LoopbackClient {
       });
   }
 
+  getRoomEvents(room) {
+    return superagent
+      .get(this._loopbackBaseUrl + `/rooms/${room.id}/events`)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
   getEvents() {
     return superagent
       .get(this._loopbackBaseUrl + '/events')

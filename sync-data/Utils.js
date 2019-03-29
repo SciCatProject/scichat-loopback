@@ -1,3 +1,6 @@
+const LoopbackClient = require('./LoopbackClient');
+const lbClient = new LoopbackClient();
+
 module.exports = class Utils {
   constructor() {}
   replaceNonallowedObjectKeyCharacters(events) {
@@ -66,5 +69,23 @@ module.exports = class Utils {
       }
     });
     return ids;
+  }
+
+  createEventIdList(rooms) {
+    return Promise.all(
+      rooms.map(room => {
+        return lbClient.getRoomEvents(room).then(roomEvents => {
+          return roomEvents.map(event => {
+            return event.eventId;
+          });
+        });
+      }),
+    )
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
 };
