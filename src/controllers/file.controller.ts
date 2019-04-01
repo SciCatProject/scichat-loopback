@@ -1,4 +1,13 @@
-import {get, param, post} from '@loopback/rest';
+import {inject} from '@loopback/core';
+import {
+  get,
+  param,
+  post,
+  Response,
+  Request,
+  requestBody,
+  RestBindings,
+} from '@loopback/rest';
 import {serviceProxy} from '@loopback/service-proxy';
 
 import {IStorageService} from '../interfaces/storage.interface';
@@ -26,17 +35,7 @@ export class FileController {
     @param.path.string('container') container: string,
     @param.query.object('options') options: Object,
   ): Promise<File[]> {
-    return await this.storageService.getFiles(
-      container,
-      options,
-      <Array>(err: Error, files: Array) => {
-        if (err) {
-          return Promise.resolve(err);
-        }
-
-        return Promise.resolve(files);
-      },
-    );
+    return await this.storageService.getFiles(container, options);
   }
 
   @get('/containers/{container}/files/{file}', {
@@ -51,17 +50,7 @@ export class FileController {
     @param.path.string('container') container: string,
     @param.path.string('file') file: string,
   ): Promise<File> {
-    return await this.storageService.getFile(
-      container,
-      file,
-      <File>(err: Error, file: File) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(file);
-      },
-    );
+    return await this.storageService.getFile(container, file);
   }
 
   @post('/containers/{container}/upload', {
@@ -74,21 +63,21 @@ export class FileController {
   })
   async upload(
     @param.path.string('container') container: string,
-    @param.query.object('req') req: Object,
-    @param.query.object('res') res: Object,
-  ): Promise<Object> {
-    return await this.storageService.upload(
-      container,
-      req,
-      res,
-      <Object>(err: Error, result: Object) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(result);
+    @requestBody({
+      description: 'multipart/form-data value',
+      required: true,
+      content: {
+        'multipart/form-data': {
+          'x-parser': 'stream',
+          schema: {type: 'object'},
+        },
       },
-    );
+    })
+    req: Request,
+    @inject(RestBindings.Http.RESPONSE) res: Response,
+    @param.query.object('options') options: Object,
+  ): Promise<Object> {
+    return await this.storageService.upload(container, req, res, options);
   }
 
   @get('/containers/{container}/download/{file}', {
@@ -105,18 +94,6 @@ export class FileController {
     @param.query.object('req') req: string,
     @param.query.object('res') res: string,
   ): Promise<Object> {
-    return await this.storageService.download(
-      container,
-      file,
-      req,
-      res,
-      <Object>(err: Error, result: Object) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(result);
-      },
-    );
+    return await this.storageService.download(container, file, req, res);
   }
 }

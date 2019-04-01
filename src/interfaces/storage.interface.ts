@@ -1,34 +1,28 @@
+import {Response, Request} from '@loopback/rest';
 import {Container} from '../models/container.model';
 import {File} from '../models/file.model';
-
-interface ICallback {
-  <T>(error: Error, result?: T): void;
-}
-
-interface IReturnFunction<T> {
-  (): T;
-}
+import {Stream} from 'stream';
 
 export interface IStorageService {
-  getContainers(cb: ICallback): Promise<Container[]>;
+  getContainers(): Promise<Container[]>;
 
-  getContainer(container: string, cb: ICallback): Promise<Container>;
+  getContainer(container: string): Promise<Container>;
 
-  createContainer(container: Container, cb: ICallback): Promise<Container>;
+  createContainer(container: Container): Promise<Container>;
 
-  destroyContainer(container: string, cb: ICallback): Promise<Object>;
+  destroyContainer(container: string): Promise<Object>;
 
-  getFiles(container: string, options: Object, cb: ICallback): Promise<File[]>;
+  getFiles(container: string, options: Object): Promise<File[]>;
 
-  getFile(container: string, file: string, cb: ICallback): Promise<File>;
+  getFile(container: string, file: string): Promise<File>;
 
-  removeFile(container: string, file: string, cb: ICallback): Promise<Object>;
+  removeFile(container: string, file: string): Promise<Object>;
 
   upload(
     container: string,
-    req: Object,
-    res: Object,
-    cb: ICallback,
+    req: Request,
+    res: Response,
+    options: Object,
   ): Promise<Object>;
 
   download(
@@ -36,18 +30,9 @@ export interface IStorageService {
     file: string,
     req: Object,
     res: Object,
-    cb: ICallback,
   ): Promise<Object>;
 
-  uploadStream(
-    container: string,
-    file: string,
-    options: Object,
-  ): IReturnFunction<Function>;
+  uploadStream(container: string, file: string, options: Object): Stream;
 
-  downloadStream(
-    container: string,
-    file: string,
-    options: Object,
-  ): IReturnFunction<Function>;
+  downloadStream(container: string, file: string, options: Object): Stream;
 }

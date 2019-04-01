@@ -21,16 +21,7 @@ export class ContainerController {
   async createContainer(
     @requestBody() container: Container,
   ): Promise<Container> {
-    return await this.storageService.createContainer(
-      container,
-      <Container>(err: Error, container: Container) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(container);
-      },
-    );
+    return await this.storageService.createContainer(container);
   }
 
   @get('/containers', {
@@ -46,15 +37,7 @@ export class ContainerController {
     },
   })
   async getContainers(): Promise<Container[]> {
-    return await this.storageService.getContainers(
-      <Array>(err: Error, containers: Array) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(containers);
-      },
-    );
+    return await this.storageService.getContainers();
   }
 
   @get('/containers/{container}', {
@@ -68,16 +51,7 @@ export class ContainerController {
   async getContainer(
     @param.path.string('container') container: string,
   ): Promise<Container> {
-    return await this.storageService.getContainer(
-      container,
-      <Container>(err: Error, container: Container) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(container);
-      },
-    );
+    return await this.storageService.getContainer(container);
   }
 
   @del('/containers/{container}', {
@@ -90,15 +64,6 @@ export class ContainerController {
   async destroyContainer(
     @param.path.string('container') container: string,
   ): Promise<Object> {
-    return await this.storageService.destroyContainer(
-      container,
-      <Object>(err: Error, res: Object) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-
-        return Promise.resolve(res);
-      },
-    );
+    return await this.storageService.destroyContainer(container);
   }
 }

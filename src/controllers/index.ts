@@ -10,3 +10,4 @@ export * from './image.controller';
 export * from './room-image.controller';
 export * from './container.controller';
 export * from './file.controller';
+export * from './logbook.controller';
