@@ -1,13 +1,11 @@
-import {Filter, repository, Where} from '@loopback/repository';
+import {Filter, repository} from '@loopback/repository';
 import {get, param} from '@loopback/rest';
 import {Room} from '../models';
-import {MessageRepository, RoomRepository} from '../repositories';
+import {RoomRepository} from '../repositories';
 
 export class LogbookController {
   room: Room;
   constructor(
-    @repository(MessageRepository)
-    protected messageRepository: MessageRepository,
     @repository(RoomRepository)
     protected roomRepository: RoomRepository,
   ) {}
