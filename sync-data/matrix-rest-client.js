@@ -6,7 +6,7 @@ module.exports = class MatrixRestClient {
   constructor() {
     this._baseUrl = 'https://scicat03.esss.lu.se:8448';
     this._accessToken =
-      'MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBYd3FfK255aTJ0MkxRNTFFCjAwMmZzaWduYXR1cmUguizglHUUiO27I-n2t2uKpeWtt3loaTsV9Gj-pzoOrNgK';
+      'MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBpPU9kdDlfcFNZQSNOQzFYCjAwMmZzaWduYXR1cmUgcLwHR_4nfCYIm97N3hIji1_QXTqV1aC1b3OzN-nuM6wK';
     this._userId = '@scicatbot:scicat03.esss.lu.se';
     this._password = 'scicatbot';
     this._txnCounter = 0;
@@ -28,6 +28,7 @@ module.exports = class MatrixRestClient {
           'm.federate': false,
         },
       },
+      rejectUnauthorized: false,
       json: true,
     };
 
@@ -43,6 +44,7 @@ module.exports = class MatrixRestClient {
       headers: {
         Authorization: 'Bearer ' + this._accessToken,
       },
+      rejectUnauthorized: false,
       json: true,
     };
 
@@ -85,6 +87,7 @@ module.exports = class MatrixRestClient {
           headers: {
             Authorization: 'Bearer ' + this._accessToken,
           },
+          rejectUnauthorized: false,
           json: true,
         };
 
@@ -118,6 +121,7 @@ module.exports = class MatrixRestClient {
             body: message,
             msgtype: 'm.text',
           },
+          rejectUnauthorized: false,
           json: true,
         };
         return requestPromise(options);
@@ -240,6 +244,7 @@ module.exports = class MatrixRestClient {
             headers: {
               Authorization: 'Bearer ' + this._accessToken,
             },
+            rejectUnauthorized: false,
           };
           return requestPromise(options).catch(err => {
             console.log('Error in findImageByRoomAndFilename(): ' + err);
@@ -323,6 +328,7 @@ module.exports = class MatrixRestClient {
         },
         password: this._password,
       },
+      rejectUnauthorized: false,
       json: true,
     };
 
@@ -341,6 +347,7 @@ module.exports = class MatrixRestClient {
       body: {
         timeout: 5000,
       },
+      rejectUnauthorized: false,
       json: true,
     };
 
@@ -357,6 +364,7 @@ module.exports = class MatrixRestClient {
       headers: {
         Authorization: 'Bearer ' + this._accessToken,
       },
+      rejectUnauthorized: false,
       json: true,
     };
 
@@ -377,6 +385,7 @@ module.exports = class MatrixRestClient {
         full_state: true,
         timeout: 5000,
       },
+      rejectUnauthorized: false,
       json: true,
     };
 

@@ -36,12 +36,12 @@ module.exports = class SyncData {
       })
       .then(dbRoomEvents => {
         dbEventIds = util.createIdList('event', dbRoomEvents);
-        console.log(dbEventIds);
+        // console.log(dbEventIds);
         return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
-        return util.createEventIdList(dbRooms);
-        // return this.postToRoom('event', dbEventIds, synapseRoomEvents);
+        // return util.createEventIdList(dbRooms);
+        return this.postToRoom('event', dbEventIds, synapseRoomEvents);
       })
       .catch(err => {
         console.error(err);

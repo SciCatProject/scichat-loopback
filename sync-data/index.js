@@ -1,22 +1,24 @@
 const SyncData = require('./SyncData');
 const sync = new SyncData();
 
-// sync.syncRooms().then(response => {
-//   console.log(response);
-// });
-
-sync.syncRoomEvents().then(response => {
-  console.log(response);
-});
-
-// sync.syncRoomMessages().then(response => {
-//   console.log(response);
-// });
-
-// sync.syncRoomMembers().then(response => {
-//   console.log(response);
-// });
-
-// sync.syncRoomImages().then(response => {
-//   console.log(response);
-// });
+sync
+  .syncRooms()
+  .then(roomResponse => {
+    console.log(roomResponse);
+    return sync.syncRoomEvents();
+  })
+  .then(roomEventResponse => {
+    console.log(roomEventResponse);
+    return sync.syncRoomMessages();
+  })
+  .then(roomMessageResponse => {
+    console.log(roomMessageResponse);
+    return sync.syncRoomMembers();
+  })
+  .then(roomMemberResponse => {
+    console.log(roomMemberResponse);
+    return sync.syncRoomImages();
+  })
+  .then(roomImageResponse => {
+    console.log(roomImageResponse);
+  });

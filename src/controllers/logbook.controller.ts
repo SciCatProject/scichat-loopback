@@ -1,17 +1,13 @@
 import {Filter, repository, Where} from '@loopback/repository';
-import {
-  get,
-  getWhereSchemaFor,
-  param,
-  post,
-  requestBody,
-  getFilterSchemaFor,
-} from '@loopback/rest';
+import {get, param} from '@loopback/rest';
 import {Room} from '../models';
-import {RoomRepository} from '../repositories';
+import {MessageRepository, RoomRepository} from '../repositories';
 
 export class LogbookController {
+  room: Room;
   constructor(
+    @repository(MessageRepository)
+    protected messageRepository: MessageRepository,
     @repository(RoomRepository)
     protected roomRepository: RoomRepository,
   ) {}
@@ -24,14 +20,65 @@ export class LogbookController {
       },
     },
   })
-  async find(@param.path.string('name') name: string): Promise<Room | null> {
-    return await this.roomRepository.findOne(
-      {where: {name: name}, fields: {id: true, name: true}},
-      {strictObjectIDCoercion: true},
-    );
+  async find(
+    @param.path.string('name') name: string,
+    @param.query.object('filter') filter?: Filter,
+  ): Promise<any> {
+    return await this.roomRepository
+      .findOne({
+        where: {name: name},
+      })
+      .then(async room => {
+        if (room !== null && room !== undefined && room.id !== undefined) {
+          this.room = room;
+          return await this.roomRepository
+            .messages(room.id)
+            .find(filter, {strictObjectIDCoercion: true});
+        } else {
+          return new Promise((resolve, reject) => {
+            resolve(undefined);
+          });
+        }
+      })
+      .then(messages => {
+        if (messages !== null && messages !== undefined) {
+          let logbook = JSON.stringify(this.parseLogbook(this.room, messages));
+          return new Promise((resolve, reject) => {
+            resolve(logbook);
+          });
+        } else {
+          return new Promise((resolve, reject) => {
+            resolve(undefined);
+          });
+        }
+      });
   }
 
-  parseRoom() {}
-
-  parseMessages() {}
+  parseLogbook(room: Room, messages: any): Object {
+    interface LooseObject {
+      [key: string]: any;
+    }
+    let newLogbook: LooseObject = {
+      name: room.name,
+      messages: [],
+    };
+    messages.forEach(
+      (message: {
+        timestamp: string | number | Date | undefined;
+        sender: any;
+        content: any;
+      }) => {
+        let parsedMessage: LooseObject = {};
+        if (message.timestamp !== undefined) {
+          parsedMessage.timestamp = new Date(message.timestamp).toISOString();
+        } else {
+          parsedMessage.timestamp = undefined;
+        }
+        parsedMessage.sender = message.sender;
+        parsedMessage.content = message.content;
+        newLogbook.messages.push(parsedMessage);
+      },
+    );
+    return newLogbook;
+  }
 }
