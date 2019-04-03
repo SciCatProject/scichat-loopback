@@ -33,19 +33,19 @@ export class LogbookController {
             .messages(room.id)
             .find(filter, {strictObjectIDCoercion: true});
         } else {
-          return new Promise((resolve, reject) => {
+          return await new Promise((resolve, reject) => {
             resolve(undefined);
           });
         }
       })
-      .then(messages => {
+      .then(async messages => {
         if (messages !== null && messages !== undefined) {
-          let logbook = JSON.stringify(this.parseLogbook(this.room, messages));
-          return new Promise((resolve, reject) => {
+          let logbook = this.parseLogbook(this.room, messages);
+          return await new Promise((resolve, reject) => {
             resolve(logbook);
           });
         } else {
-          return new Promise((resolve, reject) => {
+          return await new Promise((resolve, reject) => {
             resolve(undefined);
           });
         }

@@ -247,6 +247,19 @@ let getImagesResponse: any = [
   },
 ];
 
+let findOneRoomResponse: any = {
+  id: 'string',
+  canonicalAlias: 'string',
+  name: 'string',
+  worldReadable: false,
+  topic: 'string',
+  numberOfJoinedMembers: 1,
+  federate: false,
+  roomId: '!string',
+  guestCanJoin: false,
+  aliases: ['#string'],
+};
+
 export {
   findAllRoomsResponse,
   findEventsByRoomResponse,
@@ -265,4 +278,5 @@ export {
   findAllImagesByRoomResponse,
   postImageResponse,
   getImagesResponse,
+  findOneRoomResponse,
 };
