@@ -1,23 +1,25 @@
-"use strict";
+/* eslint-disable camelcase */
+'use strict';
 
-const requestPromise = require("request-promise");
+const requestPromise = require('request-promise');
 
 module.exports = class MatrixRestClient {
   constructor() {
-    this._baseUrl = "https://scicat03.esss.lu.se:8448";
+    this._baseUrl = 'https://scicat03.esss.lu.se:8448';
     this._accessToken =
-      "MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBpPU9kdDlfcFNZQSNOQzFYCjAwMmZzaWduYXR1cmUgcLwHR_4nfCYIm97N3hIji1_QXTqV1aC1b3OzN-nuM6wK";
-    this._userId = "@scicatbot:scicat03.esss.lu.se";
-    this._password = "scicatbot";
+      // eslint-disable-next-line max-len
+      'MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBpPU9kdDlfcFNZQSNOQzFYCjAwMmZzaWduYXR1cmUgcLwHR_4nfCYIm97N3hIji1_QXTqV1aC1b3OzN-nuM6wK';
+    this._userId = '@scicatbot:scicat03.esss.lu.se';
+    this._password = 'scicatbot';
     this._txnCounter = 0;
   }
 
-  createRoom({ visibility, room_alias_name, name, topic }) {
+  createRoom({visibility, room_alias_name, name, topic}) {
     let options = {
-      method: "POST",
-      uri: this._baseUrl + "/_matrix/client/r0/createRoom",
+      method: 'POST',
+      uri: this._baseUrl + '/_matrix/client/r0/createRoom',
       headers: {
-        Authorization: "Bearer " + this._accessToken
+        Authorization: 'Bearer ' + this._accessToken,
       },
       body: {
         visibility: visibility,
@@ -25,27 +27,27 @@ module.exports = class MatrixRestClient {
         name: name,
         topic: topic,
         creation_content: {
-          "m.federate": false
-        }
+          'm.federate': false,
+        },
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options).catch(err => {
-      console.error("Error in createRoom(): " + err);
+      console.error('Error in createRoom(): ' + err);
     });
   }
 
   findAllRooms() {
     let options = {
-      method: "GET",
-      uri: this._baseUrl + "/_matrix/client/r0/publicRooms",
+      method: 'GET',
+      uri: this._baseUrl + '/_matrix/client/r0/publicRooms',
       headers: {
-        Authorization: "Bearer " + this._accessToken
+        Authorization: 'Bearer ' + this._accessToken,
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options)
@@ -55,7 +57,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findAllRooms(): " + err);
+        console.error('Error in findAllRooms(): ' + err);
       });
   }
 
@@ -73,7 +75,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findRoomByName(): " + err);
+        console.error('Error in findRoomByName(): ' + err);
       });
   }
 
@@ -81,14 +83,14 @@ module.exports = class MatrixRestClient {
     return this.findRoomByName(roomName)
       .then(room => {
         let options = {
-          method: "GET",
+          method: 'GET',
           uri:
             this._baseUrl + `/_matrix/client/r0/rooms/${room.room_id}/members`,
           headers: {
-            Authorization: "Bearer " + this._accessToken
+            Authorization: 'Bearer ' + this._accessToken,
           },
           rejectUnauthorized: false,
-          json: true
+          json: true,
         };
 
         return requestPromise(options);
@@ -99,35 +101,35 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findRoomMemebers(): " + err);
+        console.error('Error in findRoomMemebers(): ' + err);
       });
   }
 
-  sendMessageToRoom({ roomName, message }) {
+  sendMessageToRoom({roomName, message}) {
     let txnId = this.newTxnId();
     return this.findRoomByName(roomName)
       .then(room => {
         let options = {
-          method: "PUT",
+          method: 'PUT',
           uri:
             this._baseUrl +
             `/_matrix/client/r0/rooms/${
               room.room_id
             }/send/m.room.message/${txnId}`,
           headers: {
-            Authorization: "Bearer " + this._accessToken
+            Authorization: 'Bearer ' + this._accessToken,
           },
           body: {
             body: message,
-            msgtype: "m.text"
+            msgtype: 'm.text',
           },
           rejectUnauthorized: false,
-          json: true
+          json: true,
         };
         return requestPromise(options);
       })
       .catch(err => {
-        console.error("Error in sendMessageToRoom(): " + err);
+        console.error('Error in sendMessageToRoom(): ' + err);
       });
   }
 
@@ -152,7 +154,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findEventsByRoom(): " + err);
+        console.error('Error in findEventsByRoom(): ' + err);
       });
   }
 
@@ -170,7 +172,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findMessagesByRoom(): " + err);
+        console.error('Error in findMessagesByRoom(): ' + err);
       });
   }
 
@@ -191,7 +193,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findMessagesByRoomAndDate(): " + err);
+        console.error('Error in findMessagesByRoomAndDate(): ' + err);
       });
   }
 
@@ -212,7 +214,7 @@ module.exports = class MatrixRestClient {
         });
       })
       .catch(err => {
-        console.error("Error in findMessagesByRoomAndDateRange()" + err);
+        console.error('Error in findMessagesByRoomAndDateRange()' + err);
       });
   }
 
@@ -237,17 +239,17 @@ module.exports = class MatrixRestClient {
           let mediaId = message.content.url.split(/\/+/)[2];
 
           let options = {
-            method: "GET",
+            method: 'GET',
             uri:
               this._baseUrl +
               `/_matrix/media/r0/download/${serverName}/${mediaId}`,
             headers: {
-              Authorization: "Bearer " + this._accessToken
+              Authorization: 'Bearer ' + this._accessToken,
             },
-            rejectUnauthorized: false
+            rejectUnauthorized: false,
           };
           return requestPromise(options).catch(err => {
-            console.error("Error in findImageByRoomAndFilename(): " + err);
+            console.error('Error in findImageByRoomAndFilename(): ' + err);
           });
         }
       });
@@ -255,7 +257,7 @@ module.exports = class MatrixRestClient {
   }
 
   eventTypeIsMessage(event) {
-    if (event.type === "m.room.message") {
+    if (event.type === 'm.room.message') {
       return true;
     } else {
       return false;
@@ -263,7 +265,7 @@ module.exports = class MatrixRestClient {
   }
 
   messageTypeisImage(message) {
-    if (message.content.msgtype === "m.image") {
+    if (message.content.msgtype === 'm.image') {
       return true;
     } else {
       return false;
@@ -308,8 +310,8 @@ module.exports = class MatrixRestClient {
     messages.forEach(message => {
       let messageTimeStamp = new Date(message.origin_server_ts)
         .toISOString()
-        .replace("T", " ")
-        .replace(/\.\w+/, "");
+        .replace('T', ' ')
+        .replace(/\.\w+/, '');
       console.log(
         `[${messageTimeStamp}] ${message.sender} >>> ${message.content.body}`
       );
@@ -318,90 +320,90 @@ module.exports = class MatrixRestClient {
 
   login() {
     let options = {
-      method: "POST",
-      uri: this._baseUrl + "/_matrix/client/r0/login",
+      method: 'POST',
+      uri: this._baseUrl + '/_matrix/client/r0/login',
       body: {
-        type: "m.login.password",
+        type: 'm.login.password',
         identifier: {
-          type: "m.id.user",
-          user: this._userId
+          type: 'm.id.user',
+          user: this._userId,
         },
-        password: this._password
+        password: this._password,
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options).catch(err => {
-      console.error("Error in login(): " + err);
+      console.error('Error in login(): ' + err);
     });
   }
 
   whoAmI() {
     let options = {
-      method: "GET",
-      uri: this._baseUrl + "/_matrix/client/r0/account/whoami",
+      method: 'GET',
+      uri: this._baseUrl + '/_matrix/client/r0/account/whoami',
       headers: {
-        Authorization: "Bearer " + this._accessToken
+        Authorization: 'Bearer ' + this._accessToken,
       },
       body: {
-        timeout: 5000
+        timeout: 5000,
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options).catch(err => {
-      console.error("Error in whoAmI(): " + err);
+      console.error('Error in whoAmI(): ' + err);
     });
   }
 
   findUserInfoByUserName(userName) {
-    let userId = "@" + userName.toLowerCase() + ":scicat03.esss.lu.se";
+    let userId = '@' + userName.toLowerCase() + ':scicat03.esss.lu.se';
     let options = {
-      method: "GET",
+      method: 'GET',
       uri: this._baseUrl + `/_matrix/client/r0/profile/${userId}`,
       headers: {
-        Authorization: "Bearer " + this._accessToken
+        Authorization: 'Bearer ' + this._accessToken,
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options).catch(err => {
-      console.error("Error in findUserInfoByUserId(): " + err);
+      console.error('Error in findUserInfoByUserId(): ' + err);
     });
   }
 
   sync() {
-    console.log("Syncing...");
+    console.log('Syncing...');
     let options = {
-      method: "GET",
-      uri: this._baseUrl + "/_matrix/client/r0/sync",
+      method: 'GET',
+      uri: this._baseUrl + '/_matrix/client/r0/sync',
       headers: {
-        Authorization: "Bearer " + this._accessToken
+        Authorization: 'Bearer ' + this._accessToken,
       },
       body: {
         full_state: true,
-        timeout: 5000
+        timeout: 5000,
       },
       rejectUnauthorized: false,
-      json: true
+      json: true,
     };
 
     return requestPromise(options)
       .then(response => {
-        console.log("Sync succesful");
+        console.log('Sync succesful');
         return new Promise((resolve, reject) => {
           resolve(response);
         });
       })
       .catch(err => {
-        console.error("Error in sync(): " + err);
+        console.error('Error in sync(): ' + err);
       });
   }
 
   newTxnId() {
-    return "s" + new Date().getTime() + "." + this._txnCounter++;
+    return 's' + new Date().getTime() + '.' + this._txnCounter++;
   }
 };

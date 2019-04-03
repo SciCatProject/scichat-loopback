@@ -1,3 +1,5 @@
+'use strict';
+
 const LoopbackClient = require('./loopback-client');
 const lbClient = new LoopbackClient();
 
@@ -79,7 +81,7 @@ module.exports = class Utils {
             return event.eventId;
           });
         });
-      }),
+      })
     )
       .then(res => {
         console.log(res);

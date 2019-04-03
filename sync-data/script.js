@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const SyncData = require("./sync-data");
+const SyncData = require('./sync-data');
 const sync = new SyncData();
 
 sync

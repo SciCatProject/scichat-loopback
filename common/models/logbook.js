@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const app = require("../../server/server");
+const app = require('../../server/server');
 
 module.exports = function(Logbook) {
   /**
@@ -11,12 +11,12 @@ module.exports = function(Logbook) {
   Logbook.findByName = function(name) {
     let Room = app.models.Room;
     return Room.find({
-      where: { name: name },
-      fields: ["id", "name"],
+      where: {name: name},
+      fields: ['id', 'name'],
       include: {
-        relation: "messages",
-        scope: { fields: ["timestamp", "sender", "content"] }
-      }
+        relation: 'messages',
+        scope: {fields: ['timestamp', 'sender', 'content']},
+      },
     });
   };
 };

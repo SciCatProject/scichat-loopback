@@ -1,3 +1,5 @@
+'use strict';
+
 const MatrixRestClient = require('./matrix-rest-client');
 const matrixClient = new MatrixRestClient();
 const LoopbackClient = require('./loopback-client');
@@ -25,8 +27,7 @@ module.exports = class SyncData {
   }
 
   syncRoomEvents() {
-    let dbRooms;
-    let dbEventIds;
+    let dbRooms, dbEventIds;
 
     return lbClient
       .getRooms()
@@ -49,8 +50,7 @@ module.exports = class SyncData {
   }
 
   syncRoomMessages() {
-    let dbRooms;
-    let dbMessageIds;
+    let dbRooms, dbMessageIds;
 
     return lbClient
       .getRooms()
@@ -71,8 +71,7 @@ module.exports = class SyncData {
   }
 
   syncRoomMembers() {
-    let dbRooms;
-    let dbMemberIds;
+    let dbRooms, dbMemberIds;
 
     return lbClient
       .getRooms()
@@ -93,8 +92,7 @@ module.exports = class SyncData {
   }
 
   syncRoomImages() {
-    let dbRooms;
-    let dbImagesIds;
+    let dbRooms, dbImagesIds;
 
     return lbClient
       .getRooms()
@@ -125,7 +123,7 @@ module.exports = class SyncData {
             resolve({});
           });
         }
-      }),
+      })
     );
   }
 
@@ -143,7 +141,7 @@ module.exports = class SyncData {
                     resolve({});
                   });
                 }
-              }),
+              })
             );
           }
           case 'message': {
@@ -156,7 +154,7 @@ module.exports = class SyncData {
                     resolve({});
                   });
                 }
-              }),
+              })
             );
           }
           case 'member': {
@@ -169,7 +167,7 @@ module.exports = class SyncData {
                     resolve({});
                   });
                 }
-              }),
+              })
             );
           }
           case 'image': {
@@ -182,11 +180,11 @@ module.exports = class SyncData {
                     resolve({});
                   });
                 }
-              }),
+              })
             );
           }
         }
-      }),
+      })
     );
   }
 
@@ -217,7 +215,7 @@ module.exports = class SyncData {
     return Promise.all(
       rooms.map(room => {
         return matrixClient.findEventsByRoom(room.name);
-      }),
+      })
     )
       .then(synapseRoomEvents => {
         let roomEvents = [];
@@ -270,7 +268,7 @@ module.exports = class SyncData {
     return Promise.all(
       rooms.map(room => {
         return matrixClient.findMessagesByRoom(room.name);
-      }),
+      })
     )
       .then(synapseRoomMessages => {
         let roomMessages = [];
@@ -318,7 +316,7 @@ module.exports = class SyncData {
     return Promise.all(
       rooms.map(room => {
         return matrixClient.findRoomMembers(room.name);
-      }),
+      })
     )
       .then(synapseRoomMembers => {
         let roomMembers = [];
@@ -366,7 +364,7 @@ module.exports = class SyncData {
     return Promise.all(
       rooms.map(room => {
         return matrixClient.findAllImagesByRoom(room.name);
-      }),
+      })
     )
       .then(synapseRoomImages => {
         let roomImages = [];

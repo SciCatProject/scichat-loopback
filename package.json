@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "start": "node .",
     "posttest": "npm run lint",
+    "test": "mocha",
     "sync": "node ./sync-data/script.js"
   },
   "dependencies": {
@@ -25,8 +26,11 @@
     "superagent": "^5.0.2"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^3.17.1",
-    "eslint-config-loopback": "^8.0.0"
+    "eslint-config-loopback": "^8.0.0",
+    "mocha": "^6.0.2",
+    "sinon": "^7.3.1"
   },
   "repository": {
     "type": "",
