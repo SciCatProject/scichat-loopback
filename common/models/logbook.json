@@ -1,0 +1,51 @@
+{
+  "name": "Logbook",
+  "base": "Model",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "messages": {
+      "type": [
+        "object"
+      ]
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {
+    "findByName": {
+      "accepts": [
+        {
+          "arg": "name",
+          "type": "string",
+          "required": true,
+          "description": "The name of the Logbook",
+          "http": {
+            "source": "path"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "findByName",
+          "type": "object",
+          "root": true,
+          "description": "Logbook model instance"
+        }
+      ],
+      "description": "Find Logbook model instance by name",
+      "http": [
+        {
+          "path": "/:name",
+          "verb": "get"
+        }
+      ]
+    }
+  }
+}

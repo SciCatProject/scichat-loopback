@@ -1,7 +1,0 @@
-{
-  "name": "Storage",
-  "connector": "loopback-component-storage",
-  "provider": "filesystem",
-  "root": "./storage",
-  "nameConflict": "makeUnique"
-}

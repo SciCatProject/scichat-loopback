@@ -1,0 +1,59 @@
+{
+  "name": "Member",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "previousContent": {
+      "type": "object"
+    },
+    "timestamp": {
+      "type": "date"
+    },
+    "sender": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "age": {
+      "type": "number"
+    },
+    "unsigned": {
+      "type": "object"
+    },
+    "stateKey": {
+      "type": "string"
+    },
+    "content": {
+      "type": "object"
+    },
+    "synapseRoomId": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string"
+    },
+    "replacesState": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "room": {
+      "type": "belongsTo",
+      "model": "Room",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

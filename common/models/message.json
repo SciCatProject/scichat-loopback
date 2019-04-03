@@ -1,0 +1,41 @@
+{
+  "name": "Message",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "date"
+    },
+    "sender": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "unsigned": {
+      "type": "object"
+    },
+    "content": {
+      "type": "object"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "room": {
+      "type": "belongsTo",
+      "model": "Room",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

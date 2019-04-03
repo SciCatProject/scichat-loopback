@@ -1,0 +1,70 @@
+{
+  "name": "Room",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "canonicalAlias": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "worldReadable": {
+      "type": "boolean",
+      "default": false
+    },
+    "topic": {
+      "type": "string"
+    },
+    "numberOfJoinedMembers": {
+      "type": "number"
+    },
+    "federate": {
+      "type": "boolean",
+      "default": false
+    },
+    "roomId": {
+      "type": "string"
+    },
+    "guestCanJoin": {
+      "type": "boolean",
+      "default": false
+    },
+    "aliases": {
+      "type": [
+        "string"
+      ]
+    }
+  },
+  "validations": [],
+  "relations": {
+    "events": {
+      "type": "hasMany",
+      "model": "Event",
+      "foreignKey": ""
+    },
+    "members": {
+      "type": "hasMany",
+      "model": "Member",
+      "foreignKey": ""
+    },
+    "messages": {
+      "type": "hasMany",
+      "model": "Message",
+      "foreignKey": ""
+    },
+    "images": {
+      "type": "hasMany",
+      "model": "Image",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

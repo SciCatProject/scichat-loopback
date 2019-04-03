@@ -1,4 +1,4 @@
-const LoopbackClient = require('./LoopbackClient');
+const LoopbackClient = require('./loopback-client');
 const lbClient = new LoopbackClient();
 
 module.exports = class Utils {
