@@ -2,8 +2,8 @@ import {Client, expect} from '@loopback/testlab';
 import {ScichatLoopbackApplication} from '../..';
 import {setupApplication} from '../acceptance/test-helper';
 import {createSandbox} from 'sinon';
-import {findOneRoomResponse, getMessagesResponse} from './MockStubs';
 
+import {findOneRoomResponse, getMessagesResponse} from './MockStubs';
 import {MessageRepository, RoomRepository} from '../../repositories';
 
 const sandbox = createSandbox();
