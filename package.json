@@ -19,6 +19,7 @@
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
+    "loopback-component-storage": "^3.6.0",
     "loopback-connector-mongodb": "^4.0.0",
     "request-promise": "^4.2.4",
     "serve-favicon": "^2.0.1",
