@@ -1,9 +1,6 @@
 'use strict';
 
-const LoopbackClient = require('./loopback-client');
-const lbClient = new LoopbackClient();
-
-module.exports = class Utils {
+module.exports = class LoopbackUtils {
   constructor() {}
   replaceNonallowedObjectKeyCharacters(events) {
     let keys;
@@ -73,21 +70,23 @@ module.exports = class Utils {
     return ids;
   }
 
-  createEventIdList(rooms) {
-    return Promise.all(
-      rooms.map(room => {
-        return lbClient.getRoomEvents(room).then(roomEvents => {
-          return roomEvents.map(event => {
-            return event.eventId;
-          });
-        });
-      })
-    )
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        console.error(err);
+  filterUnsyncedFiles(roomImages, containerFiles) {
+    let filenames = [];
+    containerFiles.forEach(containerFile => {
+      containerFile.forEach(file => {
+        filenames.push(file.name);
       });
+    });
+    let filteredRoomImages = roomImages.filter(roomImage => {
+      return roomImage.images.length > 0;
+    });
+    let roomImagesToUpload;
+    filteredRoomImages.forEach(roomImage => {
+      roomImagesToUpload = roomImage.images.filter(image => {
+        return filenames.includes(image.name);
+      });
+      roomImage.images = roomImagesToUpload;
+    });
+    return filteredRoomImages;
   }
 };

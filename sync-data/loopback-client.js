@@ -2,9 +2,11 @@
 
 const superagent = require('superagent');
 
+const app = require('../server/server');
+
 module.exports = class LoopbackClient {
   constructor() {
-    this._loopbackBaseUrl = 'http://localhost:3000/api';
+    this._loopbackBaseUrl = 'http://localhost:3030/api';
   }
 
   postRoom(room) {
@@ -221,6 +223,41 @@ module.exports = class LoopbackClient {
         return new Promise((resolve, reject) => {
           resolve(response.body);
         });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createContainer(roomName) {
+    console.log(`Creating new Container: ${roomName}`);
+    return superagent
+      .post(this._loopbackBaseUrl + '/containers')
+      .send({name: roomName})
+      .then(response => {
+        return Promise.resolve(response.body);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  getContainers() {
+    return superagent
+      .get(this._loopbackBaseUrl + '/containers')
+      .then(response => {
+        return Promise.resolve(response.body);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  getFiles(roomName) {
+    return superagent
+      .get(this._loopbackBaseUrl + `/containers/${roomName}/files`)
+      .then(response => {
+        return Promise.resolve(response.body);
       })
       .catch(err => {
         console.error(err);

@@ -1,10 +1,13 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 const MatrixRestClient = require('./matrix-rest-client');
 const matrixClient = new MatrixRestClient();
 const LoopbackClient = require('./loopback-client');
 const lbClient = new LoopbackClient();
-const Utils = require('./utils');
+const Utils = require('./loopback-utils');
 const util = new Utils();
 
 module.exports = class SyncData {
@@ -92,7 +95,7 @@ module.exports = class SyncData {
   }
 
   syncRoomImages() {
-    let dbRooms, dbImagesIds;
+    let dbRooms, dbImagesIds, dbRoomImageMap;
 
     return lbClient
       .getRooms()
@@ -101,7 +104,14 @@ module.exports = class SyncData {
         return this.createDbRoomImageMap(dbRooms);
       })
       .then(dbRoomImages => {
+        dbRoomImageMap = dbRoomImages;
         dbImagesIds = util.createIdList('image', dbRoomImages);
+        return this.createRoomContainers(dbRooms);
+      })
+      .then(() => {
+        return this.downloadImages(dbRoomImageMap);
+      })
+      .then(() => {
         return this.createSynapseRoomImageMap(dbRooms);
       })
       .then(synapseRoomImages => {
@@ -379,6 +389,76 @@ module.exports = class SyncData {
         return new Promise((resolve, reject) => {
           resolve(roomImages);
         });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  createRoomContainers(rooms) {
+    return lbClient
+      .getContainers()
+      .then(containers => {
+        let containerNames = containers.map(container => {
+          return container.name;
+        });
+        return Promise.all(
+          rooms.filter(room => {
+            return !containerNames.includes(room.name);
+          })
+        );
+      })
+      .then(filteredRooms => {
+        return Promise.all(
+          filteredRooms.map(room => {
+            return lbClient.createContainer(room.name);
+          })
+        );
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  downloadImages(roomImages) {
+    return lbClient
+      .getContainers()
+      .then(containers => {
+        let containerNames = containers.map(container => {
+          return container.name;
+        });
+        return Promise.all(
+          containerNames.map(container => {
+            return lbClient.getFiles(container);
+          })
+        );
+      })
+      .then(containerFiles => {
+        let filteredRoomImages = util.filterUnsyncedFiles(
+          roomImages,
+          containerFiles
+        );
+        let filePath;
+        return Promise.all(
+          filteredRoomImages.map(roomImage => {
+            return Promise.all(
+              roomImage.images.map(image => {
+                filePath = path.join(
+                  __dirname,
+                  '..',
+                  'storage',
+                  roomImage.name,
+                  image.content.body
+                );
+                return matrixClient.downloadImageFromRoom(
+                  roomImage.name,
+                  image.content.body,
+                  filePath
+                );
+              })
+            );
+          })
+        );
       })
       .catch(err => {
         console.error(err);

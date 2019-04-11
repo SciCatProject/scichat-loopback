@@ -1,38 +1,26 @@
 /* eslint-disable camelcase */
 'use strict';
 
+const fs = require('fs');
+const request = require('request');
 const requestPromise = require('request-promise');
+const Utils = require('./matrix-utils');
+const utils = new Utils();
 
 module.exports = class MatrixRestClient {
   constructor() {
-    this._baseUrl = 'https://scicat03.esss.lu.se:8448';
-    this._accessToken =
-      // eslint-disable-next-line max-len
-      'MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBpPU9kdDlfcFNZQSNOQzFYCjAwMmZzaWduYXR1cmUgcLwHR_4nfCYIm97N3hIji1_QXTqV1aC1b3OzN-nuM6wK';
     this._userId = '@scicatbot:scicat03.esss.lu.se';
     this._password = 'scicatbot';
-    this._txnCounter = 0;
   }
 
   createRoom({visibility, room_alias_name, name, topic}) {
-    let options = {
-      method: 'POST',
-      uri: this._baseUrl + '/_matrix/client/r0/createRoom',
-      headers: {
-        Authorization: 'Bearer ' + this._accessToken,
-      },
-      body: {
-        visibility: visibility,
-        room_alias_name: room_alias_name,
-        name: name,
-        topic: topic,
-        creation_content: {
-          'm.federate': false,
-        },
-      },
-      rejectUnauthorized: false,
-      json: true,
+    let roomDetails = {
+      visibility: visibility,
+      room_alias_name: room_alias_name,
+      name: name,
+      topic: topic,
     };
+    let options = utils.getRequestOptionsForMethod('createRoom', roomDetails);
 
     return requestPromise(options).catch(err => {
       console.error('Error in createRoom(): ' + err);
@@ -40,21 +28,11 @@ module.exports = class MatrixRestClient {
   }
 
   findAllRooms() {
-    let options = {
-      method: 'GET',
-      uri: this._baseUrl + '/_matrix/client/r0/publicRooms',
-      headers: {
-        Authorization: 'Bearer ' + this._accessToken,
-      },
-      rejectUnauthorized: false,
-      json: true,
-    };
+    let options = utils.getRequestOptionsForMethod('findAllRooms');
 
     return requestPromise(options)
       .then(response => {
-        return new Promise((resolve, reject) => {
-          resolve(response.chunk);
-        });
+        return Promise.resolve(response.chunk);
       })
       .catch(err => {
         console.error('Error in findAllRooms(): ' + err);
@@ -64,15 +42,11 @@ module.exports = class MatrixRestClient {
   findRoomByName(requestName) {
     return this.findAllRooms()
       .then(allRooms => {
-        let foundRoom;
-        allRooms.forEach(room => {
-          if (room.name.toLowerCase() === requestName.toLowerCase()) {
-            foundRoom = room;
-          }
-        });
-        return new Promise((resolve, reject) => {
-          resolve(foundRoom);
-        });
+        return Promise.resolve(
+          allRooms.find(room => {
+            return room.name.toLowerCase() === requestName.toLowerCase();
+          })
+        );
       })
       .catch(err => {
         console.error('Error in findRoomByName(): ' + err);
@@ -82,23 +56,15 @@ module.exports = class MatrixRestClient {
   findRoomMembers(roomName) {
     return this.findRoomByName(roomName)
       .then(room => {
-        let options = {
-          method: 'GET',
-          uri:
-            this._baseUrl + `/_matrix/client/r0/rooms/${room.room_id}/members`,
-          headers: {
-            Authorization: 'Bearer ' + this._accessToken,
-          },
-          rejectUnauthorized: false,
-          json: true,
-        };
+        let options = utils.getRequestOptionsForMethod(
+          'findRoomMembers',
+          room.room_id
+        );
 
         return requestPromise(options);
       })
       .then(members => {
-        return new Promise((resolve, reject) => {
-          resolve(members.chunk);
-        });
+        return Promise.resolve(members.chunk);
       })
       .catch(err => {
         console.error('Error in findRoomMemebers(): ' + err);
@@ -106,26 +72,17 @@ module.exports = class MatrixRestClient {
   }
 
   sendMessageToRoom({roomName, message}) {
-    let txnId = this.newTxnId();
     return this.findRoomByName(roomName)
       .then(room => {
-        let options = {
-          method: 'PUT',
-          uri:
-            this._baseUrl +
-            `/_matrix/client/r0/rooms/${
-              room.room_id
-            }/send/m.room.message/${txnId}`,
-          headers: {
-            Authorization: 'Bearer ' + this._accessToken,
-          },
-          body: {
-            body: message,
-            msgtype: 'm.text',
-          },
-          rejectUnauthorized: false,
-          json: true,
+        let messageDetails = {
+          roomId: room.room_id,
+          message: message,
         };
+        let options = utils.getRequestOptionsForMethod(
+          'sendMessageToRoom',
+          messageDetails
+        );
+
         return requestPromise(options);
       })
       .catch(err => {
@@ -149,9 +106,7 @@ module.exports = class MatrixRestClient {
             roomEvents.events = syncResponse.rooms.join[roomId].timeline.events;
           }
         });
-        return new Promise((resolve, reject) => {
-          resolve(roomEvents);
-        });
+        return Promise.resolve(roomEvents);
       })
       .catch(err => {
         console.error('Error in findEventsByRoom(): ' + err);
@@ -161,15 +116,11 @@ module.exports = class MatrixRestClient {
   findMessagesByRoom(roomName) {
     return this.findEventsByRoom(roomName)
       .then(roomEvents => {
-        let messages = [];
-        roomEvents.events.forEach(event => {
-          if (this.eventTypeIsMessage(event)) {
-            messages.push(event);
-          }
-        });
-        return new Promise((resolve, reject) => {
-          resolve(messages);
-        });
+        return Promise.all(
+          roomEvents.events.filter(event => {
+            return utils.eventTypeIsMessage(event);
+          })
+        );
       })
       .catch(err => {
         console.error('Error in findMessagesByRoom(): ' + err);
@@ -179,18 +130,14 @@ module.exports = class MatrixRestClient {
   findMessagesByRoomAndDate(roomName, date) {
     return this.findEventsByRoom(roomName)
       .then(roomEvents => {
-        let messages = [];
-        roomEvents.events.forEach(event => {
-          if (
-            this.eventTypeIsMessage(event) &&
-            this.eventDateEqualsRequestDate(event, date)
-          ) {
-            messages.push(event);
-          }
-        });
-        return new Promise((resolve, reject) => {
-          resolve(messages);
-        });
+        return Promise.all(
+          roomEvents.events.filter(event => {
+            return (
+              utils.eventTypeIsMessage(event) &&
+              utils.eventDateEqualsRequestDate(event, date)
+            );
+          })
+        );
       })
       .catch(err => {
         console.error('Error in findMessagesByRoomAndDate(): ' + err);
@@ -200,18 +147,14 @@ module.exports = class MatrixRestClient {
   findMessagesByRoomAndDateRange(roomName, startDate, endDate) {
     return this.findEventsByRoom(roomName)
       .then(roomEvents => {
-        let messages = [];
-        roomEvents.events.forEach(event => {
-          if (
-            this.eventTypeIsMessage(event) &&
-            this.eventDateIsBetweenRequestDates(event, startDate, endDate)
-          ) {
-            messages.push(event);
-          }
-        });
-        return new Promise((resolve, reject) => {
-          resolve(messages);
-        });
+        return Promise.all(
+          roomEvents.events.filter(event => {
+            return (
+              utils.eventTypeIsMessage(event) &&
+              utils.eventDateIsBetweenRequestDates(event, startDate, endDate)
+            );
+          })
+        );
       })
       .catch(err => {
         console.error('Error in findMessagesByRoomAndDateRange()' + err);
@@ -222,117 +165,54 @@ module.exports = class MatrixRestClient {
     return this.findMessagesByRoom(roomName).then(messages => {
       return Promise.all(
         messages.filter(message => {
-          return this.messageTypeisImage(message);
+          return utils.messageTypeisImage(message);
         })
       );
     });
   }
 
-  findImageByRoomAndFilename(roomName, filename) {
-    return this.findMessagesByRoom(roomName).then(messages => {
-      messages.forEach(message => {
-        if (
-          this.messageTypeisImage(message) &&
-          this.messageBodyEqualsFilename(message, filename)
-        ) {
-          let serverName = message.content.url.split(/\/+/)[1];
-          let mediaId = message.content.url.split(/\/+/)[2];
+  downloadImageFromRoom(roomName, filename, savePath) {
+    return this.findAllImagesByRoom(roomName)
+      .then(images => {
+        let foundImage = images.find(image => {
+          return utils.messageBodyEqualsFilename(image, filename);
+        });
 
-          let options = {
-            method: 'GET',
-            uri:
-              this._baseUrl +
-              `/_matrix/media/r0/download/${serverName}/${mediaId}`,
-            headers: {
-              Authorization: 'Bearer ' + this._accessToken,
-            },
-            rejectUnauthorized: false,
-          };
-          return requestPromise(options).catch(err => {
-            console.error('Error in findImageByRoomAndFilename(): ' + err);
-          });
-        }
+        let imgUrl = foundImage.content.url.slice(6);
+
+        let options = utils.getRequestOptionsForMethod(
+          'downloadImageFromRoom',
+          imgUrl
+        );
+
+        const file = fs.createWriteStream(savePath);
+
+        return Promise.resolve(
+          request(options)
+            .on('error', err => {
+              console.error(err);
+            })
+            .on('response', response => {
+              response.pipe(file);
+            })
+            .on('complete', () => {
+              return Promise.resolve(
+                `File ${filename} downloaded from Room ${roomName}`
+              );
+            })
+        );
+      })
+      .catch(err => {
+        console.error('Error in findImageByRoomAndFilename(): ' + err);
       });
-    });
-  }
-
-  eventTypeIsMessage(event) {
-    if (event.type === 'm.room.message') {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  messageTypeisImage(message) {
-    if (message.content.msgtype === 'm.image') {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  messageBodyEqualsFilename(message, filename) {
-    if (message.content.body.toLowerCase() === filename.toLowerCase()) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  eventDateEqualsRequestDate(event, date) {
-    let messageTimeStamp = new Date(event.origin_server_ts);
-    messageTimeStamp.setUTCHours(0, 0, 0, 0);
-    let requestDate = new Date(date);
-    if (messageTimeStamp.getTime() === requestDate.getTime()) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  eventDateIsBetweenRequestDates(event, startDate, endDate) {
-    let messageTimeStamp = new Date(event.origin_server_ts);
-    messageTimeStamp.setUTCHours(0, 0, 0, 0);
-    let requestStartDate = new Date(startDate);
-    let requestEndDate = new Date(endDate);
-    if (
-      messageTimeStamp.getTime() > requestStartDate.getTime() &&
-      messageTimeStamp.getTime() < requestEndDate.getTime()
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  printFormattedMessages(messages) {
-    messages.forEach(message => {
-      let messageTimeStamp = new Date(message.origin_server_ts)
-        .toISOString()
-        .replace('T', ' ')
-        .replace(/\.\w+/, '');
-      console.log(
-        `[${messageTimeStamp}] ${message.sender} >>> ${message.content.body}`
-      );
-    });
   }
 
   login() {
-    let options = {
-      method: 'POST',
-      uri: this._baseUrl + '/_matrix/client/r0/login',
-      body: {
-        type: 'm.login.password',
-        identifier: {
-          type: 'm.id.user',
-          user: this._userId,
-        },
-        password: this._password,
-      },
-      rejectUnauthorized: false,
-      json: true,
+    let loginData = {
+      user: this._userId,
+      password: this._password,
     };
+    let options = utils.getRequestOptionsForMethod('login', loginData);
 
     return requestPromise(options).catch(err => {
       console.error('Error in login(): ' + err);
@@ -340,18 +220,7 @@ module.exports = class MatrixRestClient {
   }
 
   whoAmI() {
-    let options = {
-      method: 'GET',
-      uri: this._baseUrl + '/_matrix/client/r0/account/whoami',
-      headers: {
-        Authorization: 'Bearer ' + this._accessToken,
-      },
-      body: {
-        timeout: 5000,
-      },
-      rejectUnauthorized: false,
-      json: true,
-    };
+    let options = utils.getRequestOptionsForMethod('whoAmI');
 
     return requestPromise(options).catch(err => {
       console.error('Error in whoAmI(): ' + err);
@@ -359,16 +228,10 @@ module.exports = class MatrixRestClient {
   }
 
   findUserInfoByUserName(userName) {
-    let userId = '@' + userName.toLowerCase() + ':scicat03.esss.lu.se';
-    let options = {
-      method: 'GET',
-      uri: this._baseUrl + `/_matrix/client/r0/profile/${userId}`,
-      headers: {
-        Authorization: 'Bearer ' + this._accessToken,
-      },
-      rejectUnauthorized: false,
-      json: true,
-    };
+    let options = utils.getRequestOptionsForMethod(
+      'findUserInfoByUserName',
+      userName
+    );
 
     return requestPromise(options).catch(err => {
       console.error('Error in findUserInfoByUserId(): ' + err);
@@ -376,34 +239,10 @@ module.exports = class MatrixRestClient {
   }
 
   sync() {
-    console.log('Syncing...');
-    let options = {
-      method: 'GET',
-      uri: this._baseUrl + '/_matrix/client/r0/sync',
-      headers: {
-        Authorization: 'Bearer ' + this._accessToken,
-      },
-      body: {
-        full_state: true,
-        timeout: 5000,
-      },
-      rejectUnauthorized: false,
-      json: true,
-    };
+    let options = utils.getRequestOptionsForMethod('sync');
 
-    return requestPromise(options)
-      .then(response => {
-        console.log('Sync succesful');
-        return new Promise((resolve, reject) => {
-          resolve(response);
-        });
-      })
-      .catch(err => {
-        console.error('Error in sync(): ' + err);
-      });
-  }
-
-  newTxnId() {
-    return 's' + new Date().getTime() + '.' + this._txnCounter++;
+    return requestPromise(options).catch(err => {
+      console.error('Error in sync(): ' + err);
+    });
   }
 };

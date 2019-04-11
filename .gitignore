@@ -29,3 +29,7 @@
 coverage
 node_modules
 npm-debug.log
+
+### Misc ###
+# Ignore everythin inside storage
+storage/*
