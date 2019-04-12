@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const app = require('../server/server');
 const MatrixRestClient = require('./matrix-rest-client');
 const matrixClient = new MatrixRestClient();
 const LoopbackClient = require('./loopback-client');
@@ -421,6 +422,8 @@ module.exports = class SyncData {
   }
 
   downloadImages(roomImages) {
+    const Image = app.models.Image;
+    let filePath, filteredRoomImages, storageFilename;
     return lbClient
       .getContainers()
       .then(containers => {
@@ -434,27 +437,42 @@ module.exports = class SyncData {
         );
       })
       .then(containerFiles => {
-        let filteredRoomImages = util.filterUnsyncedFiles(
+        filteredRoomImages = util.filterUnsyncedFiles(
           roomImages,
           containerFiles
         );
-        let filePath;
         return Promise.all(
           filteredRoomImages.map(roomImage => {
             return Promise.all(
               roomImage.images.map(image => {
+                storageFilename = `${new Date().getTime()}-${
+                  image.content.body
+                }`;
                 filePath = path.join(
                   __dirname,
                   '..',
                   'storage',
                   roomImage.name,
-                  image.content.body
+                  storageFilename
                 );
-                return matrixClient.downloadImageFromRoom(
-                  roomImage.name,
-                  image.content.body,
-                  filePath
-                );
+                return matrixClient
+                  .downloadImageFromRoom(
+                    roomImage.name,
+                    image.content.body,
+                    filePath
+                  )
+                  .then(() => {
+                    return Image.findOne({where: {id: image.id}});
+                  })
+                  .then(foundImage => {
+                    return foundImage.updateAttribute(
+                      'storagePath',
+                      `storage://${roomImage.name}/${storageFilename}`
+                    );
+                  })
+                  .catch(err => {
+                    console.error(err);
+                  });
               })
             );
           })

@@ -27,6 +27,9 @@
     "unsigned": {
       "type": "object"
     },
+    "storagePath": {
+      "type": "string"
+    },
     "synapseRoomId": {
       "type": "string"
     }

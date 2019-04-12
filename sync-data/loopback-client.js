@@ -2,8 +2,6 @@
 
 const superagent = require('superagent');
 
-const app = require('../server/server');
-
 module.exports = class LoopbackClient {
   constructor() {
     this._loopbackBaseUrl = 'http://localhost:3030/api';

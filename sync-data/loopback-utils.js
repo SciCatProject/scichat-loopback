@@ -74,7 +74,7 @@ module.exports = class LoopbackUtils {
     let filenames = [];
     containerFiles.forEach(containerFile => {
       containerFile.forEach(file => {
-        filenames.push(file.name);
+        filenames.push(file.name.split('-')[1]);
       });
     });
     let filteredRoomImages = roomImages.filter(roomImage => {
@@ -83,7 +83,7 @@ module.exports = class LoopbackUtils {
     let roomImagesToUpload;
     filteredRoomImages.forEach(roomImage => {
       roomImagesToUpload = roomImage.images.filter(image => {
-        return filenames.includes(image.name);
+        return !filenames.includes(image.content.body);
       });
       roomImage.images = roomImagesToUpload;
     });
