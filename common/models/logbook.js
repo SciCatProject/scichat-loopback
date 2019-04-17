@@ -5,7 +5,8 @@ const app = require('../../server/server');
 module.exports = function(Logbook) {
   /**
    * Find Logbook model instance by name
-   * @param {string} name The name of the Logbook
+   * @param {string} name Name of the Logbook
+   * @returns {object} Logbook model instance
    */
 
   Logbook.findByName = function(name) {
@@ -25,6 +26,7 @@ module.exports = function(Logbook) {
 
   /**
    * Find all Logbook model instances
+   * @returns {array} Array of Logbook model instances
    */
 
   Logbook.findAll = function() {
