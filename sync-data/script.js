@@ -7,7 +7,7 @@ const INTERVAL = 300000; // ms
 
 module.exports = function syncScript() {
   setInterval(() => {
-    console.log('Syncing...');
+    console.log(`[${new Date().toISOString()}]: Syncing...`);
     sync
       .syncRooms()
       .then(roomResponse => {
@@ -28,7 +28,7 @@ module.exports = function syncScript() {
       })
       .then(roomImageResponse => {
         console.log(roomImageResponse);
-        console.log('Sync complete');
+        console.log(`[${new Date().toISOString()}]: Sync complete`);
       });
   }, INTERVAL);
 };
