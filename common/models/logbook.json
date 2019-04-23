@@ -10,9 +10,7 @@
       "type": "string"
     },
     "messages": {
-      "type": [
-        "object"
-      ]
+      "type": ["object"]
     }
   },
   "validations": [],
@@ -34,7 +32,7 @@
       "returns": [
         {
           "arg": "findByName",
-          "type": "object",
+          "type": "Logbook",
           "root": true,
           "description": "Logbook model instance"
         }
@@ -52,7 +50,7 @@
       "returns": [
         {
           "arg": "findAll",
-          "type": "array",
+          "type": "[Logbook]",
           "root": true,
           "description": "Array of Logbook model instances"
         }
@@ -65,7 +63,7 @@
         }
       ]
     },
-    "findEntries": {
+    "filter": {
       "accepts": [
         {
           "arg": "name",
@@ -77,10 +75,9 @@
           }
         },
         {
-          "arg": "query",
+          "arg": "filter",
           "type": "string",
-          "required": true,
-          "description": "Query of content in Logbook entry",
+          "description": "Filter JSON object, keys: textSearch, showBotMessages, showUserMessages, showImages",
           "http": {
             "source": "path"
           }
@@ -88,45 +85,8 @@
       ],
       "returns": [
         {
-          "arg": "findEntries",
-          "type": "object",
-          "root": true,
-          "description": "Filtered Logbook model instance"
-        }
-      ],
-      "description": "Find all Logbook entries matching the query",
-      "http": [
-        {
-          "path": "/:name/:query",
-          "verb": "get"
-        }
-      ]
-    },
-    "filterEntries": {
-      "accepts": [
-        {
-          "arg": "name",
-          "type": "string",
-          "required": true,
-          "description": "The name of the Logbook",
-          "http": {
-            "source": "path"
-          }
-        },
-        {
-          "arg": "query",
-          "type": "string",
-          "required": true,
-          "description": "Query used to filter Logbook entries",
-          "http": {
-            "source": "path"
-          }
-        }
-      ],
-      "returns": [
-        {
-          "arg": "filterEntries",
-          "type": "object",
+          "arg": "filteredLogbook",
+          "type": "Logbook",
           "root": true,
           "description": "Filtered Logbook model instance"
         }
@@ -134,7 +94,7 @@
       "description": "Filter Logbook entries matching query",
       "http": [
         {
-          "path": "/:name/filter/:query",
+          "path": "/:name/:filter",
           "verb": "get"
         }
       ]

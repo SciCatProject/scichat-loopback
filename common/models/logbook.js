@@ -9,7 +9,7 @@ module.exports = function(Logbook) {
   /**
    * Find Logbook model instance by name
    * @param {string} name Name of the Logbook
-   * @returns {object} Logbook model instance
+   * @returns {Logbook} Logbook model instance
    */
 
   Logbook.findByName = function(name) {
@@ -29,7 +29,7 @@ module.exports = function(Logbook) {
 
   /**
    * Find all Logbook model instances
-   * @returns {array} Array of Logbook model instances
+   * @returns {Logbook[]} Array of Logbook model instances
    */
 
   Logbook.findAll = function() {
@@ -47,103 +47,73 @@ module.exports = function(Logbook) {
   };
 
   /**
-   * Find all Logbook entries matching the query
-   * @param {string} name The name of the Logbook
-   * @param {string} query Query of content in Logbook entry
-   * @returns {object} Filtered Logbook model instance
-   */
-
-  Logbook.findEntries = function(name, query) {
-    let Room = app.models.Room;
-    let pattern = new RegExp('.*' + query + '.*', 'i');
-    return Room.findOne({
-      where: {name: name},
-      fields: ['id', 'name'],
-      include: {
-        relation: 'messages',
-        scope: {
-          fields: ['timestamp', 'sender', 'content'],
-          order: 'timestamp ASC',
-          where: {
-            'content.body': {like: pattern},
-          },
-        },
-      },
-    });
-  };
-
-  /**
    * Filter Logbook entries matching query
    * @param {string} name The name of the Logbook
-   * @param {string} query Query used to filter Logbook entries
-   * @returns {object} Filtered Logbook model instance
+   * @param {string} filter Filter JSON object, keys: textSearch, showBotMessages, showUserMessages, showImages
+   * @returns {Logbook} Filtered Logbook model instance
    */
 
-  Logbook.filterEntries = function(name, query) {
+  Logbook.filter = function(name, filterString) {
     let Room = app.models.Room;
 
-    switch (query) {
-      case 'Bot Messages': {
-        return Room.findOne({
-          where: {name: name},
-          fields: ['id', 'name'],
-          include: {
-            relation: 'messages',
-            scope: {
-              fields: ['timestamp', 'sender', 'content'],
-              order: 'timestamp ASC',
-              where: {
-                sender: {neq: BOT_NAME},
-              },
+    let filter = JSON.parse(filterString);
+    let pattern = new RegExp('.*' + filter.textSearch + '.*', 'i');
+    let queryFilter = {
+      text: pattern,
+    };
+
+    if (filter.showBotMessages && filter.showUserMessages) {
+      queryFilter.messageSenderToggle = {neq: null};
+    } else if (!filter.showBotMessages && filter.showUserMessages) {
+      queryFilter.messageSenderToggle = {neq: BOT_NAME};
+    } else if (filter.showBotMessages && !filter.showUserMessages) {
+      queryFilter.messageSenderToggle = BOT_NAME;
+    } else if (!filter.showBotMessages && !filter.showUserMessages) {
+      queryFilter.messageSenderToggle = null;
+    } else {
+      queryFilter.messageSenderToggle = {neq: null};
+    }
+    if (filter.showImages) {
+      queryFilter.imagesToggle = IMAGE_MSGTYPE;
+
+      return Room.findOne({
+        where: {name: name},
+        fields: ['id', 'name'],
+        include: {
+          relation: 'messages',
+          scope: {
+            fields: ['timestamp', 'sender', 'content'],
+            order: 'timestamp ASC',
+            where: {
+              and: [
+                {sender: queryFilter.messageSenderToggle},
+                {'content.body': {like: queryFilter.text}},
+              ],
             },
           },
-        });
-      }
-      case 'User Messages': {
-        return Room.findOne({
-          where: {name: name},
-          fields: ['id', 'name'],
-          include: {
-            relation: 'messages',
-            scope: {
-              fields: ['timestamp', 'sender', 'content'],
-              order: 'timestamp ASC',
-              where: {
-                sender: BOT_NAME,
-              },
+        },
+      });
+    } else {
+      queryFilter.imagesToggle = {neq: IMAGE_MSGTYPE};
+
+      return Room.findOne({
+        where: {name: name},
+        fields: ['id', 'name'],
+        include: {
+          relation: 'messages',
+          scope: {
+            fields: ['timestamp', 'sender', 'content'],
+            order: 'timestamp ASC',
+            where: {
+              and: [
+                {sender: queryFilter.messageSenderToggle},
+                {'content.body': {like: queryFilter.text}},
+                {'content.msgtype': queryFilter.imagesToggle},
+              ],
             },
           },
-        });
-      }
-      case 'Images': {
-        return Room.findOne({
-          where: {name: name},
-          fields: ['id', 'name'],
-          include: {
-            relation: 'messages',
-            scope: {
-              fields: ['timestamp', 'sender', 'content'],
-              order: 'timestamp ASC',
-              where: {
-                'content.msgtype': {neq: IMAGE_MSGTYPE},
-              },
-            },
-          },
-        });
-      }
-      default: {
-        return Room.findOne({
-          where: {name: name},
-          fields: ['id', 'name'],
-          include: {
-            relation: 'messages',
-            scope: {
-              fields: ['timestamp', 'sender', 'content'],
-              order: 'timestamp ASC',
-            },
-          },
-        });
-      }
+        },
+      });
     }
   };
 };
