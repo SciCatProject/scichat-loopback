@@ -1,7 +1,7 @@
 'use strict';
 
 const app = require('../../server/server');
-const rison = require('rison');
+const rison = require('rison.js');
 
 const BOT_NAME = '@scicatbot:scicat03.esss.lu.se';
 const IMAGE_MSGTYPE = 'm.image';
