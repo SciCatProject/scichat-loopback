@@ -22,6 +22,7 @@
     "loopback-component-storage": "^3.6.0",
     "loopback-connector-mongodb": "^4.0.0",
     "request-promise": "^4.2.4",
+    "rison": "github:nanonid/rison",
     "serve-favicon": "^2.0.1",
     "strong-error-handler": "^3.0.0",
     "superagent": "^5.0.2"
