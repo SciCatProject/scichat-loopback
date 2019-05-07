@@ -33,3 +33,4 @@ npm-debug.log
 ### Misc ###
 # Ignore everythin inside storage
 storage/*
+!storage/README.md
