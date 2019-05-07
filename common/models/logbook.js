@@ -1,7 +1,7 @@
 'use strict';
 
 const app = require('../../server/server');
-const rison = require('rison.js');
+const rison = require('rison');
 
 const BOT_NAME = '@scicatbot:scicat03.esss.lu.se';
 const IMAGE_MSGTYPE = 'm.image';
@@ -57,7 +57,7 @@ module.exports = function(Logbook) {
   Logbook.filter = function(name, risonFilter) {
     let Room = app.models.Room;
 
-    let filter = JSON.parse(rison.decode(risonFilter));
+    let filter = rison.decode_object(risonFilter);
     let pattern = new RegExp('.*' + filter.textSearch + '.*', 'i');
     let queryFilter = {
       text: pattern,

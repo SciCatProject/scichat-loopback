@@ -74,7 +74,7 @@ module.exports = class LoopbackUtils {
     let filenames = [];
     containerFiles.forEach(containerFile => {
       containerFile.forEach(file => {
-        filenames.push(file.name.split('-')[1]);
+        filenames.push(file.name.replace(/^\d{13}\-+/, ''));
       });
     });
     let filteredRoomImages = roomImages.filter(roomImage => {
