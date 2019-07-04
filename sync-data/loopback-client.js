@@ -60,6 +60,9 @@ module.exports = class LoopbackClient {
       content: event.content,
       type: event.type,
     };
+    if (event.hasOwnProperty('redacts')) {
+      newEvent.redacts = event.redacts;
+    }
     return superagent
       .post(this._loopbackBaseUrl + `/rooms/${synapseRoomEvent.dbId}/events`)
       .send(newEvent)
@@ -129,9 +132,28 @@ module.exports = class LoopbackClient {
       });
   }
 
-  getMessages() {
+  getMessages(filter) {
+    let requestUrl;
+    if (filter) {
+      requestUrl = this._loopbackBaseUrl + '/messages?filter=' + filter;
+    } else {
+      requestUrl = this._loopbackBaseUrl + '/messages';
+    }
     return superagent
-      .get(this._loopbackBaseUrl + '/messages')
+      .get(requestUrl)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  deleteMessage(message) {
+    return superagent
+      .delete(this._loopbackBaseUrl + '/Messages/' + message.id)
       .then(response => {
         return new Promise((resolve, reject) => {
           resolve(response.body);
@@ -189,7 +211,7 @@ module.exports = class LoopbackClient {
 
   postRoomImage(synapseRoomImage, image) {
     console.log(
-      `Adding member '${image.event_id}' to room '${synapseRoomImage.name}'`
+      `Adding image '${image.event_id}' to room '${synapseRoomImage.name}'`
     );
     let newImage = {
       content: image.content,

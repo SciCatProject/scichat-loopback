@@ -17,7 +17,7 @@ module.exports = function(Logbook) {
     let Room = app.models.Room;
     return Room.findOne({
       where: {name: name},
-      fields: ['id', 'name'],
+      fields: ['id', 'name', 'roomId'],
       include: {
         relation: 'messages',
         scope: {
@@ -36,7 +36,7 @@ module.exports = function(Logbook) {
   Logbook.findAll = function() {
     let Room = app.models.Room;
     return Room.find({
-      fields: ['id', 'name'],
+      fields: ['id', 'name', 'roomId'],
       include: {
         relation: 'messages',
         scope: {
@@ -79,7 +79,7 @@ module.exports = function(Logbook) {
 
       return Room.findOne({
         where: {name: name},
-        fields: ['id', 'name'],
+        fields: ['id', 'name', 'roomId'],
         include: {
           relation: 'messages',
           scope: {

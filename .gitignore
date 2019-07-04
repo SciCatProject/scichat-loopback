@@ -34,3 +34,4 @@ npm-debug.log
 # Ignore everythin inside storage
 storage/*
 !storage/README.md
+test/Logbook.js

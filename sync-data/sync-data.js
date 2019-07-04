@@ -158,7 +158,22 @@ module.exports = class SyncData {
           case 'message': {
             return Promise.all(
               mapElements.messages.map(message => {
-                if (!IdList.includes(message.event_id)) {
+                if (message.unsigned.hasOwnProperty('redacted_because')) {
+                  let filter = JSON.stringify({
+                    where: {eventId: message.event_id},
+                  });
+                  lbClient.getMessages(filter).then(redactMessages => {
+                    return Promise.all(
+                      redactMessages.map(message => {
+                        return lbClient.deleteMessage(message);
+                      })
+                    );
+                  });
+                }
+                if (
+                  !IdList.includes(message.event_id) ||
+                  message.unsigned.hasOwnProperty('redacted_because')
+                ) {
                   return lbClient.postRoomMessage(mapElements, message);
                 } else {
                   return new Promise((resolve, reject) => {
@@ -184,6 +199,7 @@ module.exports = class SyncData {
           case 'image': {
             return Promise.all(
               mapElements.images.map(image => {
+                console.log(image);
                 if (!IdList.includes(image.event_id)) {
                   return lbClient.postRoomImage(mapElements, image);
                 } else {

@@ -88,7 +88,9 @@ module.exports = class MatrixUtils {
     switch (method) {
       case 'sync': {
         requestOptions.method = 'GET';
-        requestOptions.uri = this._baseUrl + '/_matrix/client/r0/sync';
+        requestOptions.uri =
+          this._baseUrl +
+          '/_matrix/client/r0/sync?filter={"room":{"timeline":{"limit":100}}}';
         requestOptions.body = {
           full_state: true,
           timeout: 5000,
