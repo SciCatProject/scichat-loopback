@@ -11,8 +11,30 @@ RUN npm config set https-proxy  $http_proxy
 RUN npm config set registry http://registry.npmjs.org/
 RUN npm config set strict-ssl false
 RUN apt-get update && apt-get install -y  git
-RUN npm install --no-optional
+# Set to a non-root built-in user `node`
+USER node
 
+# Create app directory (with user `node`)
+RUN mkdir -p /home/node/app
+
+WORKDIR /home/node/app
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY --chown=node package*.json ./
+
+RUN npm install
+
+# Bundle app source code
+COPY --chown=node . .
+
+# RUN npm run build
+
+# Bind to all network interfaces so that it can be mapped to the host OS
+ENV PORT=3030
+
+EXPOSE ${PORT}
 # Start the app
 ENV http_proxy "http://10.0.0.160:8123"
 ENV https_proxy $http_proxy
