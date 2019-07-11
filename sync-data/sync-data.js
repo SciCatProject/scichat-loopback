@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 
 const app = require('../server/server');
@@ -41,11 +40,9 @@ module.exports = class SyncData {
       })
       .then(dbRoomEvents => {
         dbEventIds = util.createIdList('event', dbRoomEvents);
-        // console.log(dbEventIds);
         return this.createSynapseRoomEventMap(dbRooms);
       })
       .then(synapseRoomEvents => {
-        // return util.createEventIdList(dbRooms);
         return this.postToRoom('event', dbEventIds, synapseRoomEvents);
       })
       .catch(err => {

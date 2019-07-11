@@ -32,6 +32,9 @@
     },
     "synapseRoomId": {
       "type": "string"
+    },
+    "data": {
+      "type": "string"
     }
   },
   "validations": [],

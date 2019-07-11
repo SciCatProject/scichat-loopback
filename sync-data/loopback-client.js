@@ -249,6 +249,20 @@ module.exports = class LoopbackClient {
       });
   }
 
+  patchImage(image) {
+    return superagent
+      .patch(this._loopbackBaseUrl + '/images/' + image.id)
+      .send(image)
+      .then(response => {
+        return new Promise((resolve, reject) => {
+          resolve(response.body);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
   createContainer(roomName) {
     console.log(`Creating new Container: ${roomName}`);
     return superagent

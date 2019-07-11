@@ -67,7 +67,7 @@ module.exports = class MatrixRestClient {
         return Promise.resolve(members.chunk);
       })
       .catch(err => {
-        console.error('Error in findRoomMemebers(): ' + err);
+        console.error('Error in findRoomMembers(): ' + err);
       });
   }
 
@@ -187,7 +187,7 @@ module.exports = class MatrixRestClient {
 
         const file = fs.createWriteStream(savePath);
 
-        return Promise.resolve(
+        return new Promise((resolve, reject) => {
           request(options)
             .on('error', err => {
               console.error(err);
@@ -196,11 +196,9 @@ module.exports = class MatrixRestClient {
               response.pipe(file);
             })
             .on('complete', () => {
-              return Promise.resolve(
-                `File ${filename} downloaded from Room ${roomName}`
-              );
-            })
-        );
+              resolve(`File ${filename} downloaded from Room ${roomName}`);
+            });
+        });
       })
       .catch(err => {
         console.error('Error in findImageByRoomAndFilename(): ' + err);
