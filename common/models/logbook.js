@@ -99,7 +99,7 @@ module.exports = function(Logbook) {
 
       return Room.findOne({
         where: {name: name},
-        fields: ['id', 'name'],
+        fields: ['id', 'name', 'roomId'],
         include: {
           relation: 'messages',
           scope: {
