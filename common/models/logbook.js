@@ -3,7 +3,9 @@
 const app = require('../../server/server');
 const rison = require('rison');
 
-const BOT_NAME = '@scicatbot:scicat03.esss.lu.se';
+const config = require('../../server/config.local.json');
+
+const BOT_NAME = `@${config.synapse.bot.name}:${config.synapse.host}`;
 const IMAGE_MSGTYPE = 'm.image';
 
 module.exports = function(Logbook) {

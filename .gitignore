@@ -34,6 +34,7 @@ npm-debug.log
 # Ignore everythin inside storage
 storage/*
 !storage/README.md
+# Ignore dev files
 sync-data/loopback-client.new.js
 sync-data/dev.js
 sync-data/sync-data.new.js
@@ -41,3 +42,5 @@ sync-data/script.new.js
 sync-data/loopback-utils.new.js
 sync-data/matrix-rest-client.new.js
 test/Logbook.js
+# Ignore local config file
+server/config.local.json

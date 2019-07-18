@@ -2,13 +2,16 @@
 /* eslint-disable camelcase */
 'use strict';
 
+const config = require('../server/config.local.json');
+
 module.exports = class MatrixUtils {
   constructor() {
-    this._baseUrl = 'https://scicat03.esss.lu.se:8448';
+    this._host = config.synapse.host;
+    this._baseUrl = `https://${config.synapse.host}:${config.synapse.port}`;
     this._accessToken =
       'MDAyMWxvY2F0aW9uIHNjaWNhdDAzLmVzc3MubHUuc2UKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDMxY2lkIHVzZXJfaWQgPSBAc2NpY2F0Ym90OnNjaWNhdDAzLmVzc3MubHUuc2UKMDAxNmNpZCB0eXBlID0gYWNjZXNzCjAwMjFjaWQgbm9uY2UgPSBaSDJ1cDFBSj1XX1orUCsrCjAwMmZzaWduYXR1cmUgP8e0yYSkFRJTaHThqYH4xB9eNRxVnt9JgqFgU2GqPx0K';
-    this._userId = '@scicatbot:scicat03.esss.lu.se';
-    this._scichatBot = '@scicatbot:scicat03.esss.lu.se';
+    this._userId = `@${config.synapse.bot.name}:${config.synapse.host}`;
+    this._scichatBot = `@${config.synapse.bot.name}:${config.synapse.host}`;
     this._txnCounter = 0;
   }
   eventTypeIsMessage(event) {
@@ -125,7 +128,7 @@ module.exports = class MatrixUtils {
         return requestOptions;
       }
       case 'findUserInfoByUserName': {
-        let userId = `@${options.toLowerCase()}:scicat03.esss.lu.se`;
+        let userId = `@${options.toLowerCase()}:${this._host}`;
         requestOptions.method = 'GET';
         requestOptions.uri =
           this._baseUrl + `/_matrix/client/r0/profile/${userId}`;

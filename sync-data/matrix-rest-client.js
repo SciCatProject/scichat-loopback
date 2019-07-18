@@ -7,10 +7,12 @@ const requestPromise = require('request-promise');
 const Utils = require('./matrix-utils');
 const utils = new Utils();
 
+const config = require('../server/config.local.json');
+
 module.exports = class MatrixRestClient {
   constructor() {
-    this._userId = '@scicatbot:scicat03.esss.lu.se';
-    this._password = 'scicatbot';
+    this._userId = `@${config.synapse.bot.name}:${config.synapse.host}`;
+    this._password = config.synapse.bot.password;
   }
 
   createRoom({visibility, room_alias_name, name, topic}) {

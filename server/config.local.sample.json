@@ -1,0 +1,10 @@
+{
+  "synapse": {
+    "host": "example.com",
+    "port": "8448",
+    "bot": {
+      "name": "myBotName",
+      "password": "pass"
+    }
+  }
+}
