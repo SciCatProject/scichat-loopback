@@ -43,4 +43,4 @@ sync-data/loopback-utils.new.js
 sync-data/matrix-rest-client.new.js
 test/Logbook.js
 # Ignore local config file
-server/config.local.json
+server/config.local.js

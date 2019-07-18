@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 'use strict';
 
-const config = require('../server/config.local.json');
+const config = require('../server/config.local');
 
 module.exports = class MatrixUtils {
   constructor() {

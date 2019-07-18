@@ -3,7 +3,7 @@
 const app = require('../../server/server');
 const rison = require('rison');
 
-const config = require('../../server/config.local.json');
+const config = require('../../server/config.local');
 
 const BOT_NAME = `@${config.synapse.bot.name}:${config.synapse.host}`;
 const IMAGE_MSGTYPE = 'm.image';

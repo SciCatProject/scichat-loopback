@@ -1,0 +1,12 @@
+'use strict';
+
+module.exports = {
+  synapse: {
+    host: process.env.SYNAPSE_SERVER || 'example.com',
+    port: process.env.SYNAPSE_PORT || 8448,
+    bot: {
+      name: process.env.SYNAPSE_BOT_NAME || 'myBotName',
+      password: process.env.SYNAPSE_BOT_PASSWORD || 'pass',
+    },
+  },
+};

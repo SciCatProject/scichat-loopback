@@ -7,7 +7,7 @@ const requestPromise = require('request-promise');
 const Utils = require('./matrix-utils');
 const utils = new Utils();
 
-const config = require('../server/config.local.json');
+const config = require('../server/config.local');
 
 module.exports = class MatrixRestClient {
   constructor() {
