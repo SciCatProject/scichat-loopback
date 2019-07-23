@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "main": "server/server.js",
   "engines": {
-    "node": ">=6"
+    "node": ">=8"
   },
   "scripts": {
     "lint": "eslint .",
     "start": "node .",
-    "posttest": "npm run lint",
     "test": "mocha",
     "sync": "node ./sync-data/script.js"
   },
@@ -19,8 +18,6 @@
     "loopback": "^3.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^6.2.0",
-    "loopback-component-storage": "^3.6.0",
-    "loopback-connector-mongodb": "^4.0.0",
     "request-promise": "^4.2.4",
     "rison": "github:nanonid/rison",
     "serve-favicon": "^2.0.1",

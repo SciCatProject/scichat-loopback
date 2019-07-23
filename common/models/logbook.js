@@ -1,12 +1,12 @@
 'use strict';
 
-const app = require('../../server/server');
-const rison = require('rison');
-
 const config = require('../../server/config.local');
 
-const BOT_NAME = `@${config.synapse.bot.name}:${config.synapse.host}`;
-const IMAGE_MSGTYPE = 'm.image';
+const MatrixRestClient = require('./matrix-rest-client');
+const matrixClient = new MatrixRestClient();
+
+const user = config.synapse.bot.name;
+const pass = config.synapse.bot.password;
 
 module.exports = function(Logbook) {
   /**
@@ -15,19 +15,14 @@ module.exports = function(Logbook) {
    * @returns {Logbook} Logbook model instance
    */
 
-  Logbook.findByName = function(name) {
-    let Room = app.models.Room;
-    return Room.findOne({
-      where: {name: name},
-      fields: ['id', 'name', 'roomId'],
-      include: {
-        relation: 'messages',
-        scope: {
-          fields: ['timestamp', 'sender', 'content'],
-          order: 'timestamp ASC',
-        },
-      },
-    });
+  Logbook.findByName = async function(name) {
+    try {
+      const accessToken = await matrixClient.login(user, pass);
+      const room = await matrixClient.fetchRoomByName(name, accessToken);
+      return await matrixClient.fetchRoomMessages(room, accessToken);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /**
@@ -35,88 +30,30 @@ module.exports = function(Logbook) {
    * @returns {Logbook[]} Array of Logbook model instances
    */
 
-  Logbook.findAll = function() {
-    let Room = app.models.Room;
-    return Room.find({
-      fields: ['id', 'name', 'roomId'],
-      include: {
-        relation: 'messages',
-        scope: {
-          fields: ['timestamp', 'sender', 'content'],
-          order: 'timestamp ASC',
-        },
-      },
-    });
+  Logbook.findAll = async function() {
+    try {
+      const accessToken = await matrixClient.login(user, pass);
+      const rooms = await matrixClient.fetchRooms(accessToken);
+      return await matrixClient.fetchAllRoomsMessages(rooms, accessToken);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /**
    * Filter Logbook entries matching query
    * @param {string} name The name of the Logbook
-   * @param {string} filter Filter JSON object, keys: textSearch, showBotMessages, showUserMessages, showImages
+   * @param {string} filter Filter rison object, keys: textSearch, showBotMessages, showUserMessages, showImages
    * @returns {Logbook} Filtered Logbook model instance
    */
 
-  Logbook.filter = function(name, risonFilter) {
-    let Room = app.models.Room;
-
-    let filter = rison.decode_object(risonFilter);
-    let pattern = new RegExp('.*' + filter.textSearch + '.*', 'i');
-    let queryFilter = {
-      text: pattern,
-    };
-
-    if (filter.showBotMessages && filter.showUserMessages) {
-      queryFilter.messageSenderToggle = {neq: null};
-    } else if (!filter.showBotMessages && filter.showUserMessages) {
-      queryFilter.messageSenderToggle = {neq: BOT_NAME};
-    } else if (filter.showBotMessages && !filter.showUserMessages) {
-      queryFilter.messageSenderToggle = BOT_NAME;
-    } else if (!filter.showBotMessages && !filter.showUserMessages) {
-      queryFilter.messageSenderToggle = null;
-    } else {
-      queryFilter.messageSenderToggle = {neq: null};
-    }
-    if (filter.showImages) {
-      queryFilter.imagesToggle = IMAGE_MSGTYPE;
-
-      return Room.findOne({
-        where: {name: name},
-        fields: ['id', 'name', 'roomId'],
-        include: {
-          relation: 'messages',
-          scope: {
-            fields: ['timestamp', 'sender', 'content'],
-            order: 'timestamp ASC',
-            where: {
-              and: [
-                {sender: queryFilter.messageSenderToggle},
-                {'content.body': {like: queryFilter.text}},
-              ],
-            },
-          },
-        },
-      });
-    } else {
-      queryFilter.imagesToggle = {neq: IMAGE_MSGTYPE};
-
-      return Room.findOne({
-        where: {name: name},
-        fields: ['id', 'name', 'roomId'],
-        include: {
-          relation: 'messages',
-          scope: {
-            fields: ['timestamp', 'sender', 'content'],
-            order: 'timestamp ASC',
-            where: {
-              and: [
-                {sender: queryFilter.messageSenderToggle},
-                {'content.body': {like: queryFilter.text}},
-                {'content.msgtype': queryFilter.imagesToggle},
-              ],
-            },
-          },
-        },
-      });
+  Logbook.filter = async function(name, filter) {
+    try {
+      const accessToken = await matrixClient.login(user, pass);
+      const room = await matrixClient.fetchRoomByName(name, accessToken);
+      return await matrixClient.fetchRoomMessages(room, accessToken, filter);
+    } catch (err) {
+      console.error(err);
     }
   };
 };

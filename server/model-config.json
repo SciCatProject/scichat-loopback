@@ -35,32 +35,8 @@
     "dataSource": "db",
     "public": false
   },
-  "Room": {
-    "dataSource": "mongo",
-    "public": true
-  },
-  "Event": {
-    "dataSource": "mongo",
-    "public": true
-  },
-  "Image": {
-    "dataSource": "mongo",
-    "public": true
-  },
-  "Member": {
-    "dataSource": "mongo",
-    "public": true
-  },
-  "Message": {
-    "dataSource": "mongo",
-    "public": true
-  },
   "Logbook": {
     "dataSource": null,
-    "public": true
-  },
-  "Container": {
-    "dataSource": "storage",
     "public": true
   }
 }
