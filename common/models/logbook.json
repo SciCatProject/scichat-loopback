@@ -13,7 +13,9 @@
       "type": "string"
     },
     "messages": {
-      "type": ["object"]
+      "type": [
+        "object"
+      ]
     }
   },
   "validations": [],
@@ -98,6 +100,34 @@
       "http": [
         {
           "path": "/:name/:filter",
+          "verb": "get"
+        }
+      ]
+    },
+    "findLogbooksByName": {
+      "accepts": [
+        {
+          "arg": "names",
+          "type": "array",
+          "required": true,
+          "description": "Name of the Logbooks",
+          "http": {
+            "source": "path"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "findLogbooksByName",
+          "type": "array",
+          "root": true,
+          "description": "Array of Logbook model instances"
+        }
+      ],
+      "description": "Find Logbooks filtered by names",
+      "http": [
+        {
+          "path": "/:names",
           "verb": "get"
         }
       ]
