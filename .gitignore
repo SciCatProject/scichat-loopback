@@ -41,7 +41,5 @@ sync-data/sync-data.new.js
 sync-data/script.new.js
 sync-data/loopback-utils.new.js
 sync-data/matrix-rest-client.new.js
-test/Mockstubs.js
-test/sync-data-test.js
 # Ignore local config file
 server/config.local.js

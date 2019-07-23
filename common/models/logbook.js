@@ -41,32 +41,9 @@ module.exports = function(Logbook) {
   };
 
   /**
-   * Find Logbooks filtered by names
-   * @param {string[]} names Name of the Logbooks
-   * @returns {Logbook[]} Array of Logbook model instances
-   */
-
-  Logbook.findLogbooksByName = async function(names) {
-    const roomNames = rison.decode_array(names);
-    try {
-      const accessToken = await matrixClient.login(user, pass);
-      const allRooms = await matrixClient.fetchRooms(accessToken);
-      const filteredRooms = allRooms.filter(room => {
-        return roomNames.includes(room.name);
-      });
-      return await matrixClient.fetchAllRoomsMessages(
-        filteredRooms,
-        accessToken
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  /**
    * Filter Logbook entries matching query
    * @param {string} name The name of the Logbook
-   * @param {string} filter Filter JSON object, keys: textSearch, showBotMessages, showUserMessages, showImages
+   * @param {string} filter Filter rison object, keys: textSearch, showBotMessages, showUserMessages, showImages
    * @returns {Logbook} Filtered Logbook model instance
    */
 
