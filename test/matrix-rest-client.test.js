@@ -14,9 +14,7 @@ afterEach(function(done) {
 });
 
 describe('Tests for MatrixRestClient', function() {
-  let accessToken;
-  let rooms;
-  let room;
+  let accessToken, room, rooms;
   describe('#login', function() {
     it('should return an access token', async function() {
       sandbox
