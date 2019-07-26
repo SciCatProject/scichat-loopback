@@ -37,14 +37,21 @@ module.exports = class MatrixRestClient {
    * @returns {object} The created Room
    */
 
-  async postRoom(accessToken, details) {
+  async createRoom(accessToken, name, invite) {
     let roomDetails = {
       accessToken: accessToken,
-      name: details.name,
-      topic: details.topic,
-      invite: details.invite,
+      name: name,
+      invite: invite,
     };
-    let requestOptions = utils.applyRequestOptionsFor('postRoom', roomDetails);
+    let requestOptions = utils.applyRequestOptionsFor(
+      'createRoom',
+      roomDetails
+    );
+    try {
+      return await requestPromise(requestOptions);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   /**

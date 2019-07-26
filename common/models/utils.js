@@ -40,7 +40,7 @@ module.exports = class Utils {
         };
         return requestOptions;
       }
-      case 'postRoom': {
+      case 'createRoom': {
         requestOptions.headers = {
           Authorization: 'Bearer ' + options.accessToken,
         };
@@ -52,8 +52,7 @@ module.exports = class Utils {
           visibility: 'public',
           room_alias_name: options.name,
           name: options.name,
-          topic: options.topic,
-          invite: options.invite,
+          topic: `Logbook for proposal ${options.name}`,
           creation_content: {
             'm.federate': false,
           },
@@ -62,6 +61,10 @@ module.exports = class Utils {
             invite: 100,
           },
         };
+        if (options.invite) {
+          requestOptions.body.invite = options.invite;
+        }
+        return requestOptions;
       }
       case 'fetchRooms': {
         requestOptions.headers = {Authorization: 'Bearer ' + options};
