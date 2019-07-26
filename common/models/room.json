@@ -22,7 +22,7 @@
           "arg": "invites",
           "type": "array",
           "required": false,
-          "description": "An array of strings, where the strings are the ldap usernames of the people you wish to invite"
+          "description": "An array of strings, where the strings are the ldap usernames (firstnamelastname) of the people you wish to invite"
         }
       ],
       "returns": [
