@@ -12,8 +12,8 @@ const server = config.synapse.host;
 module.exports = function(Room) {
   /* Creates a new Synapse chat room
    * @param {string} name The proposalId from which to generate the room name
-   * @param {array} invites An array of strings, where the strings are the ldap usernames (firstnamelastname) of the people you wish to invite
-   * @param {Function(Error, object)} callback
+   * @param {string[]} invites An array of strings, where the strings are the ldap usernames (firstnamelastname) of the people you wish to invite
+   * @returns {object} Object containing properties room_alias and room_id
    */
 
   Room.create = async function(name, invites) {

@@ -19,7 +19,7 @@
           "description": "The proposalId from which to generate the room name"
         },
         {
-          "arg": "invite",
+          "arg": "invites",
           "type": "array",
           "required": false,
           "description": "An array of strings, where the strings are the ldap usernames of the people you wish to invite"
@@ -30,7 +30,7 @@
           "arg": "create",
           "type": "object",
           "root": true,
-          "description": "The created room"
+          "description": "Object containing properties room_alias and room_id"
         }
       ],
       "description": "Creates a new Synapse chat room",
