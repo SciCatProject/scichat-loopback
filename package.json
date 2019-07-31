@@ -12,6 +12,7 @@
     "sync": "node ./sync-data/script.js"
   },
   "dependencies": {
+    "amqplib": "^0.5.5",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "helmet": "^3.19.0",

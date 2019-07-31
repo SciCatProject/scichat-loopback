@@ -9,4 +9,9 @@ module.exports = {
       password: process.env.SYNAPSE_BOT_PASSWORD || 'pass',
     },
   },
+  rabbitmq: {
+    host: process.env.RABBITMQ_SERVER || 'localhost',
+    port: process.env.RABBITMQ_PORT || null,
+    queue: process.env.RABBITMQ_QUEUE || null',
+  },
 };
