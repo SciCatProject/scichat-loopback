@@ -13,6 +13,23 @@ module.exports = class Utils {
 
   /**
    * Creates an object containing options for requests to Synapse server
+   * @param {string[]} invites Array of users to invite, e.g., ["firstnamelastname"]
+   * @returns {string[]} Array of Synapse formatted users
+   */
+
+  formatInvites(invites) {
+    let formattedInvites = invites.map(invite => {
+      if (!invite.startsWith('@') && invite.indexOf(':') < 0) {
+        return '@' + invite + ':' + this.serverName;
+      } else {
+        return invite;
+      }
+    });
+    return formattedInvites;
+  }
+
+  /**
+   * Creates an object containing options for requests to Synapse server
    * @param {string} type Name of the method calling this method
    * @param {object} options Object containing additional request options
    * @returns {object} Request options object

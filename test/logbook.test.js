@@ -4,17 +4,29 @@ const expect = require('chai').expect;
 const request = require('supertest');
 const rison = require('rison');
 
-let app;
+const utils = require('./loginUtils');
+
+let app, accessToken;
 before(function() {
   app = require('../server/server');
 });
 
 describe('Tests for Logbook model', function() {
+  before(function(done) {
+    const user = {
+      username: 'logbookReader',
+      password: 'logrdr',
+    };
+    utils.getToken(app, user, tokenVal => {
+      accessToken = tokenVal;
+      done();
+    });
+  });
   describe('#findByName', function() {
     it('should fetch a Logbook name 23PTEG', function(done) {
       const name = '23PTEG';
       request(app)
-        .get('/api/Logbooks/' + name)
+        .get('/api/Logbooks/' + name + '?access_token=' + accessToken)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -32,7 +44,7 @@ describe('Tests for Logbook model', function() {
   describe('#findAll', function() {
     it('should fetch all Logbooks', function(done) {
       request(app)
-        .get('/api/Logbooks')
+        .get('/api/Logbooks?access_token=' + accessToken)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -61,7 +73,14 @@ describe('Tests for Logbook model', function() {
         textSearch: '',
       });
       request(app)
-        .get('/api/Logbooks/' + name + '/' + filter)
+        .get(
+          '/api/Logbooks/' +
+            name +
+            '/' +
+            filter +
+            '?access_token=' +
+            accessToken
+        )
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)

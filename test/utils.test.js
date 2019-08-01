@@ -19,6 +19,25 @@ const testRoom = {
 };
 
 describe('Unit tests for utils', function() {
+  describe('#formatInvites', function() {
+    const unformattedInvites = ['firstnamelastname'];
+    const preformattedInvites = ['@firstnamelastname:server'];
+    it('should return an array of formatted invites', function() {
+      const formattedInvites = utils.formatInvites(unformattedInvites);
+      expect(formattedInvites).to.be.an('array');
+      formattedInvites.forEach(invite => {
+        expect(invite.startsWith('@')).to.be.true;
+        expect(invite.indexOf(':')).to.be.at.least(0);
+      });
+    });
+    it('should return the same array', function() {
+      const formattedInvites = utils.formatInvites(preformattedInvites);
+      expect(formattedInvites).to.be.an('array');
+      formattedInvites.forEach(invite => {
+        expect(preformattedInvites.includes(invite)).to.be.true;
+      });
+    });
+  });
   describe('#applyRequestOptionsFor', function() {
     it('should return a request options object for login', function() {
       const loginOptions = {

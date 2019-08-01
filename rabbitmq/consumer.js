@@ -5,6 +5,9 @@ const config = require('../server/config.local');
 const MatrixRestClient = require('../common/models/matrix-rest-client');
 const matrixClient = new MatrixRestClient();
 
+const user = config.synapse.bot.name;
+const pass = config.synapse.bot.password;
+
 module.exports = function() {
   if (config.rabbitmq.host) {
     let url;
@@ -42,8 +45,11 @@ module.exports = function() {
               case 'PROPOSAL_ACCEPTED': {
                 console.log(' [/] Received %s', msg.content.toString());
                 try {
-                  const room = await matrixClient.fetchRoomByName(
-                    msgJSON.proposalID
+                  const accessToken = await matrixClient.login(user, pass);
+                  const room = await matrixClient.createRoom(
+                    accessToken,
+                    msgJSON.proposalID,
+                    msgJSON.users
                   );
                   console.log(' [X] Created room %s', room.room_id);
                 } catch (err) {

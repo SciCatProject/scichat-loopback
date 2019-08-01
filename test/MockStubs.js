@@ -99,4 +99,8 @@ module.exports = {
     guest_can_join: false,
     aliases: ['#string'],
   },
+
+  createRoomResponse: {
+    room_id: '!abcdef:server'
+  }
 };
