@@ -10,7 +10,7 @@ module.exports = {
     },
   },
   rabbitmq: {
-    host: process.env.RABBITMQ_SERVER || 'localhost',
+    host: process.env.RABBITMQ_SERVER || null,
     port: process.env.RABBITMQ_PORT || null,
     queue: process.env.RABBITMQ_QUEUE || null',
   },
