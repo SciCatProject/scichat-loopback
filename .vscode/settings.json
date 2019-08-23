@@ -22,5 +22,10 @@
   "prettier.singleQuote": true,
   "prettier.bracketSpacing": false,
   "prettier.trailingComma": "es5",
-  "prettier.printWidth": 80
+  "prettier.printWidth": 80,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#362550",
+    "titleBar.activeBackground": "#4B3370",
+    "titleBar.activeForeground": "#FCFCFD"
+  }
 }
