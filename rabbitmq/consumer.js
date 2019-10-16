@@ -12,9 +12,9 @@ module.exports = function() {
   if (config.rabbitmq.host) {
     let url;
     if (config.rabbitmq.port) {
-      url = `amqp://${config.rabbitmq.host}:${config.rabbitmq.port}`;
+      url = `amqp://${user}:${pass}@${config.rabbitmq.host}:${config.rabbitmq.port}`;
     } else {
-      url = `amqp://${config.rabbitmq.host}`;
+      url = `amqp://${user}:${pass}@${config.rabbitmq.host}`;
     }
 
     amqp.connect(url, function(error0, connection) {

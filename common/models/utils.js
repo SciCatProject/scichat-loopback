@@ -7,7 +7,14 @@ module.exports = class Utils {
   constructor() {
     this.serverName = configs.synapse.host;
     this.serverPort = configs.synapse.port;
-    this.baseUrl = `https://${this.serverName}:${this.serverPort}`;
+    if (this.serverName) {
+      if (this.serverPort) {
+        this.baseUrl = `https://${this.serverName}:${this.serverPort}`;
+      } else {
+        this.baseUrl = `https://${this.serverName}`;
+      }
+    }
+    console.log('Synapse url: ', this.baseUrl);
     this.user = configs.synapse.bot.name;
   }
 
@@ -18,7 +25,7 @@ module.exports = class Utils {
    */
 
   formatInvites(invites) {
-    let formattedInvites = invites.map(invite => {
+    const formattedInvites = invites.map(invite => {
       if (!invite.startsWith('@') && invite.indexOf(':') < 0) {
         return '@' + invite + ':' + this.serverName;
       } else {
@@ -36,7 +43,7 @@ module.exports = class Utils {
    */
 
   applyRequestOptionsFor(type, options) {
-    let requestOptions = {
+    const requestOptions = {
       uri: this.baseUrl,
       rejectUnauthorized: false,
       json: true,
@@ -113,7 +120,7 @@ module.exports = class Utils {
    */
 
   applyFilter(options) {
-    let filter = {
+    const filter = {
       account_data: {not_types: ['m.*', 'im.*']},
       room: {
         rooms: [options.room.room_id],

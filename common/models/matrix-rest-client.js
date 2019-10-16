@@ -17,13 +17,13 @@ module.exports = class MatrixRestClient {
    */
 
   async login(username, password) {
-    let loginInfo = {
+    const loginInfo = {
       username: username,
       password: password,
     };
-    let requestOptions = utils.applyRequestOptionsFor('login', loginInfo);
+    const requestOptions = utils.applyRequestOptionsFor('login', loginInfo);
     try {
-      let response = await requestPromise(requestOptions);
+      const response = await requestPromise(requestOptions);
       return response.access_token;
     } catch (err) {
       console.error(err);
@@ -38,19 +38,19 @@ module.exports = class MatrixRestClient {
    */
 
   async createRoom(accessToken, name, invites) {
-    let roomDetails = {
+    const roomDetails = {
       accessToken: accessToken,
       name: name,
     };
     if (invites) {
       console.log('invites', invites);
-      let formattedInvites = utils.formatInvites(invites);
+      const formattedInvites = utils.formatInvites(invites);
       console.log('formattedInvites', formattedInvites);
       roomDetails.invite = formattedInvites;
     } else {
       roomDetails.invite = invites;
     }
-    let requestOptions = utils.applyRequestOptionsFor(
+    const requestOptions = utils.applyRequestOptionsFor(
       'createRoom',
       roomDetails
     );
@@ -68,12 +68,12 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchRooms(accessToken) {
-    let requestOptions = utils.applyRequestOptionsFor(
+    const requestOptions = utils.applyRequestOptionsFor(
       'fetchRooms',
       accessToken
     );
     try {
-      let response = await requestPromise(requestOptions);
+      const response = await requestPromise(requestOptions);
       return response.chunk;
     } catch (err) {
       console.error(err);
@@ -88,7 +88,7 @@ module.exports = class MatrixRestClient {
 
   async fetchRoomByName(requestName, accessToken) {
     try {
-      let rooms = await this.fetchRooms(accessToken);
+      const rooms = await this.fetchRooms(accessToken);
       return rooms.find(room => {
         return room.name === requestName;
       });
@@ -124,23 +124,23 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchRoomMessages(room, accessToken, queryFilter) {
-    let fetchOptions = {
+    const fetchOptions = {
       accessToken: accessToken,
       room: room,
     };
     if (queryFilter) {
       fetchOptions.queryFilter = rison.decode_object(queryFilter);
     }
-    let requestOptions = utils.applyRequestOptionsFor(
+    const requestOptions = utils.applyRequestOptionsFor(
       'fetchRoomMessages',
       fetchOptions
     );
     try {
-      let res = await requestPromise(requestOptions);
+      const res = await requestPromise(requestOptions);
       let messages;
       if (res.rooms.join[room.room_id]) {
         if (fetchOptions.queryFilter && fetchOptions.queryFilter.textSearch) {
-          let pattern = new RegExp(
+          const pattern = new RegExp(
             '.*' + fetchOptions.queryFilter.textSearch + '.*',
             'i'
           );
