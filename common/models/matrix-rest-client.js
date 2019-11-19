@@ -26,7 +26,11 @@ module.exports = class MatrixRestClient {
       const response = await requestPromise(requestOptions);
       return response.access_token;
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error('[-] Error in MatrixRestClient.login', err);
+      }
     }
   }
 
@@ -57,7 +61,11 @@ module.exports = class MatrixRestClient {
     try {
       return await requestPromise(requestOptions);
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error('[-] Error in MatrixRestClient.createRoom', err);
+      }
     }
   }
 
@@ -76,7 +84,11 @@ module.exports = class MatrixRestClient {
       const response = await requestPromise(requestOptions);
       return response.chunk;
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error('[-] Error in MatrixRestClient.fetchRooms', err);
+      }
     }
   }
 
@@ -93,7 +105,11 @@ module.exports = class MatrixRestClient {
         return room.name === requestName;
       });
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error('[-] Error in MatrixRestClient.fetchRoomByName', err);
+      }
     }
   }
 
@@ -111,7 +127,14 @@ module.exports = class MatrixRestClient {
         })
       );
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error(
+          '[-] Error in MatrixRestClient.fetchAllRoomsMessages',
+          err
+        );
+      }
     }
   }
 
@@ -168,7 +191,11 @@ module.exports = class MatrixRestClient {
         messages: messages,
       };
     } catch (err) {
-      console.error(err);
+      if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        console.error('[-] Error in MatrixRestClient.fetchRoomMessages', err);
+      }
     }
   }
 };
