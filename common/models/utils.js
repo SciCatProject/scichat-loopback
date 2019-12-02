@@ -5,13 +5,14 @@ const configs = require('../../server/config.local');
 
 module.exports = class Utils {
   constructor() {
-    this.serverName = configs.synapse.host;
+    this.serverName = configs.synapse.name;
+    this.serverHost = configs.synapse.host;
     this.serverPort = configs.synapse.port;
-    if (this.serverName) {
+    if (this.serverHost) {
       if (this.serverPort) {
-        this.baseUrl = `https://${this.serverName}:${this.serverPort}`;
+        this.baseUrl = `https://${this.serverHost}:${this.serverPort}`;
       } else {
-        this.baseUrl = `https://${this.serverName}`;
+        this.baseUrl = `https://${this.serverHost}`;
       }
     }
     console.log('Synapse url: ', this.baseUrl);
@@ -73,7 +74,7 @@ module.exports = class Utils {
           '/_matrix/client/r0/createRoom'
         );
         requestOptions.body = {
-          visibility: 'public',
+          visibility: 'private',
           room_alias_name: options.name,
           name: options.name,
           topic: `Logbook for proposal ${options.name}`,
@@ -90,7 +91,7 @@ module.exports = class Utils {
         }
         return requestOptions;
       }
-      case 'fetchRooms': {
+      case 'fetchPublicRooms': {
         requestOptions.headers = {Authorization: 'Bearer ' + options};
         requestOptions.method = 'GET';
         requestOptions.uri = requestOptions.uri.concat(
@@ -98,6 +99,15 @@ module.exports = class Utils {
         );
         return requestOptions;
       }
+      case 'fetchRoomIdByName': {
+        requestOptions.method = 'GET';
+        requestOptions.uri = requestOptions.uri.concat(
+          '/_matrix/client/r0/directory/room/',
+          encodeURIComponent(`#${options}:${this.serverName}`)
+        );
+        return requestOptions;
+      }
+      case 'fetchAllRoomsMessages':
       case 'fetchRoomMessages': {
         requestOptions.headers = {
           Authorization: 'Bearer ' + options.accessToken,
@@ -122,15 +132,18 @@ module.exports = class Utils {
   applyFilter(options) {
     const filter = {
       account_data: {not_types: ['m.*', 'im.*']},
+      presence: {not_types: ['*']},
       room: {
-        rooms: [options.room.room_id],
-        state: {not_types: ['m.room.*']},
+        state: {types: ['m.room.name']},
         timeline: {
           limit: 100,
           types: ['m.room.message'],
         },
       },
     };
+    if (options.roomId) {
+      filter.room.rooms = [options.roomId];
+    }
     if (options.queryFilter && !options.queryFilter.showBotMessages) {
       filter.room.timeline.not_senders = [`@${this.user}:${this.serverName}`];
     }

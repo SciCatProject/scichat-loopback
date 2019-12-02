@@ -2,6 +2,7 @@
 
 module.exports = {
   synapse: {
+    name: process.env.SYNAPSE_NAME || 'example',
     host: process.env.SYNAPSE_SERVER || 'example.com',
     port: process.env.SYNAPSE_PORT || 8448,
     bot: {

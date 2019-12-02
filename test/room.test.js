@@ -9,8 +9,14 @@ const utils = require('./loginUtils');
 const MatrixRestClient = require('../common/models/matrix-rest-client');
 
 let app, accessToken;
-before(function() {
+before(function(done) {
   app = require('../server/server');
+  done();
+});
+
+afterEach(function(done) {
+  sandbox.restore();
+  done();
 });
 
 describe('Tests for Room model', function() {
@@ -24,6 +30,7 @@ describe('Tests for Room model', function() {
       done();
     });
   });
+
   describe('#createRoom', function() {
     it('should create a new Synapse chat room', function(done) {
       sandbox

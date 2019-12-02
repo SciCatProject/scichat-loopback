@@ -42,8 +42,8 @@ module.exports = function(Logbook) {
   Logbook.findByName = async function(name) {
     do {
       try {
-        const room = await matrixClient.fetchRoomByName(name, accessToken);
-        return await matrixClient.fetchRoomMessages(room, accessToken);
+        const roomId = await matrixClient.fetchRoomIdByName(name);
+        return await matrixClient.fetchRoomMessages(roomId, accessToken);
       } catch (err) {
         if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
           renewAccessToken();
@@ -64,11 +64,10 @@ module.exports = function(Logbook) {
   Logbook.findAll = async function() {
     do {
       try {
-        const rooms = await matrixClient.fetchRooms(accessToken);
-        return await matrixClient.fetchAllRoomsMessages(rooms, accessToken);
+        return await matrixClient.fetchAllRoomsMessages(accessToken);
       } catch (err) {
-        if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
-          renewAccessToken();
+        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+          await renewAccessToken();
           continue;
         } else {
           console.error('[-] Error in Logbook.findAll', err);
@@ -88,11 +87,15 @@ module.exports = function(Logbook) {
   Logbook.filter = async function(name, filter) {
     do {
       try {
-        const room = await matrixClient.fetchRoomByName(name, accessToken);
-        return await matrixClient.fetchRoomMessages(room, accessToken, filter);
+        const roomId = await matrixClient.fetchRoomIdByName(name);
+        return await matrixClient.fetchRoomMessages(
+          roomId,
+          accessToken,
+          filter
+        );
       } catch (err) {
-        if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
-          renewAccessToken();
+        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+          await renewAccessToken();
           continue;
         } else {
           console.error('[-] Error in Logbook.filter', err);

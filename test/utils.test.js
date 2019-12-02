@@ -26,7 +26,7 @@ describe('Unit tests for utils', function() {
       const formattedInvites = utils.formatInvites(unformattedInvites);
       expect(formattedInvites).to.be.an('array');
       formattedInvites.forEach(invite => {
-        expect(invite.startsWith('@')).to.be.true;
+        expect(invite).to.match(/^@/);
         expect(invite.indexOf(':')).to.be.at.least(0);
       });
     });
@@ -34,10 +34,11 @@ describe('Unit tests for utils', function() {
       const formattedInvites = utils.formatInvites(preformattedInvites);
       expect(formattedInvites).to.be.an('array');
       formattedInvites.forEach(invite => {
-        expect(preformattedInvites.includes(invite)).to.be.true;
+        expect(preformattedInvites).to.include(invite);
       });
     });
   });
+
   describe('#applyRequestOptionsFor', function() {
     it('should return a request options object for login', function() {
       const loginOptions = {
@@ -56,6 +57,7 @@ describe('Unit tests for utils', function() {
       expect(loginRequestOptions.body.password).to.equal(loginOptions.password);
     });
   });
+
   describe('#applyFilter', function() {
     it('should return a stringified JSON filter object', function() {
       const filterOptions = {

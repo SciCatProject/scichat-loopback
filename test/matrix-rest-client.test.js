@@ -4,9 +4,9 @@ const expect = require('chai').expect;
 const sandbox = require('sinon').createSandbox();
 
 const mockStubs = require('./MockStubs');
-const config = require('../server/config.local');
 const MatrixRestClient = require('../common/models/matrix-rest-client');
 const matrixClient = new MatrixRestClient();
+const requestPromise = require('request-promise');
 
 afterEach(function(done) {
   sandbox.restore();
@@ -14,24 +14,42 @@ afterEach(function(done) {
 });
 
 describe('Tests for MatrixRestClient', function() {
-  let accessToken, room, rooms;
   describe('#login', function() {
     it('should return an access token', async function() {
       sandbox
-        .stub(MatrixRestClient.prototype, 'login')
+        .stub(requestPromise, 'Request')
         .resolves(mockStubs.loginResponse);
-      const username = config.synapse.bot.name;
-      const password = config.synapse.bot.name;
-      accessToken = await matrixClient.login(username, password);
+      const username = 'testName';
+      const password = 'testPassword';
+      const accessToken = await matrixClient.login(username, password);
       expect(accessToken).to.be.a('string');
     });
   });
-  describe('#fetchRooms', function() {
+
+  describe('#createRoom', function() {
+    it('should return a roomId', async function() {
+      sandbox
+        .stub(requestPromise, 'Request')
+        .resolves(mockStubs.createRoomResponse);
+      const accessToken = 'testToken';
+      const name = 'test';
+      const invites = [];
+      const response = await matrixClient.createRoom(
+        accessToken,
+        name,
+        invites
+      );
+      expect(response).to.have.property('room_id');
+    });
+  });
+
+  describe('#fetchPublicRooms', function() {
     it('should return an array of rooms', async function() {
       sandbox
-        .stub(MatrixRestClient.prototype, 'fetchRooms')
-        .resolves(mockStubs.fetchRoomsResponse);
-      rooms = await matrixClient.fetchRooms(accessToken);
+        .stub(requestPromise, 'Request')
+        .resolves(mockStubs.fetchPublicRoomsResponse);
+      const accessToken = 'testToken';
+      const rooms = await matrixClient.fetchPublicRooms(accessToken);
       expect(rooms).to.be.an('array');
       rooms.forEach(room => {
         expect(room).to.have.property('name');
@@ -39,25 +57,25 @@ describe('Tests for MatrixRestClient', function() {
       });
     });
   });
-  describe('#fetchRoomByName', function() {
-    it('should return the room 23PTEG', async function() {
+
+  describe('#fetchRoomIdByName', function() {
+    it('should return a roomId', async function() {
       sandbox
-        .stub(MatrixRestClient.prototype, 'fetchRoomByName')
-        .resolves(mockStubs.fetchRoomByNameResponse);
+        .stub(requestPromise, 'Request')
+        .resolves(mockStubs.fetchRoomIdByNameResponse);
       const name = '23PTEG';
-      room = await matrixClient.fetchRoomByName(name, accessToken);
-      expect(room).to.be.an('object');
-      expect(room).to.have.property('name');
-      expect(room).to.have.property('room_id');
+      const roomId = await matrixClient.fetchRoomIdByName(name);
+      expect(roomId).to.be.a('string');
     });
   });
+
   describe('#fetchAllRoomsMessages', function() {
     it('should return an array of Logbook objects', async function() {
       sandbox
-        .stub(MatrixRestClient.prototype, 'fetchAllRoomsMessages')
-        .resolves(mockStubs.fetchAllRoomsMessagesResponse);
+        .stub(requestPromise, 'Request')
+        .resolves(mockStubs.fetchRoomMessagesResponse);
+      const accessToken = 'testToken';
       const logbooks = await matrixClient.fetchAllRoomsMessages(
-        rooms,
         accessToken
       );
       expect(logbooks).to.be.an('array');
@@ -68,15 +86,20 @@ describe('Tests for MatrixRestClient', function() {
       });
     });
   });
+
   describe('#fetchRoomMessages', function() {
     it('should return a Logbook object', async function() {
       sandbox
-        .stub(MatrixRestClient.prototype, 'fetchRoomMessages')
+        .stub(requestPromise, 'Request')
         .resolves(mockStubs.fetchRoomMessagesResponse);
-      const logbook = await matrixClient.fetchRoomMessages(room, accessToken);
+
+      const roomId = '!testId';
+      const accessToken = 'testToken';
+      const logbook = await matrixClient.fetchRoomMessages(roomId, accessToken);
       expect(logbook).to.be.an('object');
       expect(logbook).to.have.property('name');
       expect(logbook).to.have.property('roomId');
+      expect(logbook.roomId).to.equal(roomId);
       expect(logbook).to.have.property('messages');
     });
   });

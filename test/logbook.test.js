@@ -2,13 +2,22 @@
 
 const expect = require('chai').expect;
 const request = require('supertest');
+const sandbox = require('sinon').createSandbox();
 const rison = require('rison');
 
+const mockStubs = require('./MockStubs');
 const utils = require('./loginUtils');
+const MatrixRestClient = require('../common/models/matrix-rest-client');
 
 let app, accessToken;
-before(function() {
+before(function(done) {
   app = require('../server/server');
+  done();
+});
+
+afterEach(function(done) {
+  sandbox.restore();
+  done();
 });
 
 describe('Tests for Logbook model', function() {
@@ -22,9 +31,17 @@ describe('Tests for Logbook model', function() {
       done();
     });
   });
+
   describe('#findByName', function() {
-    it('should fetch a Logbook name 23PTEG', function(done) {
-      const name = '23PTEG';
+    it('should fetch a Logbook by name', function(done) {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'fetchRoomIdByName')
+        .resolves(mockStubs.fetchRoomIdByNameResponse.room_id);
+      sandbox
+        .stub(MatrixRestClient.prototype, 'fetchRoomMessages')
+        .resolves(mockStubs.findLogbookResponse);
+
+      const name = 'testRoom';
       request(app)
         .get('/api/Logbooks/' + name + '?access_token=' + accessToken)
         .set('Accept', 'application/json')
@@ -43,6 +60,10 @@ describe('Tests for Logbook model', function() {
 
   describe('#findAll', function() {
     it('should fetch all Logbooks', function(done) {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'fetchAllRoomsMessages')
+        .resolves(mockStubs.findAllLogbooksResponse);
+
       request(app)
         .get('/api/Logbooks?access_token=' + accessToken)
         .set('Accept', 'application/json')
@@ -64,8 +85,15 @@ describe('Tests for Logbook model', function() {
   });
 
   describe('#filter', function() {
-    it('should fetch filtered Logbook 23PTEG', function(done) {
-      const name = '23PTEG';
+    it('should fetch filtered Logbook by name', function(done) {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'fetchRoomIdByName')
+        .resolves(mockStubs.fetchRoomIdByNameResponse.room_id);
+      sandbox
+        .stub(MatrixRestClient.prototype, 'fetchRoomMessages')
+        .resolves(mockStubs.findLogbookResponse);
+
+      const name = 'testRoom';
       const filter = rison.encode_object({
         showBotMessages: true,
         showUserMessages: true,
