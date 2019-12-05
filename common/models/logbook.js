@@ -14,11 +14,14 @@ module.exports = function(Logbook) {
 
   Logbook.beforeRemote('*', async function() {
     try {
+      console.log('[+] Looking for access token in db');
       const AccessToken = app.models.AccessToken;
       const tokenInstance = await AccessToken.findOne({where: {userId: user}});
       if (tokenInstance && tokenInstance.userId === user) {
+        console.log('[+] Found access token');
         accessToken = tokenInstance.id;
       } else {
+        console.log('[+] Access token not found, requesting new access token');
         accessToken = await matrixClient.login(user, pass);
         const token = {
           id: accessToken,
@@ -27,9 +30,10 @@ module.exports = function(Logbook) {
           userId: user,
         };
         await AccessToken.create(token);
+        console.log('[+] Request for new access token successful');
       }
     } catch (err) {
-      console.error(err);
+      console.error('[-] Error requesting new access token', err);
     }
   });
 
@@ -42,7 +46,10 @@ module.exports = function(Logbook) {
   Logbook.findByName = async function(name) {
     do {
       try {
+        console.log('[+] Fetching id for room: ' + name);
         const roomId = await matrixClient.fetchRoomIdByName(name);
+        console.log('[+] Found id: ' + roomId);
+        console.log('[+] Fetching messages for room: ' + name);
         return await matrixClient.fetchRoomMessages(roomId, accessToken);
       } catch (err) {
         if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
@@ -64,6 +71,7 @@ module.exports = function(Logbook) {
   Logbook.findAll = async function() {
     do {
       try {
+        console.log('[+] Fetching messages for all rooms');
         return await matrixClient.fetchAllRoomsMessages(accessToken);
       } catch (err) {
         if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
@@ -87,7 +95,10 @@ module.exports = function(Logbook) {
   Logbook.filter = async function(name, filter) {
     do {
       try {
+        console.log('[+] Fetching id for room: ' + name);
         const roomId = await matrixClient.fetchRoomIdByName(name);
+        console.log('[+] Found id: ' + roomId);
+        console.log('[+] Fetching messages for room: ' + name);
         return await matrixClient.fetchRoomMessages(
           roomId,
           accessToken,
