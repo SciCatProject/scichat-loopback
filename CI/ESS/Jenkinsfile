@@ -15,9 +15,9 @@ node('docker') {
             def IMAGE_ID = sh ( script: 'git rev-parse HEAD',returnStdout: true).trim()
       sh "docker build --file CI/ESS/Dockerfile.proxy . --tag dacat/scichat-loopback:latest -t dacat/scichat-loopback:${IMAGE_ID}dev"
       echo "Git image id : ${IMAGE_ID}"
-      sh "docker push dacat/scichat-loopback:${IMAGE_ID}dev"
-      sh "docker push dacat/scichat-loopback:latest"
-      sh "docker rmi dacat/scichat-loopback:${IMAGE_ID}dev"
+      // sh "docker push dacat/scichat-loopback:${IMAGE_ID}dev"
+      // sh "docker push dacat/scichat-loopback:latest"
+      // sh "docker rmi dacat/scichat-loopback:${IMAGE_ID}dev"
       }
   }
 }
