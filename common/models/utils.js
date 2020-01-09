@@ -136,7 +136,7 @@ module.exports = class Utils {
       room: {
         state: {types: ['m.room.name']},
         timeline: {
-          limit: 100,
+          limit: 1000000,
           types: ['m.room.message'],
         },
       },
