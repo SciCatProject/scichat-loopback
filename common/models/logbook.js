@@ -16,7 +16,9 @@ module.exports = function(Logbook) {
     try {
       console.log('[+] Looking for access token in db');
       const AccessToken = app.models.AccessToken;
-      const tokenInstance = await AccessToken.findOne({where: {userId: user}});
+      const tokenInstance = await AccessToken.findOne({
+        where: { userId: user }
+      });
       if (tokenInstance && tokenInstance.userId === user) {
         console.log('[+] Found access token');
         accessToken = tokenInstance.id;
@@ -27,7 +29,7 @@ module.exports = function(Logbook) {
           id: accessToken,
           ttl: 1209600,
           created: new Date(),
-          userId: user,
+          userId: user
         };
         await AccessToken.create(token);
         console.log('[+] Request for new access token successful');
@@ -52,7 +54,10 @@ module.exports = function(Logbook) {
         console.log('[+] Fetching messages for room: ' + name);
         return await matrixClient.fetchRoomMessages(roomId, accessToken);
       } catch (err) {
-        if (err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        if (
+          err.error.errcode === 'M_UNKNOWN_TOKEN' ||
+          err.error.errcode === 'M_MISSING_TOKEN'
+        ) {
           renewAccessToken();
           continue;
         } else {
@@ -74,7 +79,10 @@ module.exports = function(Logbook) {
         console.log('[+] Fetching messages for all rooms');
         return await matrixClient.fetchAllRoomsMessages(accessToken);
       } catch (err) {
-        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        if (
+          (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') ||
+          err.error.errcode === 'M_MISSING_TOKEN'
+        ) {
           await renewAccessToken();
           continue;
         } else {
@@ -105,7 +113,10 @@ module.exports = function(Logbook) {
           filter
         );
       } catch (err) {
-        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        if (
+          (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') ||
+          err.error.errcode === 'M_MISSING_TOKEN'
+        ) {
           await renewAccessToken();
           continue;
         } else {
@@ -121,14 +132,14 @@ module.exports = function(Logbook) {
       console.log('[+] Requesting new access token');
 
       const AccessToken = app.models.AccessToken;
-      await AccessToken.destroyAll({userId: user});
+      await AccessToken.destroyAll({ userId: user });
 
       accessToken = await matrixClient.login(user, pass);
       const token = {
         id: accessToken,
         ttl: 1209600,
         created: new Date(),
-        userId: user,
+        userId: user
       };
       await AccessToken.create(token);
 
