@@ -1,6 +1,13 @@
 'use strict';
 
 module.exports = function(app) {
+  const dataSource = app.datasources.mongo;
+  console.log(
+    'Datasource host %s, database %s',
+    dataSource.connector.settings.host,
+    dataSource.connector.settings.database
+  );
+
   const User = app.models.User;
   const Role = app.models.Role;
   const RoleMapping = app.models.RoleMapping;
