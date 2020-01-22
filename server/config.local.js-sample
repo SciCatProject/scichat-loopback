@@ -2,9 +2,9 @@
 
 module.exports = {
   synapse: {
-    name: process.env.SYNAPSE_NAME || 'example',
-    host: process.env.SYNAPSE_SERVER || 'example.com',
-    port: process.env.SYNAPSE_PORT || 8448,
+    name: process.env.SYNAPSE_NAME || 'ess',
+    host: process.env.SYNAPSE_SERVER || 'scitest.esss.lu.se',
+    port: process.env.SYNAPSE_PORT || null,
     bot: {
       name: process.env.SYNAPSE_BOT_NAME || 'myBotName',
       password: process.env.SYNAPSE_BOT_PASSWORD || 'pass',
