@@ -5,8 +5,8 @@ services:
     volumes:
       - "mongodb_data:/bitnami"
   scichat-loopback:
-    image: "dacat/scichat-loopback:latest"
-    command: ["npm", "test"]
+    image: "dacat/scichat-loopback:test"
+    command: ["./wait-for-it.sh", "mongodb:27017", "--", "npm", "test"]
     environment:
       - SYNAPSE_BOT_NAME
       - SYNAPSE_BOT_PASSWORD
