@@ -2,7 +2,7 @@
 
 const logger = require('../../common/logger');
 
-module.exports = function(app) {
+module.exports = function(app, cb) {
   const dataSource = app.datasources.mongo;
   logger.logInfo(
     'Datasource host: ' +
@@ -115,4 +115,5 @@ module.exports = function(app) {
       });
     }
   });
+  cb();
 };
