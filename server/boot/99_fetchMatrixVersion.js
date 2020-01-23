@@ -2,6 +2,7 @@
 
 const requestPromise = require('request-promise');
 const configs = require('../config.local');
+const logger = require('../../common/logger');
 
 module.exports = async function(app) {
   const serverHost = configs.synapse.host;
@@ -25,11 +26,12 @@ module.exports = async function(app) {
   };
 
   try {
-    console.log('[+] Requesting matrix server versions from ' + baseUrl);
+    logger.logInfo('Requesting matrix server versions', {baseUrl});
     const version = await requestPromise(request);
-    console.log('[+] Request for server versions successful');
-    console.log(version);
+    logger.logInfo('Request for server versions successful', {version});
   } catch (err) {
-    console.error('[-] Error requesting matrix server versions: ', err);
+    logger.logError(err.message, {
+      location: 'Fetching matrix server versions',
+    });
   }
 };

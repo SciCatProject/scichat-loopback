@@ -1,14 +1,16 @@
+/* eslint-disable padded-blocks */
 'use strict';
 
 const amqp = require('amqplib/callback_api');
+
 const config = require('../server/config.local');
-const MatrixRestClient = require('../common/models/matrix-rest-client');
-const matrixClient = new MatrixRestClient();
+const logger = require('../common/logger');
 
 const user = config.synapse.bot.name;
 const pass = config.synapse.bot.password;
 
-module.exports = function() {
+module.exports = function(app) {
+
   if (config.rabbitmq.host) {
     let url;
     if (config.rabbitmq.port) {
@@ -17,19 +19,18 @@ module.exports = function() {
       url = `amqp://${user}:${pass}@${config.rabbitmq.host}`;
     }
 
+    logger.logInfo('Connecting to RabbitMq', {url});
+
     amqp.connect(url, function(error0, connection) {
       if (error0) {
-        console.error(
-          ' [-] Error while connecting to RabbitMq server: ',
-          error0
-        );
+        logger.logError(error0.message, {location: 'amqp.connect', url});
       } else {
         connection.createChannel(function(error1, channel) {
           if (error1) {
-            console.error(
-              ' [-] Error while creating RabbitMq channel: ',
-              error1
-            );
+            logger.logError(error1.message, {
+              location: 'connection.createChannel',
+              connection,
+            });
           } else {
             const queue = config.rabbitmq.queue;
 
@@ -39,25 +40,28 @@ module.exports = function() {
 
             channel.prefetch(1);
 
-            console.log(' [*] RABBITMQ Waiting for messages in %s', queue);
+            logger.logInfo('RABBITMQ Waiting for messages', {queue});
 
             channel.consume(
               queue,
               async function(msg) {
-                let msgJSON = JSON.parse(msg.content);
+                const msgJSON = JSON.parse(msg.content);
                 switch (msgJSON.eventType) {
                   case 'PROPOSAL_ACCEPTED': {
-                    console.log(' [/] Received %s', msg.content.toString());
+                    logger.logInfo('RabbitMq received message', {
+                      message: msg.content.toString(),
+                    });
                     try {
-                      const accessToken = await matrixClient.login(user, pass);
-                      const room = await matrixClient.createRoom(
-                        accessToken,
+                      const Room = app.models.Room;
+                      const room = Room.create(
                         msgJSON.proposalID,
                         msgJSON.users
                       );
-                      console.log(' [X] Created room %s', room.room_id);
+                      logger.logInfo('Created room', {room});
                     } catch (err) {
-                      console.error(' [-] Error while creating room: %s', err);
+                      logger.logError(err.message, {
+                        location: 'channel.consume',
+                      });
                     }
                     channel.ack(msg);
                     break;

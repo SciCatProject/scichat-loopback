@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('../../server/config.local');
+const logger = require('../logger');
 
 const MatrixRestClient = require('./matrix-rest-client');
 const matrixClient = new MatrixRestClient();
@@ -10,32 +11,38 @@ const pass = config.synapse.bot.password;
 
 module.exports = function(Logbook) {
   const app = require('../../server/server');
+
   let accessToken;
 
   Logbook.beforeRemote('*', async function() {
     try {
-      console.log('[+] Looking for access token in db');
+      logger.logInfo('Looking for access token in db', {});
       const AccessToken = app.models.AccessToken;
       const tokenInstance = await AccessToken.findOne({
-        where: { userId: user }
+        where: {userId: user},
       });
       if (tokenInstance && tokenInstance.userId === user) {
-        console.log('[+] Found access token');
         accessToken = tokenInstance.id;
+        logger.logInfo('Found access token', {accessToken});
       } else {
-        console.log('[+] Access token not found, requesting new access token');
+        logger.logInfo(
+          'Access token not found, requesting new access token',
+          {}
+        );
         accessToken = await matrixClient.login(user, pass);
         const token = {
           id: accessToken,
           ttl: 1209600,
           created: new Date(),
-          userId: user
+          userId: user,
         };
         await AccessToken.create(token);
-        console.log('[+] Request for new access token successful');
+        logger.logInfo('Request for new access token successful', {
+          accessToken,
+        });
       }
     } catch (err) {
-      console.error('[-] Error requesting new access token', err);
+      logger.logError(err.message, {location: 'Logbook.beforeRemote'});
     }
   });
 
@@ -48,10 +55,10 @@ module.exports = function(Logbook) {
   Logbook.findByName = async function(name) {
     do {
       try {
-        console.log('[+] Fetching id for room: ' + name);
+        logger.logInfo('Fetching id for room', {name});
         const roomId = await matrixClient.fetchRoomIdByName(name);
-        console.log('[+] Found id: ' + roomId);
-        console.log('[+] Fetching messages for room: ' + name);
+        logger.logInfo('Found id', {roomId});
+        logger.logInfo('Fetching messages for room', {name});
         return await matrixClient.fetchRoomMessages(roomId, accessToken);
       } catch (err) {
         if (
@@ -61,7 +68,10 @@ module.exports = function(Logbook) {
           renewAccessToken();
           continue;
         } else {
-          console.error('[-] Error in Logbook.findByName', err);
+          logger.logError(err.message, {
+            location: 'Logbook.findByName',
+            name,
+          });
         }
       }
       break;
@@ -76,7 +86,7 @@ module.exports = function(Logbook) {
   Logbook.findAll = async function() {
     do {
       try {
-        console.log('[+] Fetching messages for all rooms');
+        logger.logInfo('Fetching messages for all rooms', {});
         return await matrixClient.fetchAllRoomsMessages(accessToken);
       } catch (err) {
         if (
@@ -86,7 +96,7 @@ module.exports = function(Logbook) {
           await renewAccessToken();
           continue;
         } else {
-          console.error('[-] Error in Logbook.findAll', err);
+          logger.logError(err.message, {});
         }
       }
       break;
@@ -103,10 +113,10 @@ module.exports = function(Logbook) {
   Logbook.filter = async function(name, filter) {
     do {
       try {
-        console.log('[+] Fetching id for room: ' + name);
+        logger.logInfo('Fetching id for room', {name});
         const roomId = await matrixClient.fetchRoomIdByName(name);
-        console.log('[+] Found id: ' + roomId);
-        console.log('[+] Fetching messages for room: ' + name);
+        logger.logInfo('Found id', {roomId});
+        logger.logInfo('Fetching messages for room', {name});
         return await matrixClient.fetchRoomMessages(
           roomId,
           accessToken,
@@ -120,7 +130,11 @@ module.exports = function(Logbook) {
           await renewAccessToken();
           continue;
         } else {
-          console.error('[-] Error in Logbook.filter', err);
+          logger.logError(err.message, {
+            location: 'Logbook.filter',
+            name,
+            filter,
+          });
         }
       }
       break;
@@ -129,23 +143,25 @@ module.exports = function(Logbook) {
 
   async function renewAccessToken() {
     try {
-      console.log('[+] Requesting new access token');
+      logger.logInfo('Requesting new access token', {});
 
       const AccessToken = app.models.AccessToken;
-      await AccessToken.destroyAll({ userId: user });
+      await AccessToken.destroyAll({userId: user});
 
       accessToken = await matrixClient.login(user, pass);
       const token = {
         id: accessToken,
         ttl: 1209600,
         created: new Date(),
-        userId: user
+        userId: user,
       };
       await AccessToken.create(token);
 
-      console.log('[+] Request for new access token successful');
+      logger.logInfo('Request for new access token successful', {
+        accessToken,
+      });
     } catch (err) {
-      console.error('[-] Error requesting new access token', err);
+      logger.logError(err.message, {location: 'Logbook.renewAccessToken'});
     }
   }
 };

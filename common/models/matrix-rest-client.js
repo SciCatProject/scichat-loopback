@@ -6,6 +6,8 @@ const rison = require('rison');
 const Utils = require('./utils');
 const utils = new Utils();
 
+const logger = require('../logger');
+
 module.exports = class MatrixRestClient {
   constructor() {}
 
@@ -17,6 +19,7 @@ module.exports = class MatrixRestClient {
    */
 
   async login(username, password) {
+    logger.logInfo('Signing in to synapse server', {username});
     const loginInfo = {
       username: username,
       password: password,
@@ -24,12 +27,16 @@ module.exports = class MatrixRestClient {
     const requestOptions = utils.applyRequestOptionsFor('login', loginInfo);
     try {
       const response = await requestPromise(requestOptions);
+      logger.logInfo('Sign in successful', {response});
       return response.access_token;
     } catch (err) {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error('[-] Error in MatrixRestClient.login', err);
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.login',
+          username,
+        });
       }
     }
   }
@@ -63,7 +70,11 @@ module.exports = class MatrixRestClient {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error('[-] Error in MatrixRestClient.createRoom', err);
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.createRoom',
+          name,
+          invites,
+        });
       }
     }
   }
@@ -75,18 +86,22 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchPublicRooms(accessToken) {
+    logger.logInfo('Fetching public rooms', {});
     const requestOptions = utils.applyRequestOptionsFor(
       'fetchPublicRooms',
       accessToken
     );
     try {
       const response = await requestPromise(requestOptions);
+      logger.logInfo('Fetching public rooms successful', {response});
       return response.chunk;
     } catch (err) {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error('[-] Error in MatrixRestClient.fetchPublicRooms', err);
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.fetchPublicRooms',
+        });
       }
     }
   }
@@ -98,18 +113,23 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchRoomIdByName(requestName) {
+    logger.logInfo('Fetching roomId by name', {requestName});
     const requestOptions = utils.applyRequestOptionsFor(
       'fetchRoomIdByName',
       requestName
     );
     try {
       const room = await requestPromise(requestOptions);
+      logger.logInfo('Fetching roomId by name succesful', {room});
       return room.room_id;
     } catch (err) {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error('[-] Error in MatrixRestClient.fetchRoomIdByName', err);
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.fetchRoomIdByName',
+          requestName,
+        });
       }
     }
   }
@@ -121,29 +141,32 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchAllRoomsMessages(accessToken) {
+    logger.logInfo('Fetching messages for all rooms', {});
     const requestOptions = utils.applyRequestOptionsFor(
       'fetchAllRoomsMessages',
       {accessToken}
     );
     try {
       const res = await requestPromise(requestOptions);
-      return Object.keys(res.rooms.join).map(roomId => {
-        return {
+      logger.logInfo('Fetching messages for all rooms successful', {
+        roomCount: Object.keys(res.rooms.join).length,
+      });
+      return Object.keys(res.rooms.join)
+        .map(roomId => ({
           roomId,
-          name: res.rooms.join[roomId].state.events.map(event => {
-            return event.content.name;
-          }).pop(),
+          name: res.rooms.join[roomId].state.events
+            .map(event => event.content.name)
+            .pop(),
           messages: res.rooms.join[roomId].timeline.events,
-        };
-      }).filter(room => (room.roomId && room.name && room.messages));
+        }))
+        .filter(room => room.roomId && room.name && room.messages);
     } catch (err) {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error(
-          '[-] Error in MatrixRestClient.fetchAllRoomsMessages',
-          err
-        );
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.fetchAllRoomsMessages',
+        });
       }
     }
   }
@@ -157,6 +180,7 @@ module.exports = class MatrixRestClient {
    */
 
   async fetchRoomMessages(roomId, accessToken, queryFilter) {
+    logger.logInfo('Fetching room messages', {roomId, queryFilter});
     const fetchOptions = {
       accessToken: accessToken,
       roomId,
@@ -170,6 +194,9 @@ module.exports = class MatrixRestClient {
     );
     try {
       const res = await requestPromise(requestOptions);
+      logger.logInfo('Fetching room messages successful', {
+        count: Object.keys(res.rooms.join[roomId].timeline.events).length,
+      });
       let messages;
       if (res.rooms.join[roomId]) {
         if (fetchOptions.queryFilter && fetchOptions.queryFilter.textSearch) {
@@ -177,13 +204,11 @@ module.exports = class MatrixRestClient {
             '.*' + fetchOptions.queryFilter.textSearch + '.*',
             'i'
           );
-          messages = res.rooms.join[roomId].timeline.events.filter(
-            message => {
-              if (message.content.hasOwnProperty('body')) {
-                return message.content.body.match(pattern);
-              }
+          messages = res.rooms.join[roomId].timeline.events.filter(message => {
+            if (message.content.hasOwnProperty('body')) {
+              return message.content.body.match(pattern);
             }
-          );
+          });
         } else {
           messages = res.rooms.join[roomId].timeline.events;
         }
@@ -197,16 +222,20 @@ module.exports = class MatrixRestClient {
       }
       return {
         roomId,
-        name: res.rooms.join[roomId].state.events.map(event => {
-          return event.content.name;
-        }).pop(),
+        name: res.rooms.join[roomId].state.events
+          .map(event => event.content.name)
+          .pop(),
         messages: messages,
       };
     } catch (err) {
       if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
         throw err;
       } else {
-        console.error('[-] Error in MatrixRestClient.fetchRoomMessages', err);
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.fetchRoomMessages',
+          roomId,
+          queryFilter,
+        });
       }
     }
   }

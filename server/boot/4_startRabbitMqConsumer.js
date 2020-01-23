@@ -1,7 +1,11 @@
 'use strict';
 
+const config = require('../config.local');
 const rabbitMqConsumer = require('../../rabbitmq/consumer');
 
 module.exports = function(app) {
-  rabbitMqConsumer();
+  const rabbitMqEnabled = config.rabbitmq ? config.rabbitmq.enabled : false;
+  if (rabbitMqEnabled) {
+    rabbitMqConsumer(app);
+  }
 };

@@ -11,8 +11,17 @@ module.exports = {
     },
   },
   rabbitmq: {
+    enabled: process.env.RABBITMQ_ENABLED || false,
     host: process.env.RABBITMQ_SERVER || null,
     port: process.env.RABBITMQ_PORT || null,
     queue: process.env.RABBITMQ_QUEUE || null,
+  },
+  grayLog: {
+    enabled: false,
+    host: "my.graylog.host",
+    port: 0000,
+    facility: "facility",
+    owner: "owner",
+    service: "service"
   },
 };

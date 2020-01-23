@@ -1,11 +1,15 @@
 'use strict';
 
+const logger = require('../../common/logger');
+
 module.exports = function(app) {
   const dataSource = app.datasources.mongo;
-  console.log(
-    'Datasource host %s, database %s',
-    dataSource.connector.settings.host,
-    dataSource.connector.settings.database
+  logger.logInfo(
+    'Datasource host: ' +
+      dataSource.connector.settings.host +
+      ', database: ' +
+      dataSource.connector.settings.database,
+    {}
   );
 
   const User = app.models.User;
@@ -34,13 +38,17 @@ module.exports = function(app) {
 
   User.findOrCreate(userFilter, user, function(err, userInstance, created) {
     if (err) {
-      console.error(`Error when creating User: ${err} ${user.username}`);
+      logger.logError(err.message, {
+        location: 'User.findOrCreate',
+        userFilter,
+        user,
+      });
       return err;
     } else {
       if (created) {
-        console.log('New account created:', user.username);
+        logger.logInfo('New account created', {user});
       } else {
-        console.log('Account already exists:', user.username);
+        logger.logInfo('Account already exists', {user});
       }
 
       const role = {
@@ -55,13 +63,17 @@ module.exports = function(app) {
 
       Role.findOrCreate(roleFilter, role, function(err, roleInstance, created) {
         if (err) {
-          console.log(`Error when creating Role: ${err} ${role.name}`);
+          logger.logError(err.message, {
+            location: 'Role.findOrCreate',
+            roleFilter,
+            role,
+          });
           return err;
         } else {
           if (created) {
-            console.log('New role created:', role.name);
+            logger.logInfo('New role created', {role});
           } else {
-            console.log('Role already exists:', role.name);
+            logger.logInfo('Role already exists', {role});
           }
 
           const mappingFilter = {
@@ -83,25 +95,19 @@ module.exports = function(app) {
             created
           ) {
             if (err) {
-              console.log(
-                `Error when finding RoleMapping: ${err} ${roleInstance.id} ${
-                  userInstance.id
-                }`
-              );
+              logger.logError(err.message, {
+                location: 'RoleMapping.findOrCreate',
+                mappingFilter,
+                mapping,
+                roleInstance,
+                userInstance,
+              });
               return err;
             } else {
               if (created) {
-                console.log(
-                  'New rolemapping created:',
-                  user.username,
-                  role.name
-                );
+                logger.logInfo('New rolemapping created', {user, role});
               } else {
-                console.log(
-                  'Rolemapping already exists:',
-                  user.username,
-                  role.name
-                );
+                logger.logInfo('Rolemapping already exists', {user, role});
               }
             }
           });
