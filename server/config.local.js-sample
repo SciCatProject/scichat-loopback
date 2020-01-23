@@ -19,7 +19,7 @@ module.exports = {
   grayLog: {
     enabled: false,
     host: "my.graylog.host",
-    port: 0000,
+    port: null,
     facility: "facility",
     owner: "owner",
     service: "service"
