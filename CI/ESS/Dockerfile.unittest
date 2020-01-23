@@ -17,8 +17,6 @@ WORKDIR /home/node/app
 COPY --chown=node package*.json ./
 
 RUN npm install
-RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
-RUN chmod +x wait-for-it.sh
 
 # Bundle app source code
 COPY --chown=node . .
@@ -27,3 +25,5 @@ COPY --chown=node . .
 ENV HOST=0.0.0.0 PORT=3030
 
 EXPOSE ${PORT}
+
+CMD [ "./wait.sh" ]
