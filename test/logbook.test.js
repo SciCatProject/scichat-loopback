@@ -43,7 +43,7 @@ describe('Tests for Logbook model', function() {
 
       const name = 'testRoom';
       request(app)
-        .get('/api/Logbooks/' + name + '?access_token=' + accessToken)
+        .get('/scichatapi/Logbooks/' + name + '?access_token=' + accessToken)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -65,7 +65,7 @@ describe('Tests for Logbook model', function() {
         .resolves(mockStubs.findAllLogbooksResponse);
 
       request(app)
-        .get('/api/Logbooks?access_token=' + accessToken)
+        .get('/scichatapi/Logbooks?access_token=' + accessToken)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -102,7 +102,7 @@ describe('Tests for Logbook model', function() {
       });
       request(app)
         .get(
-          '/api/Logbooks/' +
+          '/scichatapi/Logbooks/' +
             name +
             '/' +
             filter +

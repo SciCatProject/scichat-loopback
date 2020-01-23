@@ -41,7 +41,7 @@ describe('Tests for Room model', function() {
         invites: ['firstnamelastname'],
       };
       request(app)
-        .post('/api/Rooms?access_token=' + accessToken)
+        .post('/scichatapi/Rooms?access_token=' + accessToken)
         .set('Accept', 'application/json')
         .send(roomData)
         .expect(200)
