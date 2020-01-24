@@ -39,6 +39,6 @@
     "type": "",
     "url": ""
   },
-  "license": "UNLICENSED",
+  "license": "GPL-3.0",
   "description": "Loopback implementation of the SciChat client."
 }
