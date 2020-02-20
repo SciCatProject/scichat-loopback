@@ -110,10 +110,10 @@ module.exports = function(app, cb) {
                 logger.logInfo('Rolemapping already exists', {user, role});
               }
             }
+            cb();
           });
         }
       });
     }
   });
-  cb();
 };
