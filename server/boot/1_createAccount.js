@@ -2,7 +2,7 @@
 
 const logger = require('../../common/logger');
 
-module.exports = function(app, cb) {
+module.exports = function(app, next) {
   const dataSource = app.datasources.mongo;
   logger.logInfo(
     'Datasource host: ' +
@@ -110,7 +110,7 @@ module.exports = function(app, cb) {
                 logger.logInfo('Rolemapping already exists', {user, role});
               }
             }
-            cb();
+            return next();
           });
         }
       });
