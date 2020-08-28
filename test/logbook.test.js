@@ -12,6 +12,10 @@ const MatrixRestClient = require('../common/models/matrix-rest-client');
 let app, accessToken;
 before(function(done) {
   app = require('../server/server');
+
+  if (app.booting) {
+    return app.once('booted', done);
+  }
   done();
 });
 
