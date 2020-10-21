@@ -1,16 +1,24 @@
-# Check out https://hub.docker.com/_/node to select a new base image
-FROM node:10-slim
+FROM node:10.16.1-alpine
 
-RUN apt-get update && apt-get install -y --no-install-recommends mongodb-clients ldap-utils vim git
+RUN apk update && apk upgrade && apk add --no-cache git
 
-ENV PORT 3030
+ENV PORT=3030
 EXPOSE 3030
 
+# Prepare app directory
 WORKDIR /usr/src/app
-COPY package.json /usr/src/app/
+COPY package*.json /usr/src/app/
+COPY .snyk /usr/src/app/
+
+# set up local user to avoid running as root
+RUN chown -R node:node /usr/src/app
+USER node
 
 # Install our packages
-RUN npm install --no-optional
+RUN npm ci
 
+# Copy the rest of our application, node_modules is ignored via .dockerignore
+COPY . /usr/src/app
 
+# Start the app
 CMD [ "node", "." ]

@@ -5,7 +5,9 @@ services:
     volumes:
       - "mongodb_data:/bitnami"
   scichat-loopback:
-    image: "dacat/scichat-loopback:test"
+    build:
+      context: .
+      dockerfile: CI/ESS/Dockerfile.unittest
     environment:
       - SYNAPSE_BOT_NAME
       - SYNAPSE_BOT_PASSWORD

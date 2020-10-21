@@ -14,20 +14,17 @@ RUN npm config set registry http://registry.npmjs.org/
 RUN npm config set strict-ssl false
 RUN apk update && apk upgrade && \
     apk add --no-cache  git
-# Set to a non-root built-in user `node`
-# USER node
 
-# Create app directory (with user `node`)
-# RUN mkdir -p /home/node/app
-
+# Prepare app directory
 WORKDIR /usr/src/app
-
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY package*.json /usr/src/app/
+COPY .snyk /usr/src/app/
 
+# set up local user to avoid running as root
+RUN chown -R node:node /usr/src/app
+USER node
 
+# Install our packages
 RUN npm config set proxy  $http_proxy
 RUN npm config set https-proxy  $http_proxy
 RUN npm config set registry http://registry.npmjs.org/
@@ -39,16 +36,9 @@ COPY . /usr/src/app/
 COPY CI/ESS/datasources.json /usr/src/app/server/
 COPY CI/ESS/config.local.js /usr/src/app/server/
 
-# RUN npm run build
-
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV PORT=3030
-
 EXPOSE ${PORT}
+
 # Start the app
-# ENV http_proxy "http://10.0.0.160:8123"
-# ENV https_proxy $http_proxy
-# ENV no_proxy "localhost, 127.0.0.1"
-# RUN npm config set proxy  $http_proxy
-# RUN npm config set https-proxy  $http_proxy
 CMD ["node", "."]
