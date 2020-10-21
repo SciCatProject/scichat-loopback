@@ -19,7 +19,7 @@ RUN npm ci
 
 # Bundle app source code
 COPY . /usr/src/app/
-COPY /usr/src/app/server/config.local.js-sample /usr/src/app/server/config.local.js
+COPY server/config.local.js-sample /usr/src/app/server/config.local.js
 COPY CI/ESS/wait.sh /usr/src/app/
 
 # Bind to all network interfaces so that it can be mapped to the host OS
