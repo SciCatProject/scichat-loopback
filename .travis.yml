@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - '14.14'
+
+services:
+  - docker
+
+before_install:
+  - cp CI/ESS/docker-compose.test.yaml ./docker-compose.yaml
+
+script:
+  - docker-compose up --build --exit-code-from scichat-loopback
