@@ -18,7 +18,7 @@ USER node
 RUN npm ci
 
 # Copy the rest of our application, node_modules is ignored via .dockerignore
-COPY . /usr/src/app
+COPY --chown=node:node . /usr/src/app
 
 # Start the app
 CMD [ "node", "." ]
