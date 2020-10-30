@@ -1,5 +1,6 @@
 # scichat-loopback
 
+[![Build Status](https://travis-ci.org/SciCatProject/scichat-loopback.svg?branch=master)](https://travis-ci.org/SciCatProject/scichat-loopback)
 [![Known Vulnerabilities](https://snyk.io/test/github/SciCatProject/scichat-loopback/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/SciCatProject/scichat-loopback/master?targetFile=package.json)
 
 Loopback API for communication between SciChat-Synapse and Catamel.
