@@ -12,9 +12,9 @@ module.exports = async function(app) {
 
   if (serverHost) {
     if (serverPort) {
-      baseUrl = `https://${serverHost}:${serverPort}`;
+      baseUrl = `${serverHost}:${serverPort}`;
     } else {
-      baseUrl = `https://${serverHost}`;
+      baseUrl = serverHost;
     }
   }
 
