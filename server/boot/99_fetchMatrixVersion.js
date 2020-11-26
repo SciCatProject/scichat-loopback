@@ -1,8 +1,8 @@
 'use strict';
 
-const requestPromise = require('request-promise');
 const configs = require('../config.local');
 const logger = require('../../common/logger');
+const superagent = require('superagent');
 
 module.exports = async function(app) {
   const serverHost = configs.synapse.host;
@@ -18,16 +18,12 @@ module.exports = async function(app) {
     }
   }
 
-  const request = {
-    method: 'GET',
-    uri: baseUrl.concat('/_matrix/client/versions'),
-    rejectUnauthorized: false,
-    json: true,
-  };
+  const url = baseUrl + '/_matrix/client/versions';
 
   try {
     logger.logInfo('Requesting matrix server versions', {baseUrl});
-    const version = await requestPromise(request);
+    const response = await superagent.get(url);
+    const version = response.body;
     logger.logInfo('Request for server versions successful', {version});
   } catch (err) {
     logger.logError(err.message, {
