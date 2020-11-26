@@ -10,9 +10,9 @@ module.exports = class Utils {
     this.serverPort = configs.synapse.port;
     if (this.serverHost) {
       if (this.serverPort) {
-        this.baseUrl = `https://${this.serverHost}:${this.serverPort}`;
+        this.baseUrl = `${this.serverHost}:${this.serverPort}`;
       } else {
-        this.baseUrl = `https://${this.serverHost}`;
+        this.baseUrl = this.serverHost;
       }
     }
     console.log('Synapse url: ', this.baseUrl);
