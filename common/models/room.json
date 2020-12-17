@@ -53,6 +53,43 @@
           "verb": "post"
         }
       ]
+    },
+    "sendMessage": {
+      "accepts": [
+        {
+          "arg": "name",
+          "type": "string",
+          "required": true,
+          "description": "The name of the room",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "message",
+          "type": "string",
+          "required": true,
+          "description": "The message to be sent to the room",
+          "http": {
+            "source": "body"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "eventId",
+          "type": "object",
+          "root": true,
+          "description": "Object containing the event id of the message"
+        }
+      ],
+      "description": "Send a message to room",
+      "http": [
+        {
+          "path": "/:name/message",
+          "verb": "post"
+        }
+      ]
     }
   }
 }

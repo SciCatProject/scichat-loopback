@@ -91,6 +91,22 @@ module.exports = class Utils {
         }
         return requestOptions;
       }
+      case 'sendMessage': {
+        requestOptions.headers = {
+          Authorization: 'Bearer ' + options.accessToken,
+        };
+        requestOptions.method = 'POST';
+        requestOptions.uri = requestOptions.uri.concat(
+          '/_matrix/client/r0/rooms/',
+          encodeURIComponent(options.roomId),
+          '/send/m.room.message'
+        );
+        requestOptions.body = {
+          msgtype: 'm.text',
+          body: options.message,
+        };
+        return requestOptions;
+      }
       case 'fetchPublicRooms': {
         requestOptions.headers = {Authorization: 'Bearer ' + options};
         requestOptions.method = 'GET';

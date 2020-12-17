@@ -46,7 +46,8 @@ module.exports = function(Room) {
     }
   });
 
-  /* Creates a new Synapse chat room
+  /**
+   * Creates a new Synapse chat room
    * @param {string} name The proposalId from which to generate the room name
    * @param {string[]} invites An array of strings, where the strings are the ldap usernames (firstnamelastname) of the people you wish to invite
    * @returns {object} Object containing properties room_alias and room_id
@@ -66,6 +67,37 @@ module.exports = function(Room) {
             location: 'Room.create',
             name,
             invites,
+          });
+        }
+      }
+      break;
+    } while (true);
+  };
+
+  /**
+   * Send a message to room
+   * @param {string} name The name of the room
+   * @param {string} message The message to be sent to the room
+   * @returns {object} Object containing the event id of the message
+   */
+
+  Room.sendMessage = async function(name, message) {
+    do {
+      try {
+        logger.logInfo('Fetching id for room', {name});
+        const roomId = await matrixClient.fetchRoomIdByName(name);
+        logger.logInfo('Found id', {roomId});
+        logger.logInfo('Sending message to room', {name, message});
+        return await matrixClient.sendMessage(accessToken, roomId, message);
+      } catch (err) {
+        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+          await renewAccessToken();
+          continue;
+        } else {
+          logger.logError(err.message, {
+            location: 'Room.postMessage',
+            name,
+            message,
           });
         }
       }

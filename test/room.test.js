@@ -56,4 +56,32 @@ describe('Tests for Room model', function() {
         });
     });
   });
+
+  describe('#sendMessage', function() {
+    it('should send a message to a Synapse chat room', function(done) {
+      sandbox
+        .stub(MatrixRestClient.prototype, 'sendMessage')
+        .resolves(mockStubs.sendMessageResponse);
+
+      const roomId = encodeURIComponent('!testroomid:server');
+      const message = 'Test message.';
+
+      request(app)
+        .post(
+          '/scichatapi/Rooms/' + roomId + '/message?access_token=' + accessToken
+        )
+        .set('Accept', 'application/json')
+        .send(message)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.haveOwnProperty('event_id');
+          done();
+        });
+    });
+  });
 });

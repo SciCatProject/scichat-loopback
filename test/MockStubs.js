@@ -80,6 +80,10 @@ module.exports = {
     room_id: '!abcdef:server',
   },
 
+  sendMessageResponse: {
+    event_id: '$string',
+  },
+
   findLogbookResponse: {
     roomId: 'testId',
     name: 'testRoom',

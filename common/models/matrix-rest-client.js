@@ -80,6 +80,41 @@ module.exports = class MatrixRestClient {
   }
 
   /**
+   * Send message to a chat room on Synapse server
+   * @param {string} accessToken Access token of the signed in user
+   * @param {string} roomId The room id
+   * @param {string} message The message to be sent to the room
+   * @returns {object} Object containing the event id of the message
+   */
+
+  async sendMessage(accessToken, roomId, message) {
+    const options = {
+      accessToken,
+      roomId,
+      message,
+    };
+    const requestOptions = utils.applyRequestOptionsFor(
+      'sendMessage',
+      options
+    );
+    try {
+      const response = await requestPromise(requestOptions);
+      logger.logInfo('Message successfully sent', {response});
+      return response;
+    } catch (err) {
+      if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        throw err;
+      } else {
+        logger.logError(err.message, {
+          location: 'MatrixRestClient.sendMessage',
+          roomId,
+          message,
+        });
+      }
+    }
+  }
+
+  /**
    * Fetch all public chat rooms from Synapse server
    * @param {string} accessToken Access token of the signed in user
    * @returns {object[]} Array of room objects
