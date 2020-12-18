@@ -77,18 +77,18 @@ module.exports = function(Room) {
   /**
    * Send a message to room
    * @param {string} name The name of the room
-   * @param {string} message The message to be sent to the room
+   * @param {object} data JSON object with the key `message`
    * @returns {object} Object containing the event id of the message
    */
 
-  Room.sendMessage = async function(name, message) {
+  Room.sendMessage = async function(name, data) {
     do {
       try {
         logger.logInfo('Fetching id for room', {name});
         const roomId = await matrixClient.fetchRoomIdByName(name);
         logger.logInfo('Found id', {roomId});
-        logger.logInfo('Sending message to room', {name, message});
-        return await matrixClient.sendMessage(accessToken, roomId, message);
+        logger.logInfo('Sending message to room', {name, data});
+        return await matrixClient.sendMessage(accessToken, roomId, data);
       } catch (err) {
         if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
           await renewAccessToken();
@@ -97,7 +97,7 @@ module.exports = function(Room) {
           logger.logError(err.message, {
             location: 'Room.postMessage',
             name,
-            message,
+            data,
           });
         }
       }

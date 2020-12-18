@@ -64,14 +64,14 @@ describe('Tests for Room model', function() {
         .resolves(mockStubs.sendMessageResponse);
 
       const roomId = encodeURIComponent('!testroomid:server');
-      const message = 'Test message.';
+      const data = {message: 'Test message.'};
 
       request(app)
         .post(
           '/scichatapi/Rooms/' + roomId + '/message?access_token=' + accessToken
         )
         .set('Accept', 'application/json')
-        .send(message)
+        .send(data)
         .expect(200)
         .expect('Content-Type', /json/)
         .end((err, res) => {

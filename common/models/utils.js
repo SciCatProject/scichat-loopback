@@ -103,7 +103,7 @@ module.exports = class Utils {
         );
         requestOptions.body = {
           msgtype: 'm.text',
-          body: options.message,
+          body: options.data.message,
         };
         return requestOptions;
       }

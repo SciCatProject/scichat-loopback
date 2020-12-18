@@ -83,15 +83,15 @@ module.exports = class MatrixRestClient {
    * Send message to a chat room on Synapse server
    * @param {string} accessToken Access token of the signed in user
    * @param {string} roomId The room id
-   * @param {string} message The message to be sent to the room
+   * @param {object} data JSON object with the key `message`
    * @returns {object} Object containing the event id of the message
    */
 
-  async sendMessage(accessToken, roomId, message) {
+  async sendMessage(accessToken, roomId, data) {
     const options = {
       accessToken,
       roomId,
-      message,
+      data,
     };
     const requestOptions = utils.applyRequestOptionsFor(
       'sendMessage',
@@ -108,7 +108,7 @@ module.exports = class MatrixRestClient {
         logger.logError(err.message, {
           location: 'MatrixRestClient.sendMessage',
           roomId,
-          message,
+          data,
         });
       }
     }

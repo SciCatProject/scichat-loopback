@@ -66,10 +66,10 @@
           }
         },
         {
-          "arg": "message",
-          "type": "string",
+          "arg": "data",
+          "type": "object",
           "required": true,
-          "description": "The message to be sent to the room",
+          "description": "JSON object with the key `message`",
           "http": {
             "source": "body"
           }
