@@ -1,0 +1,19 @@
+name: Build and test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: test
+        run: |
+          cp CI/ESS/docker-compose.test.yaml docker-compose.yaml
+          docker-compose down --remove-orphans
+          docker-compose pull
+          docker-compose up --build --exit-code-from scichat-loopback
+          docker-compose down
