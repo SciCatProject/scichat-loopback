@@ -24,6 +24,7 @@ RUN npm ci --only=production
 # Bundle app source code
 COPY --chown=node:node . /home/node/app/
 COPY --chown=node:node server/config.local.js-sample /home/node/app/server/config.local.js
+COPY --chown=node:node CI/ESS/datasources.test.json /home/node/app/server/datasources.json
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV HOST=0.0.0.0 PORT=3030
