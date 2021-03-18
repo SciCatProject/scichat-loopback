@@ -9,7 +9,7 @@
     "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
-    "posttest": "npm run lint",
+    "posttest": "eslint .",
     "sync": "node ./sync-data/script.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
