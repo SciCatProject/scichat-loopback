@@ -4,7 +4,7 @@ const configs = require("../config.local");
 const logger = require("../../common/logger");
 const superagent = require("superagent");
 
-module.exports = async function(app) {
+module.exports = async function() {
   const serverHost = configs.synapse.host;
   const serverPort = configs.synapse.port;
 
