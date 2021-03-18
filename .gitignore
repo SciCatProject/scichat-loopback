@@ -43,5 +43,6 @@ sync-data/loopback-utils.new.js
 sync-data/matrix-rest-client.new.js
 # Ignore local config file
 server/config.local.js
+server/datasources.json
 
 setup.sh
