@@ -6,7 +6,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
     "sync": "node ./sync-data/script.js",
