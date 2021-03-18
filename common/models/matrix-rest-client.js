@@ -240,7 +240,7 @@ module.exports = class MatrixRestClient {
             "i"
           );
           messages = res.rooms.join[roomId].timeline.events.filter(message => {
-            if (message.content.hasOwnProperty("body")) {
+            if ("body" in message.content) {
               return message.content.body.match(pattern);
             }
           });
