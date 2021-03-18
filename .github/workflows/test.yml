@@ -12,6 +12,7 @@ jobs:
 
       - name: test
         run: |
+          cp CI/ESS/datasources.test.json server/datasources.json
           cp CI/ESS/docker-compose.test.yaml docker-compose.yaml
           docker-compose down --remove-orphans
           docker-compose pull
