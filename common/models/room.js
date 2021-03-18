@@ -1,32 +1,32 @@
-'use strict';
+"use strict";
 
-const config = require('../../server/config.local');
-const logger = require('../logger');
+const config = require("../../server/config.local");
+const logger = require("../logger");
 
-const MatrixRestClient = require('./matrix-rest-client');
+const MatrixRestClient = require("./matrix-rest-client");
 const matrixClient = new MatrixRestClient();
 
 const user = config.synapse.bot.name;
 const pass = config.synapse.bot.password;
 
 module.exports = function(Room) {
-  const app = require('../../server/server');
+  const app = require("../../server/server");
 
   let accessToken;
 
-  Room.beforeRemote('*', async function() {
+  Room.beforeRemote("*", async function() {
     try {
-      logger.logInfo('Looking for access token in db', {});
+      logger.logInfo("Looking for access token in db", {});
       const AccessToken = app.models.AccessToken;
       const tokenInstance = await AccessToken.findOne({
-        where: {userId: user},
+        where: { userId: user },
       });
       if (tokenInstance && tokenInstance.userId === user) {
         accessToken = tokenInstance.id;
-        logger.logInfo('Found access token', {accessToken});
+        logger.logInfo("Found access token", { accessToken });
       } else {
         logger.logInfo(
-          'Access token not found, requesting new access token',
+          "Access token not found, requesting new access token",
           {}
         );
         accessToken = await matrixClient.login(user, pass);
@@ -37,12 +37,12 @@ module.exports = function(Room) {
           userId: user,
         };
         await AccessToken.create(token);
-        logger.logInfo('Request for new access token successful', {
+        logger.logInfo("Request for new access token successful", {
           accessToken,
         });
       }
     } catch (err) {
-      logger.logError(err.message, {location: 'Room.beforeRemote'});
+      logger.logError(err.message, { location: "Room.beforeRemote" });
     }
   });
 
@@ -56,15 +56,15 @@ module.exports = function(Room) {
   Room.create = async function(name, invites) {
     do {
       try {
-        logger.logInfo('Creating new room', {name, invites});
+        logger.logInfo("Creating new room", { name, invites });
         return await matrixClient.createRoom(accessToken, name, invites);
       } catch (err) {
-        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        if (err.error && err.error.errcode === "M_UNKNOWN_TOKEN") {
           await renewAccessToken();
           continue;
         } else {
           logger.logError(err.message, {
-            location: 'Room.create',
+            location: "Room.create",
             name,
             invites,
           });
@@ -84,18 +84,18 @@ module.exports = function(Room) {
   Room.sendMessage = async function(name, data) {
     do {
       try {
-        logger.logInfo('Fetching id for room', {name});
+        logger.logInfo("Fetching id for room", { name });
         const roomId = await matrixClient.fetchRoomIdByName(name);
-        logger.logInfo('Found id', {roomId});
-        logger.logInfo('Sending message to room', {name, data});
+        logger.logInfo("Found id", { roomId });
+        logger.logInfo("Sending message to room", { name, data });
         return await matrixClient.sendMessage(accessToken, roomId, data);
       } catch (err) {
-        if (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') {
+        if (err.error && err.error.errcode === "M_UNKNOWN_TOKEN") {
           await renewAccessToken();
           continue;
         } else {
           logger.logError(err.message, {
-            location: 'Room.postMessage',
+            location: "Room.postMessage",
             name,
             data,
           });
@@ -107,10 +107,10 @@ module.exports = function(Room) {
 
   async function renewAccessToken() {
     try {
-      logger.logInfo('Requesting new access token', {});
+      logger.logInfo("Requesting new access token", {});
 
       const AccessToken = app.models.AccessToken;
-      await AccessToken.destroyAll({userId: user});
+      await AccessToken.destroyAll({ userId: user });
 
       accessToken = await matrixClient.login(user, pass);
       const token = {
@@ -121,11 +121,11 @@ module.exports = function(Room) {
       };
       await AccessToken.create(token);
 
-      logger.logInfo('Request for new access token successful', {
+      logger.logInfo("Request for new access token successful", {
         accessToken,
       });
     } catch (err) {
-      logger.logError(err.message, {location: 'Room.renewAccessToken'});
+      logger.logError(err.message, { location: "Room.renewAccessToken" });
     }
   }
 };

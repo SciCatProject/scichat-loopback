@@ -1,32 +1,32 @@
-'use strict';
+"use strict";
 
-const config = require('../../server/config.local');
-const logger = require('../logger');
+const config = require("../../server/config.local");
+const logger = require("../logger");
 
-const MatrixRestClient = require('./matrix-rest-client');
+const MatrixRestClient = require("./matrix-rest-client");
 const matrixClient = new MatrixRestClient();
 
 const user = config.synapse.bot.name;
 const pass = config.synapse.bot.password;
 
 module.exports = function(Logbook) {
-  const app = require('../../server/server');
+  const app = require("../../server/server");
 
   let accessToken;
 
-  Logbook.beforeRemote('*', async function() {
+  Logbook.beforeRemote("*", async function() {
     try {
-      logger.logInfo('Looking for access token in db', {});
+      logger.logInfo("Looking for access token in db", {});
       const AccessToken = app.models.AccessToken;
       const tokenInstance = await AccessToken.findOne({
-        where: {userId: user},
+        where: { userId: user },
       });
       if (tokenInstance && tokenInstance.userId === user) {
         accessToken = tokenInstance.id;
-        logger.logInfo('Found access token', {accessToken});
+        logger.logInfo("Found access token", { accessToken });
       } else {
         logger.logInfo(
-          'Access token not found, requesting new access token',
+          "Access token not found, requesting new access token",
           {}
         );
         accessToken = await matrixClient.login(user, pass);
@@ -37,12 +37,12 @@ module.exports = function(Logbook) {
           userId: user,
         };
         await AccessToken.create(token);
-        logger.logInfo('Request for new access token successful', {
+        logger.logInfo("Request for new access token successful", {
           accessToken,
         });
       }
     } catch (err) {
-      logger.logError(err.message, {location: 'Logbook.beforeRemote'});
+      logger.logError(err.message, { location: "Logbook.beforeRemote" });
     }
   });
 
@@ -55,21 +55,21 @@ module.exports = function(Logbook) {
   Logbook.findByName = async function(name) {
     do {
       try {
-        logger.logInfo('Fetching id for room', {name});
+        logger.logInfo("Fetching id for room", { name });
         const roomId = await matrixClient.fetchRoomIdByName(name);
-        logger.logInfo('Found id', {roomId});
-        logger.logInfo('Fetching messages for room', {name});
+        logger.logInfo("Found id", { roomId });
+        logger.logInfo("Fetching messages for room", { name });
         return await matrixClient.fetchRoomMessages(roomId, accessToken);
       } catch (err) {
         if (
-          err.error.errcode === 'M_UNKNOWN_TOKEN' ||
-          err.error.errcode === 'M_MISSING_TOKEN'
+          err.error.errcode === "M_UNKNOWN_TOKEN" ||
+          err.error.errcode === "M_MISSING_TOKEN"
         ) {
           renewAccessToken();
           continue;
         } else {
           logger.logError(err.message, {
-            location: 'Logbook.findByName',
+            location: "Logbook.findByName",
             name,
           });
         }
@@ -86,12 +86,12 @@ module.exports = function(Logbook) {
   Logbook.findAll = async function() {
     do {
       try {
-        logger.logInfo('Fetching messages for all rooms', {});
+        logger.logInfo("Fetching messages for all rooms", {});
         return await matrixClient.fetchAllRoomsMessages(accessToken);
       } catch (err) {
         if (
-          (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') ||
-          err.error.errcode === 'M_MISSING_TOKEN'
+          (err.error && err.error.errcode === "M_UNKNOWN_TOKEN") ||
+          err.error.errcode === "M_MISSING_TOKEN"
         ) {
           await renewAccessToken();
           continue;
@@ -113,10 +113,10 @@ module.exports = function(Logbook) {
   Logbook.filter = async function(name, filter) {
     do {
       try {
-        logger.logInfo('Fetching id for room', {name});
+        logger.logInfo("Fetching id for room", { name });
         const roomId = await matrixClient.fetchRoomIdByName(name);
-        logger.logInfo('Found id', {roomId});
-        logger.logInfo('Fetching messages for room', {name});
+        logger.logInfo("Found id", { roomId });
+        logger.logInfo("Fetching messages for room", { name });
         return await matrixClient.fetchRoomMessages(
           roomId,
           accessToken,
@@ -124,14 +124,14 @@ module.exports = function(Logbook) {
         );
       } catch (err) {
         if (
-          (err.error && err.error.errcode === 'M_UNKNOWN_TOKEN') ||
-          err.error.errcode === 'M_MISSING_TOKEN'
+          (err.error && err.error.errcode === "M_UNKNOWN_TOKEN") ||
+          err.error.errcode === "M_MISSING_TOKEN"
         ) {
           await renewAccessToken();
           continue;
         } else {
           logger.logError(err.message, {
-            location: 'Logbook.filter',
+            location: "Logbook.filter",
             name,
             filter,
           });
@@ -143,10 +143,10 @@ module.exports = function(Logbook) {
 
   async function renewAccessToken() {
     try {
-      logger.logInfo('Requesting new access token', {});
+      logger.logInfo("Requesting new access token", {});
 
       const AccessToken = app.models.AccessToken;
-      await AccessToken.destroyAll({userId: user});
+      await AccessToken.destroyAll({ userId: user });
 
       accessToken = await matrixClient.login(user, pass);
       const token = {
@@ -157,11 +157,11 @@ module.exports = function(Logbook) {
       };
       await AccessToken.create(token);
 
-      logger.logInfo('Request for new access token successful', {
+      logger.logInfo("Request for new access token successful", {
         accessToken,
       });
     } catch (err) {
-      logger.logError(err.message, {location: 'Logbook.renewAccessToken'});
+      logger.logError(err.message, { location: "Logbook.renewAccessToken" });
     }
   }
 };
