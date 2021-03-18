@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-'use strict';
+"use strict";
 
-const configs = require('../../server/config.local');
+const configs = require("../../server/config.local");
 
 module.exports = class Utils {
   constructor() {
@@ -15,7 +15,7 @@ module.exports = class Utils {
         this.baseUrl = this.serverHost;
       }
     }
-    console.log('Synapse url: ', this.baseUrl);
+    console.log("Synapse url: ", this.baseUrl);
     this.user = configs.synapse.bot.name;
   }
 
@@ -27,8 +27,8 @@ module.exports = class Utils {
 
   formatInvites(invites) {
     const formattedInvites = invites.map(invite => {
-      if (!invite.startsWith('@') && invite.indexOf(':') < 0) {
-        return '@' + invite + ':' + this.serverName;
+      if (!invite.startsWith("@") && invite.indexOf(":") < 0) {
+        return "@" + invite + ":" + this.serverName;
       } else {
         return invite;
       }
@@ -50,92 +50,92 @@ module.exports = class Utils {
       json: true,
     };
     switch (type) {
-      case 'login': {
-        requestOptions.method = 'POST';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/login'
-        );
-        requestOptions.body = {
-          type: 'm.login.password',
-          identifier: {
-            type: 'm.id.user',
-            user: options.username,
-          },
-          password: options.password,
-        };
-        return requestOptions;
+    case "login": {
+      requestOptions.method = "POST";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/login"
+      );
+      requestOptions.body = {
+        type: "m.login.password",
+        identifier: {
+          type: "m.id.user",
+          user: options.username,
+        },
+        password: options.password,
+      };
+      return requestOptions;
+    }
+    case "createRoom": {
+      requestOptions.headers = {
+        Authorization: "Bearer " + options.accessToken,
+      };
+      requestOptions.method = "POST";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/createRoom"
+      );
+      requestOptions.body = {
+        visibility: "private",
+        room_alias_name: options.name,
+        name: options.name,
+        topic: `Logbook for proposal ${options.name}`,
+        creation_content: {
+          "m.federate": false,
+        },
+        power_level_content_override: {
+          state_key: "",
+          invite: 100,
+        },
+      };
+      if (options.invite) {
+        requestOptions.body.invite = options.invite;
       }
-      case 'createRoom': {
-        requestOptions.headers = {
-          Authorization: 'Bearer ' + options.accessToken,
-        };
-        requestOptions.method = 'POST';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/createRoom'
-        );
-        requestOptions.body = {
-          visibility: 'private',
-          room_alias_name: options.name,
-          name: options.name,
-          topic: `Logbook for proposal ${options.name}`,
-          creation_content: {
-            'm.federate': false,
-          },
-          power_level_content_override: {
-            state_key: '',
-            invite: 100,
-          },
-        };
-        if (options.invite) {
-          requestOptions.body.invite = options.invite;
-        }
-        return requestOptions;
-      }
-      case 'sendMessage': {
-        requestOptions.headers = {
-          Authorization: 'Bearer ' + options.accessToken,
-        };
-        requestOptions.method = 'POST';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/rooms/',
-          encodeURIComponent(options.roomId),
-          '/send/m.room.message'
-        );
-        requestOptions.body = {
-          msgtype: 'm.text',
-          body: options.data.message,
-        };
-        return requestOptions;
-      }
-      case 'fetchPublicRooms': {
-        requestOptions.headers = {Authorization: 'Bearer ' + options};
-        requestOptions.method = 'GET';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/publicRooms'
-        );
-        return requestOptions;
-      }
-      case 'fetchRoomIdByName': {
-        requestOptions.method = 'GET';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/directory/room/',
-          encodeURIComponent(`#${options}:${this.serverName}`)
-        );
-        return requestOptions;
-      }
-      case 'fetchAllRoomsMessages':
-      case 'fetchRoomMessages': {
-        requestOptions.headers = {
-          Authorization: 'Bearer ' + options.accessToken,
-        };
-        requestOptions.method = 'GET';
-        requestOptions.uri = requestOptions.uri.concat(
-          '/_matrix/client/r0/sync',
-          '?filter=',
-          this.applyFilter(options)
-        );
-        return requestOptions;
-      }
+      return requestOptions;
+    }
+    case "sendMessage": {
+      requestOptions.headers = {
+        Authorization: "Bearer " + options.accessToken,
+      };
+      requestOptions.method = "POST";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/rooms/",
+        encodeURIComponent(options.roomId),
+        "/send/m.room.message"
+      );
+      requestOptions.body = {
+        msgtype: "m.text",
+        body: options.data.message,
+      };
+      return requestOptions;
+    }
+    case "fetchPublicRooms": {
+      requestOptions.headers = { Authorization: "Bearer " + options };
+      requestOptions.method = "GET";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/publicRooms"
+      );
+      return requestOptions;
+    }
+    case "fetchRoomIdByName": {
+      requestOptions.method = "GET";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/directory/room/",
+        encodeURIComponent(`#${options}:${this.serverName}`)
+      );
+      return requestOptions;
+    }
+    case "fetchAllRoomsMessages":
+    case "fetchRoomMessages": {
+      requestOptions.headers = {
+        Authorization: "Bearer " + options.accessToken,
+      };
+      requestOptions.method = "GET";
+      requestOptions.uri = requestOptions.uri.concat(
+        "/_matrix/client/r0/sync",
+        "?filter=",
+        this.applyFilter(options)
+      );
+      return requestOptions;
+    }
     }
   }
 
@@ -147,13 +147,13 @@ module.exports = class Utils {
 
   applyFilter(options) {
     const filter = {
-      account_data: {not_types: ['m.*', 'im.*']},
-      presence: {not_types: ['*']},
+      account_data: { not_types: ["m.*", "im.*"] },
+      presence: { not_types: ["*"] },
       room: {
-        state: {types: ['m.room.name']},
+        state: { types: ["m.room.name"] },
         timeline: {
           limit: 1000000,
-          types: ['m.room.message'],
+          types: ["m.room.message"],
         },
       },
     };

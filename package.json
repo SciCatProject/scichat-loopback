@@ -6,9 +6,10 @@
     "node": ">=8"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint --fix .",
     "start": "node .",
     "test": "mocha --timeout=30000 --exit",
+    "posttest": "npm run lint",
     "sync": "node ./sync-data/script.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
@@ -32,7 +33,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.1.0",
+    "eslint": "^6.8.0",
     "eslint-config-loopback": "^13.1.0",
     "mocha": "^6.2.0",
     "sinon": "^7.3.2",
