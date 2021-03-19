@@ -1,4 +1,3 @@
-/* eslint-disable padded-blocks */
 "use strict";
 
 const amqp = require("amqplib/callback_api");
