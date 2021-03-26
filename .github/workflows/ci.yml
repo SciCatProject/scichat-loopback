@@ -1,10 +1,10 @@
-name: Build and test
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   test:
-    name: Build and test
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,3 +18,19 @@ jobs:
           docker-compose pull
           docker-compose up --build --exit-code-from scichat-loopback
           docker-compose down
+
+  gitlab:
+    name: Build and deploy
+    need: [test]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-loopback
+    steps:
+      - name: trigger Job
+        uses: appleboy/gitlab-ci-action@master
+        with:
+          token: ${{ secrets.GITLAB_TOKEN }}
+          project_id: 1981
+          ref: "master"
+          host: "https://gitlab.esss.lu.se"
+          debug: true
+
