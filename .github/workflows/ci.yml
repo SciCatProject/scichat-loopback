@@ -23,7 +23,7 @@ jobs:
     name: Build and deploy
     needs: [test]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    runs-on: ubuntu-loopback
+    runs-on: ubuntu-latest
     steps:
       - name: trigger Job
         uses: appleboy/gitlab-ci-action@master
