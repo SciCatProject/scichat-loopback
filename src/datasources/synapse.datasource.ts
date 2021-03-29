@@ -18,7 +18,11 @@ const config = {
         method: "POST",
         url: "https://scitest.esss.lu.se/_matrix/client/r0/login",
         body: {
-          username: "{username:string}",
+          type: "m.login.password",
+          identifier: {
+            type: "m.id.user",
+            user: "{username:string}",
+          },
           password: "{password:string}",
         },
       },
