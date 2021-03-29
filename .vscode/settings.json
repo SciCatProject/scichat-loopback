@@ -3,10 +3,11 @@
   "editor.tabCompletion": "on",
   "editor.tabSize": 2,
   "editor.trimAutoWhitespace": true,
-  "editor.formatOnSave": false,
-  "editor.wordWrapColumn": 80,
-  "editor.wordWrap": "wordWrapColumn",
-  "editor.wrappingIndent": "indent",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll.eslint": true
+  },
 
   "files.exclude": {
     "**/.DS_Store": true,
@@ -14,18 +15,18 @@
     "**/.hg": true,
     "**/.svn": true,
     "**/CVS": true,
-    "dist": true
+    "dist": true,
   },
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
 
-  "prettier.singleQuote": true,
-  "prettier.bracketSpacing": false,
-  "prettier.trailingComma": "es5",
-  "prettier.printWidth": 80,
-  "workbench.colorCustomizations": {
-    "activityBar.background": "#362550",
-    "titleBar.activeBackground": "#4B3370",
-    "titleBar.activeForeground": "#FCFCFD"
-  }
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "typescript.preferences.quoteStyle": "double",
+  "eslint.run": "onSave",
+  "eslint.nodePath": "./node_modules",
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ]
 }

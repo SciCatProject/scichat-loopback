@@ -1,31 +1,28 @@
 # Check out https://hub.docker.com/_/node to select a new base image
-FROM node:15-alpine
+FROM node:10-slim
 
-RUN apk update && apk upgrade && apk add --no-cache git
-
-ENV NODE_ENV "production"
-
-# Prepare app directory
-WORKDIR /home/node/app
-COPY package*.json /home/node/app/
-COPY .snyk /home/node/app/
-
-# set up local user to avoid running as root
-RUN chown -R node:node /home/node/app
+# Set to a non-root built-in user `node`
 USER node
 
-# Install our packages
-RUN npm config set registry http://registry.npmjs.org/
-RUN npm config set strict-ssl false
-RUN npm ci --only=production
+# Create app directory (with user `node`)
+RUN mkdir -p /home/node/app
+
+WORKDIR /home/node/app
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY --chown=node package*.json ./
+
+RUN npm install
 
 # Bundle app source code
-COPY --chown=node:node . /home/node/app/
-COPY --chown=node:node server/config.local.js-sample /home/node/app/server/config.local.js
+COPY --chown=node . .
+
+RUN npm run build
 
 # Bind to all network interfaces so that it can be mapped to the host OS
-ENV HOST=0.0.0.0 PORT=3030
-EXPOSE ${PORT}
+ENV HOST=0.0.0.0 PORT=3000
 
-# Start the app
+EXPOSE ${PORT}
 CMD [ "node", "." ]
