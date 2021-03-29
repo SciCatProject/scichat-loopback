@@ -17,6 +17,10 @@ const config = {
       template: {
         method: "POST",
         url: "https://scitest.esss.lu.se/_matrix/client/r0/login",
+        body: {
+          username: "{username:string}",
+          password: "{password:string}",
+        },
       },
       functions: {
         login: ["username", "password"],
