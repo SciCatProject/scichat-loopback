@@ -22,6 +22,15 @@ const config = {
         login: ["username", "password"],
       },
     },
+    {
+      template: {
+        method: "GET",
+        url: "https://scitest.esss.lu.se/_matrix/client/r0/publicRooms",
+      },
+      functions: {
+        fetchPublicRooms: [],
+      },
+    },
   ],
 };
 
