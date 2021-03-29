@@ -6,6 +6,23 @@ const config = {
   connector: "rest",
   baseURL: "https://scitest.esss.lu.se/_matrix/client/r0/",
   crud: false,
+  options: {
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+    },
+  },
+  operations: [
+    {
+      template: {
+        method: "POST",
+        url: "https://scitest.esss.lu.se/_matrix/client/r0/login",
+      },
+      functions: {
+        login: ["username", "password"],
+      },
+    },
+  ],
 };
 
 // Observe application's life cycle to disconnect the datasource when
