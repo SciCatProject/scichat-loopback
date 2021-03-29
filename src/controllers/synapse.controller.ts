@@ -17,8 +17,22 @@ export class SynapseController {
     );
   }
 
-  @get("/fetchPublicRooms")
-  async fetchPublicRooms(): Promise<object> {
-    return this.synapseService.fetchPublicRooms();
+  @get("/fetchPublicRooms", {
+    parameters: [
+      { name: "accessToken", schema: { type: "string" }, in: "query" },
+    ],
+    responses: {
+      "200": {
+        description: "public rooms",
+        content: {
+          "application/json": {
+            schema: { type: "object" },
+          },
+        },
+      },
+    },
+  })
+  async fetchPublicRooms(accessToken: string): Promise<object> {
+    return this.synapseService.fetchPublicRooms(accessToken);
   }
 }

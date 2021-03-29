@@ -4,7 +4,7 @@ import { SynapseDataSource } from "../datasources";
 
 export interface Synapse {
   login(username: string, password: string): Promise<object>;
-  fetchPublicRooms(): Promise<object>;
+  fetchPublicRooms(accessToken: string): Promise<object>;
 }
 
 export class SynapseProvider implements Provider<Synapse> {
