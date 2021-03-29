@@ -1,5 +1,5 @@
 import { inject } from "@loopback/context";
-import { param, post } from "@loopback/openapi-v3";
+import { post, requestBody } from "@loopback/openapi-v3";
 import { Synapse } from "../services";
 
 export class SynapseController {
@@ -7,8 +7,8 @@ export class SynapseController {
 
   @post("/login")
   async login(
-    @param.path.string("username") username: string,
-    @param.path.password("password") password: string,
+    @requestBody() username: string,
+    @requestBody() password: string,
   ): Promise<object> {
     return this.synapseService.login(username, password);
   }
