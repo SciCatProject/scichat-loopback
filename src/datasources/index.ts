@@ -1,1 +1,1 @@
-export * from './synapse.datasource';
+export * from "./synapse.datasource";
