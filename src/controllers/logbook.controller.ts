@@ -38,13 +38,16 @@ export class LogbookController {
         description: "Array of Logbook model instances",
         content: {
           "application/json": {
-            schema: getModelSchemaRef(Logbook),
+            schema: {
+              type: "array",
+              items: getModelSchemaRef(Logbook),
+            },
           },
         },
       },
     },
   })
-  async findAll(): Promise<Logbook[]> {
+  async find(): Promise<Logbook[]> {
     const { access_token: accessToken } = await this.synapseService.login(
       this.username,
       this.password,
