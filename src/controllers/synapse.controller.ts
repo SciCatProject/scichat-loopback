@@ -35,4 +35,24 @@ export class SynapseController {
   async fetchPublicRooms(accessToken: string): Promise<object> {
     return this.synapseService.fetchPublicRooms(accessToken);
   }
+
+  @get("fetchRoomIdByName", {
+    parameters: [
+      { name: "name", schema: { title: "Name", type: "string" }, in: "query" },
+    ],
+    responses: {
+      "200": {
+        description: "Room ID",
+        content: {
+          "application/json": {
+            schema: { type: "object" },
+          },
+        },
+      },
+    },
+  })
+  async fetchRoomIdByName(name: string): Promise<object> {
+    const roomAlias = encodeURIComponent(`#${name}:ess`);
+    return this.synapseService.fetchRoomIdByName(roomAlias);
+  }
 }

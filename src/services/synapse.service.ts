@@ -14,7 +14,11 @@ export interface Synapse {
   ): Promise<object>;
   fetchAllRoomsMessages(accessToken: string, options?: object): Promise<object>;
   fetchRoomIdByName(name: string): Promise<object>;
-  fetchRoomMessages(accessToken: string, options?: object): Promise<object>;
+  fetchRoomMessages(
+    roomId: string,
+    accessToken: string,
+    options?: object,
+  ): Promise<object>;
   fetchPublicRooms(accessToken: string): Promise<object>;
   sendMessage(
     accessToken: string,

@@ -42,6 +42,16 @@ const config = {
         fetchPublicRooms: ["accessToken"],
       },
     },
+    {
+      template: {
+        method: "GET",
+        url:
+          "https://scitest.esss.lu.se/_matrix/client/r0/directory/room/{name}",
+      },
+      functions: {
+        fetchRoomIdByName: ["name"],
+      },
+    },
   ],
 };
 
