@@ -4,26 +4,34 @@ export * from "./synapse-login-response.model";
 export * from "./synapse-room-id-response.model";
 export * from "./synapse-sync-response.model";
 
-export interface SynapseTimelineEvent {
+export interface SynapseEvent {
   type: string;
   sender: string;
-  content: {
-    msgtype: string;
-    body: string;
-    url?: string;
-  };
   origin_server_ts: number;
   unsigned: {
     age: number;
   };
   event_id: string;
 }
+export interface SynapseStateEvent extends SynapseEvent {
+  content: {
+    name: string;
+  };
+  state_key: string;
+}
+export interface SynapseTimelineEvent extends SynapseEvent {
+  content: {
+    msgtype: string;
+    body: string;
+    url?: string;
+  };
+}
 export interface SynapseJoinedRoom {
   timeline: {
     events: SynapseTimelineEvent[];
   };
   state: {
-    events: object[];
+    events: SynapseStateEvent[];
   };
   account_data: unknown[];
   ephemeral: unknown[];
