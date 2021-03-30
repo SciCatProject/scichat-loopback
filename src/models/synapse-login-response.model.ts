@@ -4,28 +4,33 @@ import { Model, model, property } from "@loopback/repository";
 export class SynapseLoginResponse extends Model {
   @property({
     type: "string",
+    required: true,
   })
-  user_id?: string;
+  user_id: string;
 
   @property({
     type: "string",
+    required: true,
   })
-  access_token?: string;
+  access_token: string;
 
   @property({
     type: "string",
+    required: true,
   })
-  home_server?: string;
+  home_server: string;
 
   @property({
     type: "string",
+    required: true,
   })
-  device_id?: string;
+  device_id: string;
 
   @property({
     type: "object",
+    required: true,
   })
-  well_known?: object;
+  well_known: object;
 
   constructor(data?: Partial<SynapseLoginResponse>) {
     super(data);

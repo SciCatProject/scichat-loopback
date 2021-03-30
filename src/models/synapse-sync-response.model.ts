@@ -5,43 +5,51 @@ import { SynapseRooms } from ".";
 export class SynapseSyncResponse extends Model {
   @property({
     type: "object",
+    required: true,
   })
-  account_data?: object;
+  account_data: object;
 
   @property({
     type: "object",
+    required: true,
   })
-  to_device?: object;
+  to_device: object;
 
   @property({
     type: "object",
+    required: true,
   })
-  device_lists?: object;
+  device_lists: object;
 
   @property({
     type: "object",
+    required: true,
   })
-  presence?: object;
+  presence: object;
 
   @property({
     type: "object",
+    required: true,
   })
-  rooms?: SynapseRooms;
+  rooms: SynapseRooms;
 
   @property({
     type: "object",
+    required: true,
   })
-  groups?: object;
+  groups: object;
 
   @property({
     type: "object",
+    required: true,
   })
-  device_one_time_keys_count?: object;
+  device_one_time_keys_count: object;
 
   @property({
     type: "string",
+    required: true,
   })
-  next_batch?: string;
+  next_batch: string;
 
   constructor(data?: Partial<SynapseSyncResponse>) {
     super(data);

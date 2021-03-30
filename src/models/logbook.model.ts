@@ -4,19 +4,22 @@ import { Model, model, property } from "@loopback/repository";
 export class Logbook extends Model {
   @property({
     type: "string",
+    required: true,
   })
-  name?: string;
+  name: string;
 
   @property({
     type: "string",
+    required: true,
   })
-  roomId?: string;
+  roomId: string;
 
   @property({
     type: "array",
     itemType: "object",
+    required: true,
   })
-  messages?: object[];
+  messages: object[];
 
   constructor(data?: Partial<Logbook>) {
     super(data);

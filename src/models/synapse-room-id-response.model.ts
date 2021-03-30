@@ -4,14 +4,16 @@ import { Model, model, property } from "@loopback/repository";
 export class SynapseRoomIdResponse extends Model {
   @property({
     type: "string",
+    required: true,
   })
-  room_id?: string;
+  room_id: string;
 
   @property({
     type: "array",
     itemType: "string",
+    required: true,
   })
-  servers?: string[];
+  servers: string[];
 
   constructor(data?: Partial<SynapseRoomIdResponse>) {
     super(data);
