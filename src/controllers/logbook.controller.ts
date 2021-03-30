@@ -38,7 +38,7 @@ export class LogbookController {
         description: "Array of Logbook model instances",
         content: {
           "application/json": {
-            schema: [getModelSchemaRef(Logbook)],
+            schema: getModelSchemaRef(Logbook),
           },
         },
       },
@@ -149,7 +149,18 @@ export class LogbookController {
     return new Logbook({ roomId, name, messages });
   }
 
-  @post("/Logbooks/{name}/message")
+  @post("/Logbooks/{name}/message", {
+    responses: {
+      "200": {
+        description: "Send Message Response",
+        content: {
+          "application/json": {
+            schema: getModelSchemaRef(SynapseSendMessageResponse),
+          },
+        },
+      },
+    },
+  })
   async sendMessage(
     @param.path.string("name") name: string,
     @requestBody() data: { [message: string]: string },
