@@ -1,7 +1,8 @@
 export * from "./logbook.model";
-export * from "./room.model";
+export * from "./synapse-create-room-response.model";
 export * from "./synapse-login-response.model";
 export * from "./synapse-room-id-response.model";
+export * from "./synapse-send-message-response.model";
 export * from "./synapse-sync-response.model";
 
 export interface SynapseEvent {
@@ -46,5 +47,3 @@ export interface SynapseRooms {
   join: Record<string, SynapseJoinedRoom>;
   leave: Record<string, unknown>;
 }
-export * from './synapse-create-room-response.model';
-export * from './synapse-send-message-response.model';
