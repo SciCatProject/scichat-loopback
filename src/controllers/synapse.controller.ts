@@ -1,5 +1,11 @@
 import { inject } from "@loopback/context";
-import { get, post, requestBody } from "@loopback/openapi-v3";
+import {
+  get,
+  getModelSchemaRef,
+  post,
+  requestBody,
+} from "@loopback/openapi-v3";
+import { SynapseLoginResponse } from "../models";
 import { Synapse } from "../services";
 
 export interface Credentials {
@@ -9,8 +15,21 @@ export interface Credentials {
 export class SynapseController {
   constructor(@inject("services.Synapse") protected synapseService: Synapse) {}
 
-  @post("/login")
-  async login(@requestBody() credentials: Credentials): Promise<object> {
+  @post("/login", {
+    responses: {
+      "200": {
+        description: "Synapse Login Response",
+        content: {
+          "application/json": {
+            schema: getModelSchemaRef(SynapseLoginResponse),
+          },
+        },
+      },
+    },
+  })
+  async login(
+    @requestBody() credentials: Credentials,
+  ): Promise<SynapseLoginResponse> {
     return this.synapseService.login(
       credentials.username,
       credentials.password,
