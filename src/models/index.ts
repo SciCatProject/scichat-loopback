@@ -46,3 +46,4 @@ export interface SynapseRooms {
   join: Record<string, SynapseJoinedRoom>;
   leave: Record<string, unknown>;
 }
+export * from './synapse-create-room-response.model';
