@@ -34,19 +34,17 @@ export class LogbookController {
       this.username,
       this.password,
     );
-    const filter = encodeURIComponent(
-      JSON.stringify({
-        account_data: { not_types: ["m.*", "im.*"] },
-        presence: { not_types: ["*"] },
-        room: {
-          state: { types: ["m.room.name"] },
-          timeline: {
-            limit: 1000000,
-            types: ["m.room.message"],
-          },
+    const filter = JSON.stringify({
+      account_data: { not_types: ["m.*", "im.*"] },
+      presence: { not_types: ["*"] },
+      room: {
+        state: { types: ["m.room.name"] },
+        timeline: {
+          limit: 1000000,
+          types: ["m.room.message"],
         },
-      }),
-    );
+      },
+    });
     const { rooms } = await this.synapseService.fetchAllRoomsMessages(
       filter,
       accessToken,
@@ -93,20 +91,18 @@ export class LogbookController {
     const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
       roomAlias,
     );
-    const filter = encodeURIComponent(
-      JSON.stringify({
-        account_data: { not_types: ["m.*", "im.*"] },
-        presence: { not_types: ["*"] },
-        room: {
-          rooms: [roomId],
-          state: { types: ["m.room.name"] },
-          timeline: {
-            limit: 1000000,
-            types: ["m.room.message"],
-          },
+    const filter = JSON.stringify({
+      account_data: { not_types: ["m.*", "im.*"] },
+      presence: { not_types: ["*"] },
+      room: {
+        rooms: [roomId],
+        state: { types: ["m.room.name"] },
+        timeline: {
+          limit: 1000000,
+          types: ["m.room.message"],
         },
-      }),
-    );
+      },
+    });
     const { rooms } = await this.synapseService.fetchRoomMessages(
       filter,
       accessToken,
