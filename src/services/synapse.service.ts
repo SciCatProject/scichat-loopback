@@ -5,12 +5,10 @@ import {
   SynapseCreateRoomResponse,
   SynapseLoginResponse,
   SynapseRoomIdResponse,
+  SynapseSendMessageResponse,
   SynapseSyncResponse,
 } from "../models";
 
-export interface Message {
-  message: string;
-}
 export interface Synapse {
   login(username: string, password: string): Promise<SynapseLoginResponse>;
   createRoom(
@@ -28,10 +26,10 @@ export interface Synapse {
   ): Promise<SynapseSyncResponse>;
   fetchPublicRooms(accessToken: string): Promise<object>;
   sendMessage(
-    accessToken: string,
     roomId: string,
-    data: Message,
-  ): Promise<object>;
+    message: string,
+    accessToken: string,
+  ): Promise<SynapseSendMessageResponse>;
 }
 
 export class SynapseProvider implements Provider<Synapse> {

@@ -7,7 +7,11 @@ import {
   post,
   requestBody,
 } from "@loopback/openapi-v3";
-import { Logbook, SynapseCreateRoomResponse } from "../models";
+import {
+  Logbook,
+  SynapseCreateRoomResponse,
+  SynapseSendMessageResponse,
+} from "../models";
 import { Synapse } from "../services";
 
 export interface CreateLogbookDetails {
@@ -143,5 +147,22 @@ export class LogbookController {
     );
     const messages = rooms.join[roomId].timeline.events;
     return new Logbook({ roomId, name, messages });
+  }
+
+  @post("/Logbooks/{name}/message")
+  async sendMessage(
+    @param.path.string("name") name: string,
+    @requestBody() data: { [message: string]: string },
+  ): Promise<SynapseSendMessageResponse> {
+    const { access_token: accessToken } = await this.synapseService.login(
+      this.username,
+      this.password,
+    );
+    const roomAlias = encodeURIComponent(`#${name}:ess`);
+    const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
+      roomAlias,
+    );
+    const { message } = data;
+    return this.synapseService.sendMessage(roomId, message, accessToken);
   }
 }

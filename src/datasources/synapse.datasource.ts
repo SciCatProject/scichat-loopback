@@ -58,6 +58,23 @@ const config = {
     },
     {
       template: {
+        method: "POST",
+        url:
+          "https://scitest.esss.lu.se/_matrix/client/r0/rooms/{!name:string}/send/m.room.message",
+        headers: {
+          Authorization: "Bearer {!accessToken:string}",
+        },
+        body: {
+          msgtype: "m.text",
+          body: "{message:text}",
+        },
+      },
+      functions: {
+        sendMessage: ["name", "message", "accessToken"],
+      },
+    },
+    {
+      template: {
         method: "GET",
         url: "https://scitest.esss.lu.se/_matrix/client/r0/publicRooms",
         headers: {

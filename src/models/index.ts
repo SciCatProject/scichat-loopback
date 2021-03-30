@@ -47,3 +47,4 @@ export interface SynapseRooms {
   leave: Record<string, unknown>;
 }
 export * from './synapse-create-room-response.model';
+export * from './synapse-send-message-response.model';
