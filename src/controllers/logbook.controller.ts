@@ -1,8 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { inject } from "@loopback/context";
-import { get, getModelSchemaRef, param } from "@loopback/openapi-v3";
-import { Logbook } from "../models";
+import {
+  get,
+  getModelSchemaRef,
+  param,
+  post,
+  requestBody,
+} from "@loopback/openapi-v3";
+import { Logbook, SynapseCreateRoomResponse } from "../models";
 import { Synapse } from "../services";
+
+export interface CreateLogbookDetails {
+  name: string;
+  invites?: string[];
+}
 
 export class LogbookController {
   constructor(@inject("services.Synapse") protected synapseService: Synapse) {}
@@ -61,6 +72,29 @@ export class LogbookController {
           }),
       )
       .filter((room) => room.roomId && room.name && room.messages);
+  }
+
+  @post("/Logbooks", {
+    responses: {
+      "200": {
+        description: "Create Room Response",
+        content: {
+          "application/json": {
+            schema: getModelSchemaRef(SynapseCreateRoomResponse),
+          },
+        },
+      },
+    },
+  })
+  async create(
+    @requestBody() details: CreateLogbookDetails,
+  ): Promise<SynapseCreateRoomResponse> {
+    const { access_token: accessToken } = await this.synapseService.login(
+      this.username,
+      this.password,
+    );
+    const { name } = details;
+    return this.synapseService.createRoom(name, accessToken);
   }
 
   @get("/Logbooks/{name}", {

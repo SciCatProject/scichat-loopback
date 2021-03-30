@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
 import { juggler } from "@loopback/repository";
 
@@ -28,6 +29,31 @@ const config = {
       },
       functions: {
         login: ["username", "password"],
+      },
+    },
+    {
+      template: {
+        method: "POST",
+        url: "https://scitest.esss.lu.se/_matrix/client/r0/createRoom",
+        headers: {
+          Authorization: "Bearer {!accessToken:string}",
+        },
+        body: {
+          visibility: "private",
+          room_alias_name: "{!name:string}",
+          name: "{!name:string}",
+          topic: "Logbook for proposal {!name:string}",
+          creation_content: {
+            "m.federate": false,
+          },
+          power_level_content_override: {
+            state_key: "",
+            invite: 100,
+          },
+        },
+      },
+      functions: {
+        createRoom: ["name", "accessToken"],
       },
     },
     {
