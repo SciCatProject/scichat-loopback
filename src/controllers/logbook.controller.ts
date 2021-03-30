@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { inject } from "@loopback/context";
 import {
+  api,
   get,
   getModelSchemaRef,
   param,
@@ -19,6 +20,7 @@ export interface CreateLogbookDetails {
   invites?: string[];
 }
 
+@api({ basePath: "/scichatapi" })
 export class LogbookController {
   constructor(@inject("services.Synapse") protected synapseService: Synapse) {}
 
