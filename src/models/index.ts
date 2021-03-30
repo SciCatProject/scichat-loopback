@@ -20,10 +20,10 @@ export interface SynapseTimelineEvent {
 }
 export interface SynapseJoinedRoom {
   timeline: {
-    events: object[];
+    events: SynapseTimelineEvent[];
   };
   state: {
-    events: SynapseTimelineEvent[];
+    events: object[];
   };
   account_data: unknown[];
   ephemeral: unknown[];
