@@ -65,6 +65,19 @@ const config = {
         fetchRoomMessages: ["filter", "accessToken"],
       },
     },
+    {
+      template: {
+        method: "GET",
+        url:
+          "https://scitest.esss.lu.se/_matrix/client/r0/sync?filter={filter}",
+        headers: {
+          Authorization: "Bearer {accessToken:string}",
+        },
+      },
+      functions: {
+        fetchAllRoomsMessages: ["filter", "accessToken"],
+      },
+    },
   ],
 };
 
