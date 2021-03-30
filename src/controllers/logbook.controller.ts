@@ -26,11 +26,12 @@ export class LogbookController {
     },
   })
   async findByName(@param.path.string("name") name: string): Promise<object> {
-    const accessToken = this.synapseService.login("username", "password");
+    // const accessToken = this.synapseService.login("username", "password");
     const roomInfo = await this.synapseService.fetchRoomIdByName(name);
-    return this.synapseService.fetchRoomMessages(
-      roomInfo["room_id"],
-      accessToken,
-    );
+    return roomInfo;
+    // return this.synapseService.fetchRoomMessages(
+    //   roomInfo["room_id"],
+    //   accessToken,
+    // );
   }
 }

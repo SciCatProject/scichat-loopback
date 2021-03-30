@@ -5,7 +5,7 @@ import {
   post,
   requestBody,
 } from "@loopback/openapi-v3";
-import { SynapseLoginResponse } from "../models";
+import { SynapseLoginResponse, SynapseRoomIdResponse } from "../models";
 import { Synapse } from "../services";
 
 export interface Credentials {
@@ -64,13 +64,13 @@ export class SynapseController {
         description: "Room ID",
         content: {
           "application/json": {
-            schema: { type: "object" },
+            schema: getModelSchemaRef(SynapseRoomIdResponse),
           },
         },
       },
     },
   })
-  async fetchRoomIdByName(name: string): Promise<object> {
+  async fetchRoomIdByName(name: string): Promise<SynapseRoomIdResponse> {
     const roomAlias = encodeURIComponent(`#${name}:ess`);
     return this.synapseService.fetchRoomIdByName(roomAlias);
   }
