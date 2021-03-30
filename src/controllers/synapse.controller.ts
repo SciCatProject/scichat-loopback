@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { inject } from "@loopback/context";
 import {
   get,
@@ -5,7 +6,11 @@ import {
   post,
   requestBody,
 } from "@loopback/openapi-v3";
-import { SynapseLoginResponse, SynapseRoomIdResponse } from "../models";
+import {
+  SynapseLoginResponse,
+  SynapseRoomIdResponse,
+  SynapseSyncResponse,
+} from "../models";
 import { Synapse } from "../services";
 
 export interface Credentials {
@@ -73,5 +78,88 @@ export class SynapseController {
   async fetchRoomIdByName(name: string): Promise<SynapseRoomIdResponse> {
     const roomAlias = encodeURIComponent(`#${name}:ess`);
     return this.synapseService.fetchRoomIdByName(roomAlias);
+  }
+
+  @get("fetchRoomMessages", {
+    parameters: [
+      {
+        name: "roomId",
+        schema: { title: "Room Id", type: "string" },
+        in: "query",
+      },
+      {
+        name: "accessToken",
+        schema: { title: "Access Token", type: "string" },
+        in: "query",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Room Messages",
+        content: {
+          "application/json": {
+            schema: getModelSchemaRef(SynapseSyncResponse),
+          },
+        },
+      },
+    },
+  })
+  async fetchRoomMessages(
+    roomId: string,
+    accessToken: string,
+  ): Promise<SynapseSyncResponse> {
+    const filter = encodeURIComponent(
+      JSON.stringify({
+        account_data: { not_types: ["m.*", "im.*"] },
+        presence: { not_types: ["*"] },
+        room: {
+          rooms: [roomId],
+          state: { types: ["m.room.name"] },
+          timeline: {
+            limit: 1000000,
+            types: ["m.room.message"],
+          },
+        },
+      }),
+    );
+    return this.synapseService.fetchRoomMessages(filter, accessToken);
+  }
+
+  @get("fetchAllRoomsMessages", {
+    parameters: [
+      {
+        name: "accessToken",
+        schema: { title: "Access Token", type: "string" },
+        in: "query",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Room Messages",
+        content: {
+          "application/json": {
+            schema: getModelSchemaRef(SynapseSyncResponse),
+          },
+        },
+      },
+    },
+  })
+  async fetchAllRoomsMessages(
+    accessToken: string,
+  ): Promise<SynapseSyncResponse> {
+    const filter = encodeURIComponent(
+      JSON.stringify({
+        account_data: { not_types: ["m.*", "im.*"] },
+        presence: { not_types: ["*"] },
+        room: {
+          state: { types: ["m.room.name"] },
+          timeline: {
+            limit: 1000000,
+            types: ["m.room.message"],
+          },
+        },
+      }),
+    );
+    return this.synapseService.fetchAllRoomsMessages(filter, accessToken);
   }
 }
