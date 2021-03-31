@@ -7,11 +7,7 @@ import {
   post,
   requestBody,
 } from "@loopback/rest";
-import {
-  Logbook,
-  SynapseSendMessageResponse,
-  SynapseTimelineEvent,
-} from "../models";
+import { Logbook, SynapseTimelineEvent } from "../models";
 import { Synapse } from "../services";
 
 export interface CreateLogbookDetails {
@@ -192,7 +188,14 @@ export class LogbookController {
         description: "Send Message Response",
         content: {
           "application/json": {
-            schema: getModelSchemaRef(SynapseSendMessageResponse),
+            schema: {
+              type: "object",
+              properties: {
+                event_id: {
+                  type: "string",
+                },
+              },
+            },
           },
         },
       },
@@ -201,7 +204,7 @@ export class LogbookController {
   async sendMessage(
     @param.path.string("name") name: string,
     @requestBody() data: { [message: string]: string },
-  ): Promise<SynapseSendMessageResponse> {
+  ): Promise<{ event_id: string }> {
     const { access_token: accessToken } = await this.synapseService.login(
       username,
       password,
