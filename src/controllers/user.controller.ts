@@ -8,7 +8,7 @@ import {
 } from "@loopback/authentication-jwt";
 import { inject } from "@loopback/core";
 import { repository } from "@loopback/repository";
-import { post, requestBody, SchemaObject } from "@loopback/rest";
+import { api, post, requestBody, SchemaObject } from "@loopback/rest";
 import { SecurityBindings, UserProfile } from "@loopback/security";
 
 const credentialsSchema: SchemaObject = {
@@ -34,6 +34,7 @@ export const credentialsRequestBody = {
   },
 };
 
+@api({ basePath: "/scichatapi" })
 export class UserController {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE) public jwtService: TokenService,
