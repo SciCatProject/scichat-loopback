@@ -1,0 +1,12 @@
+{
+  "extends": "@loopback/eslint-config",
+  "rules": {
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "format": ["camelCase", "snake_case", "UPPER_CASE"],
+        "selector": ["variable", "function"]
+      }
+    ]
+  }
+}
