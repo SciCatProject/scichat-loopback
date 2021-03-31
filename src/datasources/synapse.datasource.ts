@@ -2,29 +2,29 @@
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
 import { juggler } from "@loopback/repository";
 
+const baseURL = "https://scitest.esss.lu.se/_matrix/client/r0/";
+
 const config = {
   name: "synapse",
   connector: "rest",
-  baseURL: "https://scitest.esss.lu.se/_matrix/client/r0/",
+  baseURL,
   crud: false,
-  options: {
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-    },
-  },
   operations: [
     {
       template: {
         method: "POST",
-        url: "https://scitest.esss.lu.se/_matrix/client/r0/login",
+        url: baseURL + "login",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+        },
         body: {
           type: "m.login.password",
           identifier: {
             type: "m.id.user",
-            user: "{username:string}",
+            user: "{!username:string}",
           },
-          password: "{password:string}",
+          password: "{!password:string}",
         },
       },
       functions: {
@@ -34,8 +34,10 @@ const config = {
     {
       template: {
         method: "POST",
-        url: "https://scitest.esss.lu.se/_matrix/client/r0/createRoom",
+        url: baseURL + "createRoom",
         headers: {
+          accept: "application/json",
+          "content-type": "application/json",
           Authorization: "Bearer {!accessToken:string}",
         },
         body: {
@@ -59,14 +61,15 @@ const config = {
     {
       template: {
         method: "POST",
-        url:
-          "https://scitest.esss.lu.se/_matrix/client/r0/rooms/{!name:string}/send/m.room.message",
+        url: baseURL + "rooms/{!name:string}/send/m.room.message",
         headers: {
+          accept: "application/json",
+          "content-type": "application/json",
           Authorization: "Bearer {!accessToken:string}",
         },
         body: {
           msgtype: "m.text",
-          body: "{message:text}",
+          body: "{!message:text}",
         },
       },
       functions: {
@@ -76,20 +79,11 @@ const config = {
     {
       template: {
         method: "GET",
-        url: "https://scitest.esss.lu.se/_matrix/client/r0/publicRooms",
+        url: baseURL + "directory/room/{!name:string}",
         headers: {
-          Authorization: "Bearer {accessToken:string}",
+          accept: "application/json",
+          "content-type": "application/json",
         },
-      },
-      functions: {
-        fetchPublicRooms: ["accessToken"],
-      },
-    },
-    {
-      template: {
-        method: "GET",
-        url:
-          "https://scitest.esss.lu.se/_matrix/client/r0/directory/room/{name}",
       },
       functions: {
         fetchRoomIdByName: ["name"],
@@ -98,26 +92,15 @@ const config = {
     {
       template: {
         method: "GET",
-        url:
-          "https://scitest.esss.lu.se/_matrix/client/r0/sync?filter={filter}",
+        url: baseURL + "sync?filter={filter:string}",
         headers: {
-          Authorization: "Bearer {accessToken:string}",
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: "Bearer {!accessToken:string}",
         },
       },
       functions: {
         fetchRoomMessages: ["filter", "accessToken"],
-      },
-    },
-    {
-      template: {
-        method: "GET",
-        url:
-          "https://scitest.esss.lu.se/_matrix/client/r0/sync?filter={filter}",
-        headers: {
-          Authorization: "Bearer {accessToken:string}",
-        },
-      },
-      functions: {
         fetchAllRoomsMessages: ["filter", "accessToken"],
       },
     },
