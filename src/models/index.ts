@@ -1,5 +1,4 @@
 export * from "./logbook.model";
-export * from "./synapse-create-room-response.model";
 export * from "./synapse-login-response.model";
 export * from "./synapse-room-id-response.model";
 export * from "./synapse-send-message-response.model";

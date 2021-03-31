@@ -2,7 +2,6 @@ import { inject, Provider } from "@loopback/core";
 import { getService } from "@loopback/service-proxy";
 import { SynapseDataSource } from "../datasources";
 import {
-  SynapseCreateRoomResponse,
   SynapseLoginResponse,
   SynapseRoomIdResponse,
   SynapseSendMessageResponse,
@@ -14,7 +13,7 @@ export interface Synapse {
   createRoom(
     name: string,
     accessToken: string,
-  ): Promise<SynapseCreateRoomResponse>;
+  ): Promise<{ room_alias: string; room_id: string }>;
   fetchAllRoomsMessages(
     filter: string,
     accessToken: string,

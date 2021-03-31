@@ -9,7 +9,6 @@ import {
 } from "@loopback/rest";
 import {
   Logbook,
-  SynapseCreateRoomResponse,
   SynapseSendMessageResponse,
   SynapseTimelineEvent,
 } from "../models";
@@ -103,7 +102,17 @@ export class LogbookController {
         description: "Create Room Response",
         content: {
           "application/json": {
-            schema: getModelSchemaRef(SynapseCreateRoomResponse),
+            schema: {
+              type: "object",
+              properties: {
+                room_id: {
+                  type: "string",
+                },
+                room_alias: {
+                  type: "string",
+                },
+              },
+            },
           },
         },
       },
@@ -111,7 +120,7 @@ export class LogbookController {
   })
   async create(
     @requestBody() details: CreateLogbookDetails,
-  ): Promise<SynapseCreateRoomResponse> {
+  ): Promise<{ room_alias: string; room_id: string }> {
     const { access_token: accessToken } = await this.synapseService.login(
       username,
       password,
