@@ -47,6 +47,8 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^7.1.0",
+    "@loopback/authentication-jwt": "^0.8.0",
     "@loopback/boot": "^3.3.0",
     "@loopback/context": "^3.15.0",
     "@loopback/core": "^2.15.0",
