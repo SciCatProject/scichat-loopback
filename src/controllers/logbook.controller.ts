@@ -169,7 +169,6 @@ export class LogbookController {
       : defaultFilter;
     logbookFilter.roomId = roomId;
     const synapseFilter = createSynapseFilter(logbookFilter);
-    console.log({ synapseFilter });
     const { rooms } = await this.synapseService.fetchRoomMessages(
       synapseFilter,
       accessToken,
@@ -221,7 +220,6 @@ const createSynapseFilter = (options?: LogbookFilters): string => {
     },
   };
   if (options) {
-    console.log({ options });
     if (options.roomId) {
       filter.room.rooms = [options.roomId];
     }
