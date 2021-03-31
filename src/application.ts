@@ -16,6 +16,8 @@ import path from "path";
 import { MongodbDataSource } from "./datasources";
 import { MySequence } from "./sequence";
 
+export { ApplicationConfig };
+
 export class ScichatLoopbackApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {

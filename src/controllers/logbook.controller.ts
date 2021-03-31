@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import { inject } from "@loopback/context";
+import { inject } from "@loopback/core";
 import {
   api,
   get,
@@ -7,7 +6,7 @@ import {
   param,
   post,
   requestBody,
-} from "@loopback/openapi-v3";
+} from "@loopback/rest";
 import {
   Logbook,
   SynapseCreateRoomResponse,
