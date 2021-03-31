@@ -44,9 +44,9 @@ export interface SynapseFilters {
   };
 }
 
-const username = "";
-const password = "";
-const serverName = "ess";
+const username = process.env.SYNAPSE_BOT_NAME ?? "";
+const password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
+const serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
 
 @api({ basePath: "/scichatapi" })
 export class LogbookController {

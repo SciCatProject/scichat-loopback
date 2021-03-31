@@ -2,7 +2,9 @@
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
 import { juggler } from "@loopback/repository";
 
-const baseURL = "https://scitest.esss.lu.se/_matrix/client/r0/";
+const baseURL =
+  process.env.SYNAPSE_SERVER_HOST + "/_matrix/client/r0" ||
+  "https://scitest.esss.lu.se/_matrix/client/r0";
 
 const config = {
   name: "synapse",
@@ -13,7 +15,7 @@ const config = {
     {
       template: {
         method: "POST",
-        url: baseURL + "login",
+        url: baseURL + "/login",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
@@ -34,7 +36,7 @@ const config = {
     {
       template: {
         method: "POST",
-        url: baseURL + "createRoom",
+        url: baseURL + "/createRoom",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
@@ -61,7 +63,7 @@ const config = {
     {
       template: {
         method: "POST",
-        url: baseURL + "rooms/{!name:string}/send/m.room.message",
+        url: baseURL + "/rooms/{!name:string}/send/m.room.message",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
@@ -79,7 +81,7 @@ const config = {
     {
       template: {
         method: "GET",
-        url: baseURL + "directory/room/{!name:string}",
+        url: baseURL + "/directory/room/{!name:string}",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
@@ -92,7 +94,7 @@ const config = {
     {
       template: {
         method: "GET",
-        url: baseURL + "sync?filter={filter:string}",
+        url: baseURL + "/sync?filter={filter:string}",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
