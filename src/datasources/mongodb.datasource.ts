@@ -5,11 +5,11 @@ const config = {
   name: "mongodb",
   connector: "mongodb",
   url: "",
-  host: "mongodb",
-  port: 27017,
-  user: "",
-  password: "",
-  database: "scichat",
+  host: process.env.MONGODB_HOST ?? "mongodb",
+  port: process.env.MONGODB_PORT ?? 27017,
+  user: process.env.MONGODB_USER ?? "",
+  password: process.env.MONGODB_PASSWORD ?? "",
+  database: process.env.MONGODB_DB_NAME ?? "scichat",
   useNewUrlParser: true,
 };
 
