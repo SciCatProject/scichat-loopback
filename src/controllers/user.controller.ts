@@ -1,27 +1,43 @@
-import { TokenService } from "@loopback/authentication";
+import { authenticate, TokenService } from "@loopback/authentication";
 import {
-  Credentials,
-  MyUserService,
   TokenServiceBindings,
+  User,
   UserRepository,
   UserServiceBindings,
 } from "@loopback/authentication-jwt";
 import { inject } from "@loopback/core";
-import { repository } from "@loopback/repository";
-import { api, post, requestBody, SchemaObject } from "@loopback/rest";
-import { SecurityBindings, UserProfile } from "@loopback/security";
+import { model, property, repository } from "@loopback/repository";
+import {
+  api,
+  get,
+  getModelSchemaRef,
+  post,
+  requestBody,
+  SchemaObject,
+} from "@loopback/rest";
+import { SecurityBindings, securityId, UserProfile } from "@loopback/security";
+import { genSalt, hash } from "bcryptjs";
+import _ from "lodash";
+import { Credentials, SciChatUserService } from "../services";
+
+@model()
+export class NewUserRequest extends User {
+  @property({
+    type: "string",
+    required: true,
+  })
+  password: string;
+}
 
 const credentialsSchema: SchemaObject = {
   type: "object",
-  required: ["email", "password"],
+  required: ["username", "password"],
   properties: {
-    email: {
+    username: {
       type: "string",
-      format: "email",
     },
     password: {
       type: "string",
-      minLength: 8,
     },
   },
 };
@@ -38,7 +54,8 @@ export const credentialsRequestBody = {
 export class UserController {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE) public jwtService: TokenService,
-    @inject(UserServiceBindings.USER_SERVICE) public userService: MyUserService,
+    @inject(UserServiceBindings.USER_SERVICE)
+    public userService: SciChatUserService,
     @inject(SecurityBindings.USER, { optional: true }) public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
   ) {}
@@ -69,5 +86,62 @@ export class UserController {
     const userProfile = this.userService.convertToUserProfile(user);
     const token = await this.jwtService.generateToken(userProfile);
     return { token };
+  }
+
+  @authenticate("jwt")
+  @get("/Users/whoAmI", {
+    responses: {
+      "200": {
+        description: "Return current user",
+        content: {
+          "application/json": {
+            schema: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
+  })
+  async whoAmI(
+    @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
+  ): Promise<string> {
+    return currentUserProfile[securityId];
+  }
+
+  @post("/Users/signup", {
+    responses: {
+      "200": {
+        description: "User",
+        content: {
+          "application/json": {
+            schema: {
+              "x-ts-type": User,
+            },
+          },
+        },
+      },
+    },
+  })
+  async signUp(
+    @requestBody({
+      content: {
+        "application/json": {
+          schema: getModelSchemaRef(NewUserRequest, { title: "NewUser" }),
+        },
+      },
+    })
+    newUserRequest: NewUserRequest,
+  ): Promise<User> {
+    const password = await hash(newUserRequest.password, await genSalt());
+    const savedUser = await this.userRepository.create(
+      _.omit(newUserRequest, "password"),
+    );
+
+    await this.userRepository
+      .userCredentials(savedUser.id)
+      .create({ password });
+
+    return savedUser;
   }
 }
