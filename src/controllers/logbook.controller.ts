@@ -1,3 +1,4 @@
+import { authenticate } from "@loopback/authentication";
 import { inject } from "@loopback/core";
 import {
   api,
@@ -71,6 +72,7 @@ const serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
 export class LogbookController {
   constructor(@inject("services.Synapse") protected synapseService: Synapse) {}
 
+  @authenticate("jwt")
   @get("/Logbooks", {
     parameters: [
       {
@@ -117,6 +119,7 @@ export class LogbookController {
       .filter((room) => room.roomId && room.name && room.messages);
   }
 
+  @authenticate("jwt")
   @post("/Logbooks", {
     responses: {
       "200": {
@@ -150,6 +153,7 @@ export class LogbookController {
     return this.synapseService.createRoom(name, accessToken);
   }
 
+  @authenticate("jwt")
   @get("/Logbooks/{name}", {
     parameters: [
       {
@@ -207,6 +211,7 @@ export class LogbookController {
     return new Logbook({ roomId, name, messages });
   }
 
+  @authenticate("jwt")
   @post("/Logbooks/{name}/message", {
     responses: {
       "200": {
