@@ -109,7 +109,7 @@ export class UserController {
     return currentUserProfile[securityId];
   }
 
-  @post("/Users/signup", {
+  @post("/Users", {
     responses: {
       "200": {
         description: "User",
