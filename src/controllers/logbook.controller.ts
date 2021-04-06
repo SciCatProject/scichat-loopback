@@ -6,14 +6,15 @@ import {
   param,
   post,
   requestBody,
+  SchemaObject,
 } from "@loopback/rest";
 import { Logbook, SynapseTimelineEvent } from "../models";
 import { Synapse } from "../services";
 
-export interface CreateLogbookDetails {
+export type CreateLogbookDetails = {
   name: string;
   invites?: string[];
-}
+};
 
 export interface LogbookFilters {
   roomId?: string;
@@ -37,6 +38,30 @@ export interface SynapseFilters {
     };
   };
 }
+
+const createLogbookSchema: SchemaObject = {
+  type: "object",
+  required: ["name"],
+  properties: {
+    name: {
+      type: "string",
+    },
+    invites: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+  },
+};
+
+export const createLogbookRequestBody = {
+  description: "The input of create Logbook",
+  required: true,
+  content: {
+    "application/json": { schema: createLogbookSchema },
+  },
+};
 
 const username = process.env.SYNAPSE_BOT_NAME ?? "";
 const password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
@@ -115,7 +140,7 @@ export class LogbookController {
     },
   })
   async create(
-    @requestBody() details: CreateLogbookDetails,
+    @requestBody(createLogbookRequestBody) details: CreateLogbookDetails,
   ): Promise<{ room_alias: string; room_id: string }> {
     const { access_token: accessToken } = await this.synapseService.login(
       username,
