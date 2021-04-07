@@ -8,7 +8,6 @@ USER node
 
 # Create app directory (with user `node`)
 WORKDIR /home/node/app
-RUN chown -R node:node /home/node/app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
