@@ -45,6 +45,7 @@ const config = {
           visibility: "private",
           room_alias_name: "{!name:string}",
           name: "{!name:string}",
+          invite: "{invites}",
           topic: "Logbook for proposal {!name:string}",
           creation_content: {
             "m.federate": false,
@@ -56,7 +57,7 @@ const config = {
         },
       },
       functions: {
-        createRoom: ["name", "accessToken"],
+        createRoom: ["name", "invites", "accessToken"],
       },
     },
     {

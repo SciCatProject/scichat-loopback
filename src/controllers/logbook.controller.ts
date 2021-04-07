@@ -173,8 +173,13 @@ export class LogbookController {
       username,
       password,
     );
-    const { name } = details;
-    return this.synapseService.createRoom(name, accessToken);
+    const { name, invites } = details;
+    const formattedInvites = invites
+      ? invites.map((user) =>
+          user.includes("@") ? user : `@${user}:${serverName}`,
+        )
+      : [];
+    return this.synapseService.createRoom(name, formattedInvites, accessToken);
   }
 
   @authenticate("jwt")

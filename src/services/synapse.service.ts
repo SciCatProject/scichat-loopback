@@ -7,6 +7,7 @@ export interface SynapseService {
   login(username: string, password: string): Promise<SynapseLoginResponse>;
   createRoom(
     name: string,
+    invites: string[],
     accessToken: string,
   ): Promise<{ room_alias: string; room_id: string }>;
   fetchAllRoomsMessages(
