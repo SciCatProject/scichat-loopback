@@ -42,7 +42,7 @@
     "type": "git",
     "url": ""
   },
-  "author": "Henrik Johansson <henrik.johansson712@gmail.com>",
+  "author": "Henrik Johansson <henrik.johansson@ess.eu>",
   "license": "GPL-3.0",
   "files": [
     "README.md",
