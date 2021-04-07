@@ -3,29 +3,30 @@ FROM node:15-alpine
 
 RUN apk update && apk upgrade && apk add --no-cache bash git
 
-# Prepare app directory
-WORKDIR /home/node/app
-COPY package*.json /home/node/app/
-COPY .snyk /home/node/app/
-
-# set up local user to avoid running as root
-RUN chown -R node:node /home/node/app
+# Set to a non-root built-in user `node`
 USER node
 
-# Install our packages
-RUN npm config set registry http://registry.npmjs.org/
-RUN npm config set strict-ssl false
+# Create app directory (with user `node`)
+WORKDIR /home/node/app
+RUN chown -R node:node /home/node/app
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY --chown=node:node package*.json /home/node/app/
+COPY --chown=node:node .snyk /home/node/app/
 RUN npm ci
 
 # Bundle app source code
 COPY --chown=node:node . /home/node/app/
-COPY --chown=node:node server/config.local.js-sample /home/node/app/server/config.local.js
+COPY --chown=node:node CI/ESS/.env /home/node/app/
 COPY --chown=node:node CI/ESS/wait.sh /home/node/app/
 RUN chmod +x /home/node/app/wait.sh
 
+RUN npm run build
+
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV HOST=0.0.0.0 PORT=3030
-EXPOSE ${PORT}
 
-# Start the app
+EXPOSE ${PORT}
 CMD [ "./wait.sh" ]
