@@ -54,6 +54,10 @@ const createLogbookSchema: SchemaObject = {
       },
     },
   },
+  example: {
+    name: "123456",
+    invites: ["firstnamelastname"],
+  },
 };
 
 export const createLogbookRequestBody = {
@@ -61,6 +65,24 @@ export const createLogbookRequestBody = {
   required: true,
   content: {
     "application/json": { schema: createLogbookSchema },
+  },
+};
+
+const sendMessageSchema: SchemaObject = {
+  type: "object",
+  required: ["message"],
+  properties: {
+    message: {
+      type: "string",
+    },
+  },
+};
+
+export const sendMessageRequestBody = {
+  description: "The message to be sent to the room",
+  required: true,
+  content: {
+    "application/json": { schema: sendMessageSchema },
   },
 };
 
@@ -233,7 +255,7 @@ export class LogbookController {
   })
   async sendMessage(
     @param.path.string("name") name: string,
-    @requestBody() data: { [message: string]: string },
+    @requestBody(sendMessageRequestBody) data: { [message: string]: string },
   ): Promise<{ event_id: string }> {
     const { access_token: accessToken } = await this.synapseService.login(
       username,
