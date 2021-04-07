@@ -10,7 +10,7 @@ import {
   SchemaObject,
 } from "@loopback/rest";
 import { Logbook, SynapseTimelineEvent } from "../models";
-import { Synapse } from "../services";
+import { SynapseService } from "../services";
 
 export type CreateLogbookDetails = {
   name: string;
@@ -92,7 +92,9 @@ const serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
 
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
-  constructor(@inject("services.Synapse") protected synapseService: Synapse) {}
+  constructor(
+    @inject("services.Synapse") protected synapseService: SynapseService,
+  ) {}
 
   @authenticate("jwt")
   @get("/Logbooks", {
