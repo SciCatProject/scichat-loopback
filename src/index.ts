@@ -3,7 +3,6 @@ import { ApplicationConfig, ScichatLoopbackApplication } from "./application";
 export * from "./application";
 export * from "./jwt-authentication-component";
 export * from "./keys";
-export * from "./types";
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new ScichatLoopbackApplication(options);

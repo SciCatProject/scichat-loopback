@@ -13,7 +13,7 @@ import {
   TokenServiceBindings,
   TokenServiceConstants,
   UserServiceBindings,
-} from "./keys";
+} from ".";
 import {
   RefreshTokenRepository,
   UserCredentialsRepository,
