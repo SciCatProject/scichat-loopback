@@ -14,9 +14,27 @@ describe("LogbookController", () => {
     await app.stop();
   });
 
-  describe("#find()", () => {
-    it("should...", async () => {
-      await client.get("/scichatapi/Logbooks").expect(200);
+  context("find", () => {
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      await client.get("/scichatapi/Logbooks").expect(401);
+    });
+  });
+
+  context("create", () => {
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      await client.post("/scichatapi/Logbooks").expect(401);
+    });
+  });
+
+  context("findByName", () => {
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      await client.get("/scichatapi/Logbooks/123456").expect(401);
+    });
+  });
+
+  context("sendMessage", () => {
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      await client.post("/scichatapi/Logbooks/123456/message").expect(401);
     });
   });
 });
