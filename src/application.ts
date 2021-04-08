@@ -1,8 +1,4 @@
 import { AuthenticationComponent } from "@loopback/authentication";
-import {
-  JWTAuthenticationComponent,
-  UserServiceBindings,
-} from "@loopback/authentication-jwt";
 import { BootMixin } from "@loopback/boot";
 import { ApplicationConfig } from "@loopback/core";
 import { RepositoryMixin } from "@loopback/repository";
@@ -14,6 +10,8 @@ import {
 import { ServiceMixin } from "@loopback/service-proxy";
 import path from "path";
 import { MongodbDataSource } from "./datasources";
+import { JWTAuthenticationComponent } from "./jwt-authentication-component";
+import { UserServiceBindings } from "./keys";
 import { MySequence } from "./sequence";
 
 export { ApplicationConfig };

@@ -1,13 +1,10 @@
 import { UserService } from "@loopback/authentication";
-import {
-  User,
-  UserRepository,
-  UserWithRelations,
-} from "@loopback/authentication-jwt";
 import { repository } from "@loopback/repository";
 import { HttpErrors } from "@loopback/rest";
 import { securityId, UserProfile } from "@loopback/security";
 import { compare } from "bcryptjs";
+import { User, UserWithRelations } from "../models";
+import { UserRepository } from "../repositories";
 
 export type Credentials = {
   username: string;

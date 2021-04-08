@@ -58,7 +58,9 @@
     "@loopback/rest": "^9.2.0",
     "@loopback/rest-explorer": "^3.2.0",
     "@loopback/service-proxy": "^3.1.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
     "loopback-connector-mongodb": "^6.0.0",
     "loopback-connector-rest": "^4.0.1",
     "snyk": "^1.519.0",
@@ -66,11 +68,12 @@
   },
   "devDependencies": {
     "@loopback/build": "^6.3.0",
-    "source-map-support": "^0.5.19",
-    "@loopback/testlab": "^3.3.0",
-    "@types/node": "^10.17.55",
     "@loopback/eslint-config": "^10.1.0",
+    "@loopback/testlab": "^3.3.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/node": "^10.17.55",
     "eslint": "^7.22.0",
+    "source-map-support": "^0.5.19",
     "typescript": "~4.2.3"
   },
   "snyk": true

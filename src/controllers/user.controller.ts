@@ -1,10 +1,4 @@
 import { authenticate, TokenService } from "@loopback/authentication";
-import {
-  TokenServiceBindings,
-  User,
-  UserRepository,
-  UserServiceBindings,
-} from "@loopback/authentication-jwt";
 import { inject } from "@loopback/core";
 import { model, property, repository } from "@loopback/repository";
 import {
@@ -18,6 +12,9 @@ import {
 import { SecurityBindings, securityId, UserProfile } from "@loopback/security";
 import { genSalt, hash } from "bcryptjs";
 import _ from "lodash";
+import { TokenServiceBindings, UserServiceBindings } from "../keys";
+import { User } from "../models";
+import { UserRepository } from "../repositories";
 import { Credentials, SciChatUserService } from "../services";
 
 @model()
