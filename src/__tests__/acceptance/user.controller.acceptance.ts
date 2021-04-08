@@ -23,11 +23,20 @@ describe("UserController", () => {
   });
 
   context("login", () => {
-    it("should", async () => {
+    it("should resolve in a 401 code when logging in with the wrong credentials", async () => {
+      const credentials = { username: "testUser", password: "wrongPassword" };
+      await client
+        .post("/scichatapi/Users/login")
+        .send(credentials)
+        .expect(401);
+    });
+
+    it("should resolve in a jwt token when logging in with the correct credentials", async () => {
       const credentials = givenCredentials();
       const res = await client
         .post("/scichatapi/Users/login")
-        .send(credentials);
+        .send(credentials)
+        .expect(200);
 
       expect(res.body).to.have.property("token");
     });
