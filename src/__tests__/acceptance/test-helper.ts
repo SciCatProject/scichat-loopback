@@ -1,9 +1,9 @@
-import {ScichatLoopbackApplication} from '../..';
 import {
+  Client,
   createRestAppClient,
   givenHttpServerConfig,
-  Client,
-} from '@loopback/testlab';
+} from "@loopback/testlab";
+import { ScichatLoopbackApplication } from "../..";
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -19,11 +19,17 @@ export async function setupApplication(): Promise<AppWithClient> {
   });
 
   await app.boot();
+
+  app.bind("datasources.config.mongodb").to({
+    name: "mongodb",
+    connector: "mongodb",
+  });
+
   await app.start();
 
   const client = createRestAppClient(app);
 
-  return {app, client};
+  return { app, client };
 }
 
 export interface AppWithClient {
