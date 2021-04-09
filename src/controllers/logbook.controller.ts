@@ -9,8 +9,8 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
-import { Logbook, SynapseTimelineEvent } from "../models";
-import { SynapseService } from "../services";
+import { Logbook } from "../models";
+import { SynapseService, SynapseTimelineEvent } from "../services";
 
 export type CreateLogbookDetails = {
   name: string;

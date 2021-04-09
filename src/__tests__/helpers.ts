@@ -1,13 +1,8 @@
 import { genSalt, hash } from "bcryptjs";
 import { MongodbDataSource } from "../datasources";
-import {
-  Logbook,
-  SynapseSyncResponse,
-  SynapseToken,
-  User,
-  UserCredentials,
-} from "../models";
+import { Logbook, SynapseToken, User, UserCredentials } from "../models";
 import { UserCredentialsRepository, UserRepository } from "../repositories";
+import { SynapseSyncResponse } from "../services";
 import { testdb } from "./fixtures/datasources/testdb.datasource";
 
 const mongodb = new MongodbDataSource(testdb);
@@ -74,7 +69,7 @@ export function givenSynapseLoginResponse() {
 }
 
 export function givenAllRoomsSyncResponse() {
-  const data = {
+  const data: SynapseSyncResponse = {
     account_data: {},
     to_device: {},
     device_lists: {},
@@ -175,7 +170,7 @@ export function givenAllRoomsSyncResponse() {
     device_one_time_keys_count: {},
     next_batch: "abc123",
   };
-  return new SynapseSyncResponse(data);
+  return data;
 }
 
 export function givenLogbooks() {
@@ -236,7 +231,7 @@ export function givenFetchRoomIdByNameResponse() {
 }
 
 export function givenFetchRoomMessagesResponse() {
-  const data = {
+  const data: SynapseSyncResponse = {
     account_data: {},
     to_device: {},
     device_lists: {},
@@ -295,7 +290,7 @@ export function givenFetchRoomMessagesResponse() {
     next_batch: "abc123",
   };
 
-  return new SynapseSyncResponse(data);
+  return data;
 }
 
 export function givenLogbook() {

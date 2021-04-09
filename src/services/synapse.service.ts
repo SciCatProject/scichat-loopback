@@ -1,7 +1,8 @@
 import { inject, Provider } from "@loopback/core";
 import { getService } from "@loopback/service-proxy";
+import { SynapseSyncResponse } from ".";
 import { SynapseDataSource } from "../datasources";
-import { SynapseSyncResponse, SynapseToken } from "../models";
+import { SynapseToken } from "../models";
 
 export interface SynapseService {
   login(username: string, password: string): Promise<SynapseToken>;
