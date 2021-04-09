@@ -2,8 +2,8 @@ import { genSalt, hash } from "bcryptjs";
 import { MongodbDataSource } from "../datasources";
 import {
   Logbook,
-  SynapseLoginResponse,
   SynapseSyncResponse,
+  SynapseToken,
   User,
   UserCredentials,
 } from "../models";
@@ -70,7 +70,7 @@ export function givenSynapseLoginResponse() {
     device_id: "edcba54321",
     well_known: {},
   };
-  return new SynapseLoginResponse(data);
+  return new SynapseToken(data);
 }
 
 export function givenAllRoomsSyncResponse() {
