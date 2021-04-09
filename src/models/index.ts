@@ -1,5 +1,4 @@
 export * from "./logbook.model";
-export * from "./refresh-token.model";
 export * from "./synapse-login-response.model";
 export * from "./synapse-sync-response.model";
 export * from "./user-credentials.model";

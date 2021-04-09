@@ -7,11 +7,7 @@ import {
   User,
   UserCredentials,
 } from "../models";
-import {
-  RefreshTokenRepository,
-  UserCredentialsRepository,
-  UserRepository,
-} from "../repositories";
+import { UserCredentialsRepository, UserRepository } from "../repositories";
 import { testdb } from "./fixtures/datasources/testdb.datasource";
 
 const mongodb = new MongodbDataSource(testdb);
@@ -23,15 +19,9 @@ const userRepository = new UserRepository(
 
 const userCredentialsRepository = new UserCredentialsRepository(mongodb);
 
-const refreshTokenRepository = new RefreshTokenRepository(
-  mongodb,
-  async () => userRepository,
-);
-
 export async function givenEmptyDatabase() {
   await userRepository.deleteAll();
   await userCredentialsRepository.deleteAll();
-  await refreshTokenRepository.deleteAll();
 }
 
 export function givenUserData(data?: Partial<User>) {
