@@ -1,5 +1,5 @@
 import { authenticate } from "@loopback/authentication";
-import { inject } from "@loopback/core";
+import { inject, intercept } from "@loopback/core";
 import {
   api,
   get,
@@ -9,6 +9,7 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
+import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
 import { SynapseService, SynapseTimelineEvent } from "../services";
 
@@ -90,6 +91,7 @@ const username = process.env.SYNAPSE_BOT_NAME ?? "";
 const password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
 const serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
 
+@intercept(LogbookInterceptor.BINDING_KEY)
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
   constructor(
