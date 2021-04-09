@@ -176,7 +176,9 @@ export class LogbookController {
     const { name, invites } = details;
     const formattedInvites = invites
       ? invites.map((user) =>
-          user.includes("@") ? user : `@${user}:${serverName}`,
+          user.startsWith("@") && user.indexOf(":") > 0
+            ? user
+            : `@${user}:${serverName}`,
         )
       : [];
     return this.synapseService.createRoom(name, formattedInvites, accessToken);
