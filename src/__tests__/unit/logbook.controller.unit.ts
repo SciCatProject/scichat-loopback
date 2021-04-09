@@ -80,7 +80,6 @@ describe("LogbookController", () => {
       fetchAllRoomsMessages: sinon.stub(),
       fetchRoomIdByName: sinon.stub(),
       fetchRoomMessages: sinon.stub(),
-      fetchPublicRooms: sinon.stub(),
       sendMessage: sinon.stub(),
     };
 

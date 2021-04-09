@@ -21,7 +21,6 @@ export interface SynapseService {
     filter: string,
     accessToken: string,
   ): Promise<SynapseSyncResponse>;
-  fetchPublicRooms(accessToken: string): Promise<object>;
   sendMessage(
     roomId: string,
     message: string,
