@@ -4,8 +4,8 @@ import { User } from "./models";
 import { Credentials } from "./services/user.service";
 
 export namespace TokenServiceConstants {
-  export const TOKEN_SECRET_VALUE = "myjwts3cr3t";
-  export const TOKEN_EXPIRES_IN_VALUE = "21600";
+  export const TOKEN_SECRET_VALUE = process.env.JWT_SECRET ?? "myjwts3cr3t";
+  export const TOKEN_EXPIRES_IN_VALUE = process.env.JWT_EXPIRES_IN ?? "21600";
 }
 
 export namespace TokenServiceBindings {
