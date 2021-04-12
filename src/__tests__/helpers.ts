@@ -1,17 +1,11 @@
 import { genSalt, hash } from "bcryptjs";
 import { MongodbDataSource } from "../datasources";
 import { Logbook, SynapseToken, User, UserCredentials } from "../models";
-import {
-  SynapseTokenRepository,
-  UserCredentialsRepository,
-  UserRepository,
-} from "../repositories";
+import { UserCredentialsRepository, UserRepository } from "../repositories";
 import { SynapseSyncResponse } from "../services";
 import { testdbConfig } from "./fixtures/datasources/testdb.datasource";
 
 const testdb = new MongodbDataSource(testdbConfig);
-
-const synapseTokenRepositry = new SynapseTokenRepository(testdb);
 const userRepository = new UserRepository(
   testdb,
   async () => userCredentialsRepository,
@@ -19,7 +13,6 @@ const userRepository = new UserRepository(
 const userCredentialsRepository = new UserCredentialsRepository(testdb);
 
 export async function givenEmptyDatabase() {
-  await synapseTokenRepositry.deleteAll();
   await userRepository.deleteAll();
   await userCredentialsRepository.deleteAll();
 }
