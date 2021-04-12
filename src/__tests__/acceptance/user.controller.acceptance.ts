@@ -15,12 +15,10 @@ describe("UserController (acceptance)", () => {
     ({ app, client } = await setupApplication());
   });
 
-  before(givenEmptyDatabase);
+  before(() => givenEmptyDatabase());
   before(givenUserAccount);
 
-  after(async () => {
-    await app.stop();
-  });
+  after(() => app.stop());
 
   context("login", () => {
     it("should resolve in a 401 code when logging in with the wrong credentials", async () => {
