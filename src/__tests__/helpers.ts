@@ -21,7 +21,7 @@ const userCredentialsRepository = new UserCredentialsRepository(testdb);
 export async function givenEmptyDatabase() {
   await synapseTokenRepositry.deleteAll();
   await userRepository.deleteAll();
-  return userCredentialsRepository.deleteAll();
+  await userCredentialsRepository.deleteAll();
 }
 
 export function givenUserData(data?: Partial<User>) {

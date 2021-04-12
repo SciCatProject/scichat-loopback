@@ -15,7 +15,7 @@ describe("UserController (acceptance)", () => {
     ({ app, client } = await setupApplication());
   });
 
-  before(() => givenEmptyDatabase());
+  before(givenEmptyDatabase);
   before(givenUserAccount);
 
   after(() => app.stop());
