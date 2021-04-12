@@ -2,7 +2,7 @@ import { Client } from "@loopback/testlab";
 import { ScichatLoopbackApplication } from "../../application";
 import { setupApplication } from "./test-helper";
 
-describe("LogbookController", () => {
+describe("LogbookController (acceptance)", () => {
   let app: ScichatLoopbackApplication;
   let client: Client;
 

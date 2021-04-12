@@ -7,7 +7,7 @@ import {
 } from "../helpers";
 import { setupApplication } from "./test-helper";
 
-describe("UserController", () => {
+describe("UserController (acceptance)", () => {
   let app: ScichatLoopbackApplication;
   let client: Client;
 

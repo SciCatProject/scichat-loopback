@@ -15,7 +15,7 @@ import {
   givenSynapseLoginResponse,
 } from "../helpers";
 
-describe("LogbookController", () => {
+describe("LogbookController (unit)", () => {
   let controller: LogbookController;
 
   let synapseService: SynapseService;
