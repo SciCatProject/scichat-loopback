@@ -7,22 +7,21 @@ import {
   UserRepository,
 } from "../repositories";
 import { SynapseSyncResponse } from "../services";
-import { testdb } from "./fixtures/datasources/testdb.datasource";
+import { testdbConfig } from "./fixtures/datasources/testdb.datasource";
 
-const mongodb = new MongodbDataSource(testdb);
+const testdb = new MongodbDataSource(testdbConfig);
 
-const synapseTokenRepositry = new SynapseTokenRepository(mongodb);
+const synapseTokenRepositry = new SynapseTokenRepository(testdb);
 const userRepository = new UserRepository(
-  mongodb,
+  testdb,
   async () => userCredentialsRepository,
 );
-const userCredentialsRepository = new UserCredentialsRepository(mongodb);
+const userCredentialsRepository = new UserCredentialsRepository(testdb);
 
 export async function givenEmptyDatabase() {
   await synapseTokenRepositry.deleteAll();
   await userRepository.deleteAll();
-  await userCredentialsRepository.deleteAll();
-  return;
+  return userCredentialsRepository.deleteAll();
 }
 
 export function givenUserData(data?: Partial<User>) {

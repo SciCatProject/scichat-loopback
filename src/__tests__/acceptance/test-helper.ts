@@ -4,7 +4,7 @@ import {
   givenHttpServerConfig,
 } from "@loopback/testlab";
 import { ScichatLoopbackApplication } from "../..";
-import { testdb } from "../fixtures/datasources/testdb.datasource";
+import { testdbConfig } from "../fixtures/datasources/testdb.datasource";
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -21,7 +21,7 @@ export async function setupApplication(): Promise<AppWithClient> {
 
   await app.boot();
 
-  app.bind("datasources.config.mongodb").to(testdb);
+  app.bind("datasources.config.mongodb").to(testdbConfig);
 
   await app.start();
 
