@@ -1,7 +1,10 @@
 import { expect } from "@loopback/testlab";
 import sinon from "sinon";
 import { LogbookController } from "../../controllers";
+import { MongodbDataSource } from "../../datasources";
+import { SynapseTokenRepository } from "../../repositories";
 import { SynapseService } from "../../services";
+import { testdb } from "../fixtures/datasources/testdb.datasource";
 import {
   givenAllRoomsSyncResponse,
   givenCreateRoomResponse,
@@ -90,6 +93,8 @@ describe("LogbookController", () => {
     fetchRoomMessages = synapseService.fetchRoomMessages as sinon.SinonStub;
     sendMessage = synapseService.sendMessage as sinon.SinonStub;
 
-    controller = new LogbookController(synapseService);
+    const mongodb = new MongodbDataSource(testdb);
+    const synapseTokenRepositry = new SynapseTokenRepository(mongodb);
+    controller = new LogbookController(synapseTokenRepositry, synapseService);
   }
 });

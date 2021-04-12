@@ -1,5 +1,6 @@
 import { authenticate } from "@loopback/authentication";
 import { inject, intercept } from "@loopback/core";
+import { repository } from "@loopback/repository";
 import {
   api,
   get,
@@ -11,6 +12,7 @@ import {
 } from "@loopback/rest";
 import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
+import { SynapseTokenRepository } from "../repositories";
 import { SynapseService, SynapseTimelineEvent } from "../services";
 
 export type CreateLogbookDetails = {
@@ -87,14 +89,17 @@ export const sendMessageRequestBody = {
   },
 };
 
-const username = process.env.SYNAPSE_BOT_NAME ?? "";
-const password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
-const serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
-
 @intercept(LogbookInterceptor.BINDING_KEY)
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
+  username = process.env.SYNAPSE_BOT_NAME ?? "";
+  password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
+  serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
+  userId = `@${this.username}:${this.serverName}`;
+
   constructor(
+    @repository(SynapseTokenRepository)
+    public synapseTokenRepositry: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
   ) {}
 
@@ -121,28 +126,45 @@ export class LogbookController {
       },
     },
   })
-  async find(): Promise<Logbook[]> {
-    const { access_token: accessToken } = await this.synapseService.login(
-      username,
-      password,
-    );
-    const filter = createSynapseFilter();
-    const { rooms } = await this.synapseService.fetchAllRoomsMessages(
-      filter,
-      accessToken,
-    );
-    return Object.keys(rooms.join)
-      .map(
-        (roomId) =>
-          new Logbook({
-            roomId,
-            name: rooms.join[roomId].state.events
-              .map((event) => event.content["name"])
-              .pop(),
-            messages: rooms.join[roomId].timeline.events,
-          }),
-      )
-      .filter((room) => room.roomId && room.name && room.messages);
+  async find(): Promise<Logbook[] | undefined> {
+    do {
+      try {
+        const synapseToken = await this.synapseTokenRepositry.findOne({
+          where: { user_id: this.userId },
+        });
+        const accessToken = synapseToken?.access_token;
+        const filter = this.createSynapseFilter();
+        console.log("Fetching messages for all rooms");
+        const { rooms } = await this.synapseService.fetchAllRoomsMessages(
+          filter,
+          accessToken,
+        );
+        return Object.keys(rooms.join)
+          .map(
+            (roomId) =>
+              new Logbook({
+                roomId,
+                name: rooms.join[roomId].state.events
+                  .map((event) => event.content["name"])
+                  .pop(),
+                messages: rooms.join[roomId].timeline.events,
+              }),
+          )
+          .filter((room) => room.roomId && room.name && room.messages);
+      } catch (err) {
+        if (
+          err.error &&
+          (err.error.errcode === "M_UNKNOWN_TOKEN" ||
+            err.error.errcode === "M_MISSING_TOKEN")
+        ) {
+          await this.renewAccessToken();
+          continue;
+        } else {
+          console.error(err);
+        }
+      }
+      break;
+    } while (true);
   }
 
   @authenticate("jwt")
@@ -170,20 +192,41 @@ export class LogbookController {
   })
   async create(
     @requestBody(createLogbookRequestBody) details: CreateLogbookDetails,
-  ): Promise<{ room_alias: string; room_id: string }> {
-    const { access_token: accessToken } = await this.synapseService.login(
-      username,
-      password,
-    );
-    const { name, invites } = details;
-    const formattedInvites = invites
-      ? invites.map((user) =>
-          user.startsWith("@") && user.indexOf(":") > 0
-            ? user
-            : `@${user}:${serverName}`,
-        )
-      : [];
-    return this.synapseService.createRoom(name, formattedInvites, accessToken);
+  ): Promise<{ room_alias: string; room_id: string } | undefined> {
+    do {
+      try {
+        console.log("Creating new room", { details });
+        const synapseToken = await this.synapseTokenRepositry.findOne({
+          where: { user_id: this.userId },
+        });
+        const accessToken = synapseToken?.access_token;
+        const { name, invites } = details;
+        const formattedInvites = invites
+          ? invites.map((user) =>
+              user.startsWith("@") && user.indexOf(":") > 0
+                ? user
+                : `@${user}:${this.serverName}`,
+            )
+          : [];
+        return this.synapseService.createRoom(
+          name,
+          formattedInvites,
+          accessToken,
+        );
+      } catch (err) {
+        if (
+          err.error &&
+          (err.error.errcode === "M_UNKNOWN_TOKEN" ||
+            err.error.errcode === "M_MISSING_TOKEN")
+        ) {
+          await this.renewAccessToken();
+          continue;
+        } else {
+          console.error(err);
+        }
+      }
+      break;
+    } while (true);
   }
 
   @authenticate("jwt")
@@ -215,33 +258,50 @@ export class LogbookController {
     @param.path.string("name") name: string,
     @param.query.string("filter")
     filter?: string,
-  ): Promise<Logbook> {
-    const { access_token: accessToken } = await this.synapseService.login(
-      username,
-      password,
-    );
-    const roomAlias = encodeURIComponent(`#${name}:${serverName}`);
-    const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
-      roomAlias,
-    );
-    const defaultFilter: LogbookFilters = {
-      textSearch: "",
-      showBotMessages: true,
-      showUserMessages: true,
-      showImages: true,
-    };
-    const logbookFilter: LogbookFilters = filter
-      ? { ...defaultFilter, ...JSON.parse(filter) }
-      : defaultFilter;
-    logbookFilter.roomId = roomId;
-    const synapseFilter = createSynapseFilter(logbookFilter);
-    const { rooms } = await this.synapseService.fetchRoomMessages(
-      synapseFilter,
-      accessToken,
-    );
-    const events: SynapseTimelineEvent[] = rooms.join[roomId].timeline.events;
-    const messages = filterMessages(events, logbookFilter);
-    return new Logbook({ roomId, name, messages });
+  ): Promise<Logbook | undefined> {
+    do {
+      try {
+        const synapseToken = await this.synapseTokenRepositry.findOne({
+          where: { user_id: this.userId },
+        });
+        const accessToken = synapseToken?.access_token;
+        const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
+        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
+          roomAlias,
+        );
+        const defaultFilter: LogbookFilters = {
+          textSearch: "",
+          showBotMessages: true,
+          showUserMessages: true,
+          showImages: true,
+        };
+        const logbookFilter: LogbookFilters = filter
+          ? { ...defaultFilter, ...JSON.parse(filter) }
+          : defaultFilter;
+        logbookFilter.roomId = roomId;
+        const synapseFilter = this.createSynapseFilter(logbookFilter);
+        const { rooms } = await this.synapseService.fetchRoomMessages(
+          synapseFilter,
+          accessToken,
+        );
+        const events: SynapseTimelineEvent[] =
+          rooms.join[roomId].timeline.events;
+        const messages = this.filterMessages(events, logbookFilter);
+        return new Logbook({ roomId, name, messages });
+      } catch (err) {
+        if (
+          err.error &&
+          (err.error.errcode === "M_UNKNOWN_TOKEN" ||
+            err.error.errcode === "M_MISSING_TOKEN")
+        ) {
+          await this.renewAccessToken();
+          continue;
+        } else {
+          console.error(err);
+        }
+      }
+      break;
+    } while (true);
   }
 
   @authenticate("jwt")
@@ -267,63 +327,100 @@ export class LogbookController {
   async sendMessage(
     @param.path.string("name") name: string,
     @requestBody(sendMessageRequestBody) data: { [message: string]: string },
-  ): Promise<{ event_id: string }> {
-    const { access_token: accessToken } = await this.synapseService.login(
-      username,
-      password,
-    );
-    const roomAlias = encodeURIComponent(`#${name}:${serverName}`);
-    const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
-      roomAlias,
-    );
-    const { message } = data;
-    return this.synapseService.sendMessage(roomId, message, accessToken);
+  ): Promise<{ event_id: string } | undefined> {
+    do {
+      try {
+        const synapseToken = await this.synapseTokenRepositry.findOne({
+          where: { user_id: this.userId },
+        });
+        const accessToken = synapseToken?.access_token;
+        const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
+        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
+          roomAlias,
+        );
+        const { message } = data;
+        return await this.synapseService.sendMessage(
+          roomId,
+          message,
+          accessToken,
+        );
+      } catch (err) {
+        if (
+          err.error &&
+          (err.error.errcode === "M_UNKNOWN_TOKEN" ||
+            err.error.errcode === "M_MISSING_TOKEN")
+        ) {
+          await this.renewAccessToken();
+          continue;
+        } else {
+          console.error(err);
+        }
+      }
+      break;
+    } while (true);
   }
-}
 
-const createSynapseFilter = (options?: LogbookFilters): string => {
-  const filter: SynapseFilters = {
-    account_data: { not_types: ["m.*", "im.*"] },
-    presence: { not_types: ["*"] },
-    room: {
-      state: { types: ["m.room.name"] },
-      timeline: {
-        limit: 1000000,
-        types: ["m.room.message"],
+  async renewAccessToken() {
+    try {
+      console.log("Requesting new Synapse token");
+      await this.synapseTokenRepositry.deleteAll();
+      const synapseToken = await this.synapseService.login(
+        this.username,
+        this.password,
+      );
+      await this.synapseTokenRepositry.create(synapseToken);
+      console.log("Request for new Synapse token successful");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  createSynapseFilter = (options?: LogbookFilters): string => {
+    const filter: SynapseFilters = {
+      account_data: { not_types: ["m.*", "im.*"] },
+      presence: { not_types: ["*"] },
+      room: {
+        state: { types: ["m.room.name"] },
+        timeline: {
+          limit: 1000000,
+          types: ["m.room.message"],
+        },
       },
-    },
+    };
+    if (options) {
+      if (options.roomId) {
+        filter.room.rooms = [options.roomId];
+      }
+      if (!options.showBotMessages) {
+        filter.room.timeline.not_senders = [
+          `@${this.username}:${this.serverName}`,
+        ];
+      }
+      if (!options.showUserMessages) {
+        filter.room.timeline.senders = [`@${this.username}:${this.serverName}`];
+      }
+    }
+    return JSON.stringify(filter);
   };
-  if (options) {
-    if (options.roomId) {
-      filter.room.rooms = [options.roomId];
-    }
-    if (!options.showBotMessages) {
-      filter.room.timeline.not_senders = [`@${username}:${serverName}`];
-    }
-    if (!options.showUserMessages) {
-      filter.room.timeline.senders = [`@${username}:${serverName}`];
-    }
-  }
-  return JSON.stringify(filter);
-};
 
-const filterMessages = (
-  events: SynapseTimelineEvent[],
-  filter?: LogbookFilters,
-): SynapseTimelineEvent[] => {
-  let messages = events;
-  if (filter) {
-    if (filter.textSearch) {
-      const pattern = new RegExp(".*" + filter.textSearch + ".*", "i");
-      messages = messages.filter((message) =>
-        message.content.body ? message.content.body.match(pattern) : true,
-      );
+  filterMessages = (
+    events: SynapseTimelineEvent[],
+    filter?: LogbookFilters,
+  ): SynapseTimelineEvent[] => {
+    let messages = events;
+    if (filter) {
+      if (filter.textSearch) {
+        const pattern = new RegExp(".*" + filter.textSearch + ".*", "i");
+        messages = messages.filter((message) =>
+          message.content.body ? message.content.body.match(pattern) : true,
+        );
+      }
+      if (!filter.showImages) {
+        messages = messages.filter(
+          (message) => message.content.msgtype !== "m.image",
+        );
+      }
     }
-    if (!filter.showImages) {
-      messages = messages.filter(
-        (message) => message.content.msgtype !== "m.image",
-      );
-    }
-  }
-  return messages;
-};
+    return messages;
+  };
+}

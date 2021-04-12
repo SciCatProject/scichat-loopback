@@ -7,6 +7,8 @@ import {
   Provider,
   ValueOrPromise,
 } from "@loopback/core";
+import { repository } from "@loopback/repository";
+import _ from "lodash";
 import { SynapseTokenRepository } from "../repositories";
 import { SynapseService } from "../services";
 
@@ -20,11 +22,10 @@ export class LogbookInterceptor implements Provider<Interceptor> {
   username = process.env.SYNAPSE_BOT_NAME ?? "";
   password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
-  synapseToken: string;
 
   constructor(
-    @inject("repositories.SynapseToken")
-    protected synapseTokenRepositry: SynapseTokenRepository,
+    @repository(SynapseTokenRepository)
+    public synapseTokenRepositry: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
   ) {}
 
@@ -55,18 +56,20 @@ export class LogbookInterceptor implements Provider<Interceptor> {
         where: { user_id: userId },
       });
       if (tokenInstance && tokenInstance.user_id === userId) {
-        this.synapseToken = tokenInstance.access_token;
-        console.log("Found Synapse token", { synapseToken: this.synapseToken });
+        console.log("Found Synapse token", {
+          synapseToken: tokenInstance.access_token,
+        });
       } else {
         console.log("Synapse token not found, requesting new token");
         const synapseLoginResponse = await this.synapseService.login(
           this.username,
           this.password,
         );
-        this.synapseToken = synapseLoginResponse.access_token;
-        await this.synapseTokenRepositry.create(synapseLoginResponse);
+        await this.synapseTokenRepositry.create(
+          _.omit(synapseLoginResponse, "well_known"),
+        );
         console.log("Request for new access token successful", {
-          synapseToken: this.synapseToken,
+          synapseToken: synapseLoginResponse.access_token,
         });
       }
       const result = await next();

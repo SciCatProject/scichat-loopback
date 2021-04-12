@@ -9,23 +9,23 @@ export interface SynapseService {
   createRoom(
     name: string,
     invites: string[],
-    accessToken: string,
+    accessToken: string | undefined,
   ): Promise<{ room_alias: string; room_id: string }>;
   fetchAllRoomsMessages(
     filter: string,
-    accessToken: string,
+    accessToken: string | undefined,
   ): Promise<SynapseSyncResponse>;
   fetchRoomIdByName(
     name: string,
   ): Promise<{ room_id: string; servers: string[] }>;
   fetchRoomMessages(
     filter: string,
-    accessToken: string,
+    accessToken: string | undefined,
   ): Promise<SynapseSyncResponse>;
   sendMessage(
     roomId: string,
     message: string,
-    accessToken: string,
+    accessToken: string | undefined,
   ): Promise<{ event_id: string }>;
 }
 
