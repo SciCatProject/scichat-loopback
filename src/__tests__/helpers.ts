@@ -61,7 +61,7 @@ export function givenSynapseLoginResponse() {
   const data = {
     user_id: "@testUser:ess",
     access_token: "123456abcdef",
-    home_server: "https://scitest.esss.lu.se",
+    home_server: "ess",
     device_id: "edcba54321",
     well_known: {},
   };
