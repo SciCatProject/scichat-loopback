@@ -1,22 +1,28 @@
 import { genSalt, hash } from "bcryptjs";
 import { MongodbDataSource } from "../datasources";
 import { Logbook, SynapseToken, User, UserCredentials } from "../models";
-import { UserCredentialsRepository, UserRepository } from "../repositories";
+import {
+  SynapseTokenRepository,
+  UserCredentialsRepository,
+  UserRepository,
+} from "../repositories";
 import { SynapseSyncResponse } from "../services";
 import { testdb } from "./fixtures/datasources/testdb.datasource";
 
 const mongodb = new MongodbDataSource(testdb);
 
+const synapseTokenRepositry = new SynapseTokenRepository(mongodb);
 const userRepository = new UserRepository(
   mongodb,
   async () => userCredentialsRepository,
 );
-
 const userCredentialsRepository = new UserCredentialsRepository(mongodb);
 
 export async function givenEmptyDatabase() {
+  await synapseTokenRepositry.deleteAll();
   await userRepository.deleteAll();
   await userCredentialsRepository.deleteAll();
+  return;
 }
 
 export function givenUserData(data?: Partial<User>) {
