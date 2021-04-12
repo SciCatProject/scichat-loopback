@@ -1,4 +1,6 @@
+import { genSalt, hash } from "bcryptjs";
 import { ApplicationConfig, ScichatLoopbackApplication } from "./application";
+import { UserRepository } from "./repositories";
 
 export * from "./application";
 export * from "./jwt-authentication-component";
@@ -12,6 +14,28 @@ export async function main(options: ApplicationConfig = {}) {
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
   console.log(`Try ${url}/ping`);
+
+  const username = process.env.SCICHAT_USER;
+  const password = process.env.SCICHAT_PASSWORD;
+
+  if (!username) {
+    throw new Error("SCICHAT_USER environment variable not defined");
+  }
+
+  const userRepository = await app.getRepository(UserRepository);
+  const foundUser = await userRepository.findOne({ where: { username } });
+
+  if (!foundUser) {
+    console.log("Creating new user account");
+    if (!password) {
+      throw new Error("SCICHAT_PASSWORD environment variable not defined");
+    }
+    const hashedPassword = await hash(password, await genSalt());
+    const savedUser = await userRepository.create({ username });
+    await userRepository
+      .userCredentials(savedUser.id)
+      .create({ password: hashedPassword });
+  }
 
   return app;
 }
