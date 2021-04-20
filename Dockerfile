@@ -1,23 +1,19 @@
-# Check out https://hub.docker.com/_/node to select a new base image
-FROM node:10-slim
+FROM node:15-alpine
 
-# Set to a non-root built-in user `node`
+# Prepare app directory
+WORKDIR /home/node/app
+COPY package*.json /home/node/app/
+COPY .snyk /home/node/app/
+
+# Set up local user to avoid running as root
+RUN chown -R node:node /home/node/app
 USER node
 
-# Create app directory (with user `node`)
-RUN mkdir -p /home/node/app
-
-WORKDIR /home/node/app
-
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY --chown=node package*.json ./
-
-RUN npm install
+RUN npm ci
 
 # Bundle app source code
-COPY --chown=node . .
+COPY --chown=node:node . /home/node/app/
 
 RUN npm run build
 
@@ -25,4 +21,4 @@ RUN npm run build
 ENV HOST=0.0.0.0 PORT=3000
 
 EXPOSE ${PORT}
-CMD [ "node", "." ]
+CMD [ "node", "-r", "dotenv/config", "." ]
