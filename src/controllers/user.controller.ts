@@ -1,16 +1,8 @@
 import { TokenService } from "@loopback/authentication";
 import { inject } from "@loopback/core";
 import { model, property, repository } from "@loopback/repository";
-import {
-  api,
-  getModelSchemaRef,
-  post,
-  requestBody,
-  SchemaObject,
-} from "@loopback/rest";
+import { api, post, requestBody, SchemaObject } from "@loopback/rest";
 import { SecurityBindings, UserProfile } from "@loopback/security";
-import { genSalt, hash } from "bcryptjs";
-import _ from "lodash";
 import { TokenServiceBindings, UserServiceBindings } from "../keys";
 import { User } from "../models";
 import { UserRepository } from "../repositories";
@@ -82,41 +74,5 @@ export class UserController {
     const userProfile = this.userService.convertToUserProfile(user);
     const token = await this.jwtService.generateToken(userProfile);
     return { token };
-  }
-
-  @post("/Users", {
-    responses: {
-      "200": {
-        description: "User",
-        content: {
-          "application/json": {
-            schema: {
-              "x-ts-type": User,
-            },
-          },
-        },
-      },
-    },
-  })
-  async signUp(
-    @requestBody({
-      content: {
-        "application/json": {
-          schema: getModelSchemaRef(NewUserRequest, { title: "NewUser" }),
-        },
-      },
-    })
-    newUserRequest: NewUserRequest,
-  ): Promise<User> {
-    const password = await hash(newUserRequest.password, await genSalt());
-    const savedUser = await this.userRepository.create(
-      _.omit(newUserRequest, "password"),
-    );
-
-    await this.userRepository
-      .userCredentials(savedUser.id)
-      .create({ password });
-
-    return savedUser;
   }
 }
