@@ -1,21 +1,11 @@
 import { TokenService } from "@loopback/authentication";
 import { inject } from "@loopback/core";
-import { model, property, repository } from "@loopback/repository";
+import { repository } from "@loopback/repository";
 import { api, post, requestBody, SchemaObject } from "@loopback/rest";
 import { SecurityBindings, UserProfile } from "@loopback/security";
 import { TokenServiceBindings, UserServiceBindings } from "../keys";
-import { User } from "../models";
 import { UserRepository } from "../repositories";
 import { Credentials, SciChatUserService } from "../services";
-
-@model()
-export class NewUserRequest extends User {
-  @property({
-    type: "string",
-    required: true,
-  })
-  password: string;
-}
 
 const credentialsSchema: SchemaObject = {
   type: "object",
