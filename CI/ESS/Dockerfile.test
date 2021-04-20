@@ -1,24 +1,30 @@
-FROM node:14-alpine
+# Check out https://hub.docker.com/_/node to select a new base image
+FROM node:15-alpine
 
-RUN apk update && apk upgrade && apk add --no-cache git
+RUN apk update && apk upgrade && apk add --no-cache bash git
 
-ENV PORT=3030
-EXPOSE 3030
-
-# Prepare app directory
+# Create app directory (with user `node`)
 WORKDIR /home/node/app
-COPY package*.json /home/node/app/
-COPY .snyk /home/node/app/
-
-# set up local user to avoid running as root
 RUN chown -R node:node /home/node/app
 USER node
 
-# Install our packages
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY --chown=node:node package*.json /home/node/app/
+COPY --chown=node:node .snyk /home/node/app/
 RUN npm ci
 
-# Copy the rest of our application, node_modules is ignored via .dockerignore
-COPY --chown=node:node . /home/node/app
+# Bundle app source code
+COPY --chown=node:node . /home/node/app/
+COPY --chown=node:node CI/ESS/.env /home/node/app/
+COPY --chown=node:node CI/ESS/wait.sh /home/node/app/
+RUN chmod +x /home/node/app/wait.sh
 
-# Start the app
-CMD [ "node", "." ]
+RUN npm run build
+
+# Bind to all network interfaces so that it can be mapped to the host OS
+ENV HOST=0.0.0.0 PORT=3030
+
+EXPOSE ${PORT}
+CMD [ "./wait.sh" ]

@@ -7,7 +7,7 @@ services:
   scichat-loopback:
     build:
       context: .
-      dockerfile: CI/ESS/Dockerfile.unittest
+      dockerfile: CI/ESS/Dockerfile.test
     environment:
       - SYNAPSE_BOT_NAME
       - SYNAPSE_BOT_PASSWORD
