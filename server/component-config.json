@@ -1,6 +1,0 @@
-{
-  "loopback-component-explorer": {
-    "mountPath": "/scichatexplorer",
-    "generateOperationScopedModels": true
-  }
-}
