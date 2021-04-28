@@ -1,6 +1,7 @@
 # SciChat Wrapper API
 
 [![Build Status](https://github.com/SciCatProject/scichat-loopback/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SciCatProject/scichat-loopback/actions)
+[![DeepScan grade](https://deepscan.io/api/teams/8394/projects/16916/branches/371282/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=8394&pid=16916&bid=371282)
 [![Known Vulnerabilities](https://snyk.io/test/github/SciCatProject/scichat-loopback/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/SciCatProject/scichat-loopback/master?targetFile=package.json)
 
 Loopback API for communication between SciChat and Catamel.
