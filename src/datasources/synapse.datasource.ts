@@ -1,9 +1,8 @@
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
 import { juggler } from "@loopback/repository";
 
-const baseURL =
-  process.env.SYNAPSE_SERVER_HOST + "/_matrix/client/r0" ||
-  "https://scitest.esss.lu.se/_matrix/client/r0";
+const synapseHost = process.env.SYNAPSE_SERVER_HOST ?? "";
+const baseURL = synapseHost ? synapseHost + "/_matrix/client/r0" : "";
 
 const config = {
   name: "synapse",
