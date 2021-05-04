@@ -51,7 +51,7 @@ export class ScichatLoopbackApplication extends BootMixin(
             ? 5672
             : +process.env.RABBITMQ_PORT,
         username: process.env.RABBITMQ_USER ?? "rabbitmq",
-        password: process.env.RABBITMQ_PASS ?? "rabbitmq",
+        password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
         vhost: process.env.RABBITMQ_VHOST ?? "/",
       },
     });
