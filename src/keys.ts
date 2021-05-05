@@ -29,3 +29,7 @@ export namespace UserServiceBindings {
   export const USER_CREDENTIALS_REPOSITORY =
     "repositories.UserCredentialsRepository";
 }
+
+export namespace UtilsBindings {
+  export const UTILS = "utils";
+}

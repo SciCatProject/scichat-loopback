@@ -18,8 +18,9 @@ import {
 import path from "path";
 import { MongodbDataSource } from "./datasources";
 import { JWTAuthenticationComponent } from "./jwt-authentication-component";
-import { UserServiceBindings } from "./keys";
+import { UserServiceBindings, UtilsBindings } from "./keys";
 import { MySequence } from "./sequence";
+import { Utils } from "./utils";
 
 export { ApplicationConfig };
 
@@ -81,5 +82,7 @@ export class ScichatLoopbackApplication extends BootMixin(
     this.component(JWTAuthenticationComponent);
     // Bind datasource
     this.dataSource(MongodbDataSource, UserServiceBindings.DATASOURCE_NAME);
+
+    this.bind(UtilsBindings.UTILS).toClass(Utils);
   }
 }
