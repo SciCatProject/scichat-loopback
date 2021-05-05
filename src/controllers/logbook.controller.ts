@@ -99,7 +99,7 @@ export class LogbookController {
 
   constructor(
     @repository(SynapseTokenRepository)
-    public synapseTokenRepositry: SynapseTokenRepository,
+    public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
   ) {}
 
@@ -129,7 +129,7 @@ export class LogbookController {
   async find(): Promise<Logbook[] | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -196,7 +196,7 @@ export class LogbookController {
     do {
       try {
         console.log("Creating new room", { details });
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -261,7 +261,7 @@ export class LogbookController {
   ): Promise<Logbook | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -330,7 +330,7 @@ export class LogbookController {
   ): Promise<{ event_id: string } | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -363,12 +363,12 @@ export class LogbookController {
   async renewAccessToken() {
     try {
       console.log("Requesting new Synapse token");
-      await this.synapseTokenRepositry.deleteAll();
+      await this.synapseTokenRepository.deleteAll();
       const synapseToken = await this.synapseService.login(
         this.username,
         this.password,
       );
-      await this.synapseTokenRepositry.create(synapseToken);
+      await this.synapseTokenRepository.create(synapseToken);
       console.log("Request for new Synapse token successful");
     } catch (err) {
       console.error(err);
