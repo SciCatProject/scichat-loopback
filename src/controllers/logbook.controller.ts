@@ -14,6 +14,7 @@ import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
 import { SynapseTokenRepository } from "../repositories";
 import { SynapseService, SynapseTimelineEvent } from "../services";
+import { Utils } from "../utils";
 
 export type CreateLogbookDetails = {
   name: string;
@@ -99,8 +100,9 @@ export class LogbookController {
 
   constructor(
     @repository(SynapseTokenRepository)
-    public synapseTokenRepositry: SynapseTokenRepository,
+    public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
+    private utils: Utils,
   ) {}
 
   @authenticate("jwt")
@@ -129,7 +131,7 @@ export class LogbookController {
   async find(): Promise<Logbook[] | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -157,7 +159,7 @@ export class LogbookController {
           (err.error.errcode === "M_UNKNOWN_TOKEN" ||
             err.error.errcode === "M_MISSING_TOKEN")
         ) {
-          await this.renewAccessToken();
+          await this.utils.renewAccessToken();
           continue;
         } else {
           console.error(err);
@@ -195,31 +197,15 @@ export class LogbookController {
   ): Promise<{ room_alias: string; room_id: string } | undefined> {
     do {
       try {
-        console.log("Creating new room", { details });
-        const synapseToken = await this.synapseTokenRepositry.findOne({
-          where: { user_id: this.userId },
-        });
-        const accessToken = synapseToken?.access_token;
         const { name, invites } = details;
-        const formattedInvites = invites
-          ? invites.map((user) =>
-              user.startsWith("@") && user.indexOf(":") > 0
-                ? user
-                : `@${user}:${this.serverName}`,
-            )
-          : [];
-        return this.synapseService.createRoom(
-          name,
-          formattedInvites,
-          accessToken,
-        );
+        return await this.utils.createRoom(name, invites);
       } catch (err) {
         if (
           err.error &&
           (err.error.errcode === "M_UNKNOWN_TOKEN" ||
             err.error.errcode === "M_MISSING_TOKEN")
         ) {
-          await this.renewAccessToken();
+          await this.utils.renewAccessToken();
           continue;
         } else {
           console.error(err);
@@ -261,7 +247,7 @@ export class LogbookController {
   ): Promise<Logbook | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -294,7 +280,7 @@ export class LogbookController {
           (err.error.errcode === "M_UNKNOWN_TOKEN" ||
             err.error.errcode === "M_MISSING_TOKEN")
         ) {
-          await this.renewAccessToken();
+          await this.utils.renewAccessToken();
           continue;
         } else {
           console.error(err);
@@ -330,7 +316,7 @@ export class LogbookController {
   ): Promise<{ event_id: string } | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepositry.findOne({
+        const synapseToken = await this.synapseTokenRepository.findOne({
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
@@ -350,7 +336,7 @@ export class LogbookController {
           (err.error.errcode === "M_UNKNOWN_TOKEN" ||
             err.error.errcode === "M_MISSING_TOKEN")
         ) {
-          await this.renewAccessToken();
+          await this.utils.renewAccessToken();
           continue;
         } else {
           console.error(err);
@@ -358,21 +344,6 @@ export class LogbookController {
       }
       break;
     } while (true);
-  }
-
-  async renewAccessToken() {
-    try {
-      console.log("Requesting new Synapse token");
-      await this.synapseTokenRepositry.deleteAll();
-      const synapseToken = await this.synapseService.login(
-        this.username,
-        this.password,
-      );
-      await this.synapseTokenRepositry.create(synapseToken);
-      console.log("Request for new Synapse token successful");
-    } catch (err) {
-      console.error(err);
-    }
   }
 
   createSynapseFilter = (options?: LogbookFilters): string => {

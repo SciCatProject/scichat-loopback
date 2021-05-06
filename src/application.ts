@@ -8,11 +8,19 @@ import {
   RestExplorerComponent,
 } from "@loopback/rest-explorer";
 import { ServiceMixin } from "@loopback/service-proxy";
+import {
+  ConsumersBooter,
+  QueueComponent,
+  RabbitmqBindings,
+  RabbitmqComponent,
+  RabbitmqComponentConfig,
+} from "loopback-rabbitmq";
 import path from "path";
 import { MongodbDataSource } from "./datasources";
 import { JWTAuthenticationComponent } from "./jwt-authentication-component";
-import { UserServiceBindings } from "./keys";
+import { UserServiceBindings, UtilsBindings } from "./keys";
 import { MySequence } from "./sequence";
+import { Utils } from "./utils";
 
 export { ApplicationConfig };
 
@@ -45,11 +53,40 @@ export class ScichatLoopbackApplication extends BootMixin(
       },
     };
 
+    // Set up RabbitMQ
+    const rabbitMqEnabled = process.env.RABBITMQ_ENABLED ?? "no";
+    if (rabbitMqEnabled === "yes") {
+      this.configure<RabbitmqComponentConfig>(RabbitmqBindings.COMPONENT).to({
+        options: {
+          protocol: process.env.RABBITMQ_PROTOCOL ?? "amqp",
+          hostname: process.env.RABBITMQ_HOST ?? "localhost",
+          port:
+            process.env.RABBITMQ_PORT === undefined
+              ? 5672
+              : +process.env.RABBITMQ_PORT,
+          username: process.env.RABBITMQ_USER ?? "rabbitmq",
+          password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
+          vhost: process.env.RABBITMQ_VHOST ?? "/",
+        },
+      });
+      this.component(RabbitmqComponent);
+      this.booters(ConsumersBooter);
+      this.component(QueueComponent);
+
+      this.bootOptions["consumers"] = {
+        dirs: ["consumers"],
+        extensions: [".consumer.js"],
+        nested: true,
+      };
+    }
+
     // Mount authentication system
     this.component(AuthenticationComponent);
     // Mount jwt component
     this.component(JWTAuthenticationComponent);
     // Bind datasource
     this.dataSource(MongodbDataSource, UserServiceBindings.DATASOURCE_NAME);
+
+    this.bind(UtilsBindings.UTILS).toClass(Utils);
   }
 }

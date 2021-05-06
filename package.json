@@ -63,6 +63,7 @@
     "jsonwebtoken": "^8.5.1",
     "loopback-connector-mongodb": "^6.0.0",
     "loopback-connector-rest": "^4.0.1",
+    "loopback-rabbitmq": "^1.1.4",
     "snyk": "^1.519.0",
     "tslib": "^2.0.0"
   },

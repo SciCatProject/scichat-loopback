@@ -7,6 +7,7 @@ import sinon from "sinon";
 import { LogbookController } from "../../controllers";
 import { SynapseTokenRepository } from "../../repositories";
 import { SynapseService } from "../../services";
+import { Utils } from "../../utils";
 import {
   givenAllRoomsSyncResponse,
   givenCreateRoomResponse,
@@ -22,6 +23,7 @@ describe("LogbookController (unit)", () => {
 
   let synapseTokenRepositry: StubbedInstanceWithSinonAccessor<SynapseTokenRepository>;
   let synapseService: SynapseService;
+  let utils: Utils;
   let createRoom: sinon.SinonStub;
   let fetchAllRoomsMessages: sinon.SinonStub;
   let fetchRoomIdByName: sinon.SinonStub;
@@ -95,6 +97,11 @@ describe("LogbookController (unit)", () => {
     sendMessage = synapseService.sendMessage as sinon.SinonStub;
 
     synapseTokenRepositry = createStubInstance(SynapseTokenRepository);
-    controller = new LogbookController(synapseTokenRepositry, synapseService);
+    utils = new Utils(synapseTokenRepositry, synapseService);
+    controller = new LogbookController(
+      synapseTokenRepositry,
+      synapseService,
+      utils,
+    );
   }
 });
