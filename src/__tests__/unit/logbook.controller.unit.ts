@@ -23,7 +23,7 @@ describe("LogbookController (unit)", () => {
 
   let synapseTokenRepositry: StubbedInstanceWithSinonAccessor<SynapseTokenRepository>;
   let synapseService: SynapseService;
-  let utils: StubbedInstanceWithSinonAccessor<Utils>;
+  let utils: Utils;
   let createRoom: sinon.SinonStub;
   let fetchAllRoomsMessages: sinon.SinonStub;
   let fetchRoomIdByName: sinon.SinonStub;
@@ -97,7 +97,7 @@ describe("LogbookController (unit)", () => {
     sendMessage = synapseService.sendMessage as sinon.SinonStub;
 
     synapseTokenRepositry = createStubInstance(SynapseTokenRepository);
-    utils = createStubInstance(Utils);
+    utils = new Utils(synapseTokenRepositry, synapseService);
     controller = new LogbookController(
       synapseTokenRepositry,
       synapseService,
