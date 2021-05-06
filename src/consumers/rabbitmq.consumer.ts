@@ -9,8 +9,12 @@ interface Message {
 }
 
 export class RabbitMQConsumer {
+  rabbitMqEnabled: string = process.env.RABBITMQ_ENABLED ?? "no";
+
   constructor(@inject("utils") protected utils: Utils) {
-    console.log("Starting RabbitMQ Consumer");
+    if (this.rabbitMqEnabled === "yes") {
+      console.log("Starting RabbitMQ Consumer");
+    }
   }
 
   @rabbitConsume({
@@ -42,6 +46,8 @@ export class RabbitMQConsumer {
         }
         break;
       } while (true);
+    } else {
+      console.log("Message: ", message);
     }
   }
 }

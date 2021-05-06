@@ -42,32 +42,9 @@ export class ScichatLoopbackApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
 
-    // Set up RabbitMQ
-    this.configure<RabbitmqComponentConfig>(RabbitmqBindings.COMPONENT).to({
-      options: {
-        protocol: process.env.RABBITMQ_PROTOCOL ?? "amqp",
-        hostname: process.env.RABBITMQ_HOST ?? "localhost",
-        port:
-          process.env.RABBITMQ_PORT === undefined
-            ? 5672
-            : +process.env.RABBITMQ_PORT,
-        username: process.env.RABBITMQ_USER ?? "rabbitmq",
-        password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
-        vhost: process.env.RABBITMQ_VHOST ?? "/",
-      },
-    });
-    this.component(RabbitmqComponent);
-    this.booters(ConsumersBooter);
-    this.component(QueueComponent);
-
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
-      consumers: {
-        dirs: ["consumers"],
-        extensions: [".consumer.js"],
-        nested: true,
-      },
       controllers: {
         // Customize ControllerBooter Conventions here
         dirs: ["controllers"],
@@ -75,6 +52,33 @@ export class ScichatLoopbackApplication extends BootMixin(
         nested: true,
       },
     };
+
+    // Set up RabbitMQ
+    const rabbitMqEnabled = process.env.RABBITMQ_ENABLED ?? "no";
+    if (rabbitMqEnabled === "yes") {
+      this.configure<RabbitmqComponentConfig>(RabbitmqBindings.COMPONENT).to({
+        options: {
+          protocol: process.env.RABBITMQ_PROTOCOL ?? "amqp",
+          hostname: process.env.RABBITMQ_HOST ?? "localhost",
+          port:
+            process.env.RABBITMQ_PORT === undefined
+              ? 5672
+              : +process.env.RABBITMQ_PORT,
+          username: process.env.RABBITMQ_USER ?? "rabbitmq",
+          password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
+          vhost: process.env.RABBITMQ_VHOST ?? "/",
+        },
+      });
+      this.component(RabbitmqComponent);
+      this.booters(ConsumersBooter);
+      this.component(QueueComponent);
+
+      this.bootOptions["consumers"] = {
+        dirs: ["consumers"],
+        extensions: [".consumer.js"],
+        nested: true,
+      };
+    }
 
     // Mount authentication system
     this.component(AuthenticationComponent);
