@@ -12,7 +12,7 @@ Loopback API for communication between SciChat and Catamel.
 1. `git clone https://github.com/SciCatProject/scichat-loopback.git`
 2. `npm install`
 3. Add *.env* file to project root folder. Valid env varaibles:
-   
+
    - `JWT_SECRET` [string] The secret for your JWT token, used for authorization.
    - `JWT_EXPIRES_IN` [string] How long, in seconds, the JWT token is valid.
    - `MONGODB_HOST` [string] The hostname/URL of your MongoDB.
@@ -21,6 +21,16 @@ Loopback API for communication between SciChat and Catamel.
    - `MONGODB_USER` [string] Username for the MongoDB user. Leave out or set to empty string if you don't have MongoDB authorization set up.
    - `MONGODB_PASSWORD` [string] Password for the MongoDB user. Leave out or set to empty string if you don't have MongoDB authorization set up.
    - `PORT` [number] The port that this service should be exposed on. Defaults to `3000` if value is not set.
+   - `RABBITMQ_ENABLED` [string] Toggles RabbitMQ consumer. Valid values are `"yes"` and `"no"`. Defaults to `"no"`.
+   - `RABBITMQ_PROTOCOL` [string] The RabbitMQ protocol. Defaults to `"amqp"`.
+   - `RABBITMQ_HOST` [string] The hostname/URL of your RabbitMQ. Defaults to `"localhost"`.
+   - `RABBITMQ_PORT` [number] The port used to access RabbitMQ. Defaults to `5672`.
+   - `RABBITMQ_USER` [string] Username of the RabbitMQ user.
+   - `RABBITMQ_PASSWORD` [string] Password of the RabbitMQ user.
+   - `RABBITMQ_VHOST` [string] The vhost of your RabbitMQ. Defaults to `"/"`.
+   - `RABBITMQ_EXCHANGE` [string] The RabbitMQ exchange. Defaults to `"amq.direct"`.
+   - `RABBITMQ_ROUTING_KEY` [string] The RabbitMQ routing key.
+   - `RABBITMQ_QUEUE` [string] The queue that the RabbitMQ consumer should listen to.
    - `SCICHAT_USER` [string] The username of the user for this service. The app will create a user account with this username if this is the first time you run the app. If this is value is not set, the app will not start.
    - `SCICHAT_PASSWORD` [string] The password of the user for this service. The app will create a user account with this password if this is the first time you run the app.
    - `SYNAPSE_SERVER_NAME` [string] The name of of your Synapse server.
