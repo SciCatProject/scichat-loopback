@@ -102,7 +102,7 @@ export class LogbookController {
     @repository(SynapseTokenRepository)
     public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
-    private utils: Utils,
+    @inject("utils") protected utils: Utils,
   ) {}
 
   @authenticate("jwt")
