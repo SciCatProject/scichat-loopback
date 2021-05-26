@@ -6,6 +6,13 @@ import { SynapseToken } from "../models";
 
 export interface SynapseService {
   login(username: string, password: string): Promise<SynapseToken>;
+  searchUser(
+    username: string,
+    accessToken: string | undefined,
+  ): Promise<{
+    limited: boolean;
+    results: [{ user_id: string; display_name: string; avatar_url: string }];
+  }>;
   createRoom(
     name: string,
     invites: string[],
