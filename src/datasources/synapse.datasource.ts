@@ -34,6 +34,23 @@ const config = {
     {
       template: {
         method: "POST",
+        url: baseURL + "/user_directory/search",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: "Bearer {!accessToken:string}",
+        },
+        body: {
+          search_term: "{!username:string}",
+        },
+      },
+      functions: {
+        searchUser: ["username", "accessToken"],
+      },
+    },
+    {
+      template: {
+        method: "POST",
         url: baseURL + "/createRoom",
         headers: {
           accept: "application/json",
