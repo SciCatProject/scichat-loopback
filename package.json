@@ -59,7 +59,7 @@
     "@loopback/rest-explorer": "^3.3.0",
     "@loopback/service-proxy": "^3.1.0",
     "bcryptjs": "^2.4.3",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
     "loopback-connector-mongodb": "^6.0.0",
     "loopback-connector-rest": "^4.0.1",
