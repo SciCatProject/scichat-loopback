@@ -123,6 +123,24 @@ const config = {
         fetchAllRoomsMessages: ["filter", "accessToken"],
       },
     },
+    {
+      template: {
+        method: "PUT",
+        url: baseURL + "/_synapse/admin/v2/users/{!userId:string}",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: "Bearer {!accessToken:string}",
+        },
+        body: {
+          password: "{!password:string}",
+          displayName: "{!username:string}",
+        },
+      },
+      functions: {
+        createUser: ["userId", "username", "password", "accessToken"],
+      },
+    },
   ],
 };
 
