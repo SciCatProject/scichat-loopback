@@ -57,3 +57,25 @@ export interface SynapseSyncResponse {
   device_one_time_keys_count: object;
   next_batch: string;
 }
+
+export interface ThreePid {
+  medium: string;
+  address: string;
+}
+
+export interface SynapseCreateUserResponse {
+  name: string;
+  password_hash: string;
+  is_guest: number;
+  admin: number;
+  consent_version: string;
+  consent_server_notice_sent: string;
+  appservice_id: string;
+  creation_ts: number;
+  user_type: string;
+  deactivated: number;
+  shadow_banned: boolean;
+  displayname: string;
+  avatar_url: string;
+  threepids: ThreePid[];
+}

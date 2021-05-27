@@ -89,6 +89,7 @@ describe("LogbookController (unit)", () => {
       fetchRoomIdByName: sinon.stub(),
       fetchRoomMessages: sinon.stub(),
       sendMessage: sinon.stub(),
+      createUser: sinon.stub(),
     };
 
     createRoom = synapseService.createRoom as sinon.SinonStub;

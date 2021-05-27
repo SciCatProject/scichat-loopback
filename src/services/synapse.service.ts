@@ -1,6 +1,6 @@
 import { inject, Provider } from "@loopback/core";
 import { getService } from "@loopback/service-proxy";
-import { SynapseSyncResponse } from ".";
+import { SynapseCreateUserResponse, SynapseSyncResponse } from ".";
 import { SynapseDataSource } from "../datasources";
 import { SynapseToken } from "../models";
 
@@ -34,6 +34,12 @@ export interface SynapseService {
     message: string,
     accessToken: string | undefined,
   ): Promise<{ event_id: string }>;
+  createUser(
+    userId: string,
+    username: string,
+    password: string,
+    accessToken: string | undefined,
+  ): Promise<SynapseCreateUserResponse>;
 }
 
 export class SynapseProvider implements Provider<SynapseService> {
