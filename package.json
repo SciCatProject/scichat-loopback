@@ -61,7 +61,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
-    "loopback-connector-mongodb": "^6.0.0",
+    "loopback-connector-mongodb": "^6.0.1",
     "loopback-connector-rest": "^4.0.1",
     "loopback-rabbitmq": "^1.1.5",
     "snyk": "^1.584.0",
