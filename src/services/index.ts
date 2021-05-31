@@ -63,7 +63,7 @@ export interface ThreePid {
   address: string;
 }
 
-export interface SynapseCreateUserResponse {
+export interface SynapseAdminUserResponse {
   name: string;
   password_hash: string;
   is_guest: number;

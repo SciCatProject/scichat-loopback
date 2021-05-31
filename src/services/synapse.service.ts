@@ -1,18 +1,11 @@
 import { inject, Provider } from "@loopback/core";
 import { getService } from "@loopback/service-proxy";
-import { SynapseCreateUserResponse, SynapseSyncResponse } from ".";
+import { SynapseAdminUserResponse, SynapseSyncResponse } from ".";
 import { SynapseDataSource } from "../datasources";
 import { SynapseToken } from "../models";
 
 export interface SynapseService {
   login(username: string, password: string): Promise<SynapseToken>;
-  searchUser(
-    username: string,
-    accessToken: string | undefined,
-  ): Promise<{
-    limited: boolean;
-    results: [{ user_id: string; display_name: string; avatar_url: string }];
-  }>;
   createRoom(
     name: string,
     invites: string[],
@@ -34,12 +27,16 @@ export interface SynapseService {
     message: string,
     accessToken: string | undefined,
   ): Promise<{ event_id: string }>;
+  queryUser(
+    userId: string,
+    accessToken: string | undefined,
+  ): Promise<SynapseAdminUserResponse>;
   createUser(
     userId: string,
     username: string,
     password: string,
     accessToken: string | undefined,
-  ): Promise<SynapseCreateUserResponse>;
+  ): Promise<SynapseAdminUserResponse>;
 }
 
 export class SynapseProvider implements Provider<SynapseService> {

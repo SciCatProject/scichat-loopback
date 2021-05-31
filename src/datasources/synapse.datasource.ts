@@ -33,23 +33,6 @@ const config = {
     {
       template: {
         method: "POST",
-        url: baseURL + "/_matrix/client/r0/user_directory/search",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          Authorization: "Bearer {!accessToken:string}",
-        },
-        body: {
-          search_term: "{!username:string}",
-        },
-      },
-      functions: {
-        searchUser: ["username", "accessToken"],
-      },
-    },
-    {
-      template: {
-        method: "POST",
         url: baseURL + "/_matrix/client/r0/createRoom",
         headers: {
           accept: "application/json",
@@ -121,6 +104,20 @@ const config = {
       functions: {
         fetchRoomMessages: ["filter", "accessToken"],
         fetchAllRoomsMessages: ["filter", "accessToken"],
+      },
+    },
+    {
+      template: {
+        method: "GET",
+        url: baseURL + "/_synapse/admin/v2/users/{!userId:string}",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: "Bearer {!accessToken:string}",
+        },
+      },
+      functions: {
+        queryUser: ["userId", "accessToken"],
       },
     },
     {

@@ -83,12 +83,12 @@ describe("LogbookController (unit)", () => {
   function givenMockSynapseServiceAndRepository() {
     synapseService = {
       login: sinon.stub(),
-      searchUser: sinon.stub(),
       createRoom: sinon.stub(),
       fetchAllRoomsMessages: sinon.stub(),
       fetchRoomIdByName: sinon.stub(),
       fetchRoomMessages: sinon.stub(),
       sendMessage: sinon.stub(),
+      queryUser: sinon.stub(),
       createUser: sinon.stub(),
     };
 
