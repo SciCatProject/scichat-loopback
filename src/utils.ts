@@ -1,13 +1,15 @@
 import { inject } from "@loopback/core";
 import { repository } from "@loopback/repository";
+import { Member } from "./consumers";
 import { SynapseTokenRepository } from "./repositories";
-import { SynapseService } from "./services";
+import { SynapseAdminUserResponse, SynapseService } from "./services";
 
 export class Utils {
   username = process.env.SYNAPSE_BOT_NAME ?? "";
   password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
   userId = `@${this.username}:${this.serverName}`;
+  defaultPassword = process.env.DEFAULT_PASSWORD ?? "";
 
   constructor(
     @repository(SynapseTokenRepository)
@@ -38,6 +40,51 @@ export class Utils {
     );
   }
 
+  async createUser(user: Member): Promise<SynapseAdminUserResponse> {
+    const synapseToken = await this.synapseTokenRepository.findOne({
+      where: { user_id: this.userId },
+    });
+    const accessToken = synapseToken?.access_token;
+
+    const username = user.firstName.toLowerCase() + user.lastName.toLowerCase();
+    const userId = `@${username}:${this.serverName}`;
+    const password = this.defaultPassword;
+    return this.synapseService.createUser(
+      userId,
+      username,
+      password,
+      accessToken,
+    );
+  }
+
+  async membersToCreate(members: Member[]): Promise<Member[]> {
+    const synapseToken = await this.synapseTokenRepository.findOne({
+      where: { user_id: this.userId },
+    });
+    const accessToken = synapseToken?.access_token;
+    const queriedMembers = await Promise.all(
+      members.map(async (member) => {
+        const username =
+          member.firstName.toLowerCase() + member.lastName.toLowerCase();
+        const userId = `@${username}:${this.serverName}`;
+        try {
+          await this.synapseService.queryUser(userId, accessToken);
+          console.log(`User ${username} already exists`);
+          return null;
+        } catch (err) {
+          const errMessage = JSON.parse(err.message);
+          if (errMessage.errcode && errMessage.errcode === "M_NOT_FOUND") {
+            return member;
+          } else {
+            console.error(err);
+            return null;
+          }
+        }
+      }),
+    );
+    return queriedMembers.filter(notEmpty);
+  }
+
   async renewAccessToken() {
     try {
       console.log("Requesting new Synapse token");
@@ -52,4 +99,11 @@ export class Utils {
       console.error(err);
     }
   }
+}
+
+function notEmpty<T>(value: T | null | undefined): value is T {
+  if (value === null || value === undefined) {
+    return false;
+  }
+  return true;
 }

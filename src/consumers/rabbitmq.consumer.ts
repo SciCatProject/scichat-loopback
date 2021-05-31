@@ -1,12 +1,7 @@
 import { inject } from "@loopback/context";
-import { rabbitConsume } from "loopback-rabbitmq";
+import { ConsumeMessage, rabbitConsume } from "loopback-rabbitmq";
+import { Member, ProposalAcceptedMessage } from ".";
 import { Utils } from "../utils";
-
-interface Message {
-  queue: string;
-  type: string;
-  msg: string;
-}
 
 export class RabbitMQConsumer {
   rabbitMqEnabled: string = process.env.RABBITMQ_ENABLED ?? "no";
@@ -22,15 +17,31 @@ export class RabbitMQConsumer {
     routingKey: process.env.RABBITMQ_ROUTING_KEY ?? "tenant.webhook",
     queue: process.env.RABBITMQ_QUEUE ?? "webhooks",
   })
-  async handle(message: Message) {
-    if (message.type === "PROPOSAL_ACCEPTED") {
-      console.log("RabbitMQ received message: ", message);
-      const parsedMsg = JSON.parse(message.msg);
-      const name = parsedMsg.proposalId;
-      const invites = parsedMsg.invites;
+  async handle(message: ProposalAcceptedMessage, rawMessage: ConsumeMessage) {
+    if (rawMessage.properties.type === "PROPOSAL_ACCEPTED") {
+      console.log("PROPOSAL_ACCEPTED: ", message);
+
+      const members: Member[] = message.members;
+      if (message.proposer) {
+        members.push(message.proposer);
+      }
+
       do {
         try {
-          const logbookDetails = this.utils.createRoom(name, invites);
+          const membersToCreate = await this.utils.membersToCreate(members);
+          await Promise.all(
+            membersToCreate.map(async (member) =>
+              this.utils.createUser(member),
+            ),
+          );
+          const invites = members.map(
+            (member) =>
+              member.firstName.toLowerCase() + member.lastName.toLowerCase(),
+          );
+          const logbookDetails = await this.utils.createRoom(
+            message.shortCode,
+            invites,
+          );
           console.log("Room created with details: ", logbookDetails);
         } catch (err) {
           if (
@@ -46,8 +57,6 @@ export class RabbitMQConsumer {
         }
         break;
       } while (true);
-    } else {
-      console.log("Message: ", message);
     }
   }
 }

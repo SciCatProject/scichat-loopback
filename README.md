@@ -52,6 +52,7 @@ Valid environment variables for the *.env* file.
 - `RABBITMQ_EXCHANGE` [string] The RabbitMQ exchange. Defaults to `"amq.direct"`.
 - `RABBITMQ_ROUTING_KEY` [string] The RabbitMQ routing key.
 - `RABBITMQ_QUEUE` [string] The queue that the RabbitMQ consumer should listen to.
+- `DEFAULT_PASSWORD` [string] The default password for new SciChat users created from the RabbitMQ message queue
 
 ### Synapse
 
