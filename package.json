@@ -51,20 +51,20 @@
     "!*/__tests__"
   ],
   "dependencies": {
-    "@loopback/authentication": "^7.1.0",
+    "@loopback/authentication": "^7.3.0",
     "@loopback/boot": "^3.4.0",
     "@loopback/core": "^2.16.0",
     "@loopback/repository": "^3.6.0",
-    "@loopback/rest": "^9.2.0",
+    "@loopback/rest": "^9.3.0",
     "@loopback/rest-explorer": "^3.3.0",
-    "@loopback/service-proxy": "^3.1.0",
+    "@loopback/service-proxy": "^3.2.0",
     "bcryptjs": "^2.4.3",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
-    "loopback-connector-mongodb": "^6.0.0",
+    "loopback-connector-mongodb": "^6.0.1",
     "loopback-connector-rest": "^4.0.1",
-    "loopback-rabbitmq": "^1.1.4",
-    "snyk": "^1.574.0",
+    "loopback-rabbitmq": "^1.1.5",
+    "snyk": "^1.586.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
