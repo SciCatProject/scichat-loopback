@@ -64,7 +64,7 @@
     "loopback-connector-mongodb": "^6.0.1",
     "loopback-connector-rest": "^4.0.1",
     "loopback-rabbitmq": "^1.1.5",
-    "snyk": "^1.605.0",
+    "snyk": "^1.606.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
