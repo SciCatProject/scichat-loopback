@@ -72,7 +72,7 @@ export class ScichatLoopbackApplication extends BootMixin(
         },
         exchanges: [
           {
-            name: "useroffice.fanout",
+            name: process.env.RABBITMQ_EXCHANGE ?? "amq.fanout",
             type: "fanout",
             options: {
               [deadLetterExchange]: {
