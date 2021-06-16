@@ -16,6 +16,11 @@ export class RabbitMQConsumer {
     exchange: process.env.RABBITMQ_EXCHANGE ?? "amq.direct",
     routingKey: process.env.RABBITMQ_ROUTING_KEY ?? "tenant.webhook",
     queue: process.env.RABBITMQ_QUEUE ?? "webhooks",
+    queueOptions: {
+      [`DL__${process.env.RABBITMQ_QUEUE ?? "webhooks"}`]: {
+        durable: true,
+      },
+    },
   })
   async handle(message: ProposalAcceptedMessage, rawMessage: ConsumeMessage) {
     if (rawMessage.properties.type === "PROPOSAL_ACCEPTED") {

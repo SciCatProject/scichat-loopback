@@ -56,6 +56,8 @@ export class ScichatLoopbackApplication extends BootMixin(
     // Set up RabbitMQ
     const rabbitMqEnabled = process.env.RABBITMQ_ENABLED ?? "no";
     if (rabbitMqEnabled === "yes") {
+      const queue = process.env.RABBITMQ_QUEUE ?? "webhooks";
+      const deadLetterExchange = `DLX__${queue}`;
       this.configure<RabbitmqComponentConfig>(RabbitmqBindings.COMPONENT).to({
         options: {
           protocol: process.env.RABBITMQ_PROTOCOL ?? "amqp",
@@ -68,6 +70,17 @@ export class ScichatLoopbackApplication extends BootMixin(
           password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
           vhost: process.env.RABBITMQ_VHOST ?? "/",
         },
+        exchanges: [
+          {
+            name: "useroffice.fanout",
+            type: "fanout",
+            options: {
+              [deadLetterExchange]: {
+                durable: true,
+              },
+            },
+          },
+        ],
       });
       this.component(RabbitmqComponent);
       this.booters(ConsumersBooter);
