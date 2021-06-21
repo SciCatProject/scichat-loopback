@@ -1,6 +1,6 @@
 import { inject } from "@loopback/core";
 import { repository } from "@loopback/repository";
-import { Member } from "./consumers";
+import { Member } from ".";
 import { SynapseTokenRepository } from "./repositories";
 import { SynapseAdminUserResponse, SynapseService } from "./services";
 

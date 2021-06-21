@@ -8,13 +8,6 @@ import {
   RestExplorerComponent,
 } from "@loopback/rest-explorer";
 import { ServiceMixin } from "@loopback/service-proxy";
-import {
-  ConsumersBooter,
-  QueueComponent,
-  RabbitmqBindings,
-  RabbitmqComponent,
-  RabbitmqComponentConfig,
-} from "loopback-rabbitmq";
 import path from "path";
 import { MongodbDataSource } from "./datasources";
 import { JWTAuthenticationComponent } from "./jwt-authentication-component";
@@ -52,46 +45,6 @@ export class ScichatLoopbackApplication extends BootMixin(
         nested: true,
       },
     };
-
-    // Set up RabbitMQ
-    const rabbitMqEnabled = process.env.RABBITMQ_ENABLED ?? "no";
-    if (rabbitMqEnabled === "yes") {
-      const queue = process.env.RABBITMQ_QUEUE ?? "webhooks";
-      const deadLetterExchange = `DLX__${queue}`;
-      this.configure<RabbitmqComponentConfig>(RabbitmqBindings.COMPONENT).to({
-        options: {
-          protocol: process.env.RABBITMQ_PROTOCOL ?? "amqp",
-          hostname: process.env.RABBITMQ_HOST ?? "localhost",
-          port:
-            process.env.RABBITMQ_PORT === undefined
-              ? 5672
-              : +process.env.RABBITMQ_PORT,
-          username: process.env.RABBITMQ_USER ?? "rabbitmq",
-          password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
-          vhost: process.env.RABBITMQ_VHOST ?? "/",
-        },
-        exchanges: [
-          {
-            name: process.env.RABBITMQ_EXCHANGE ?? "amq.fanout",
-            type: "fanout",
-            options: {
-              [deadLetterExchange]: {
-                durable: true,
-              },
-            },
-          },
-        ],
-      });
-      this.component(RabbitmqComponent);
-      this.booters(ConsumersBooter);
-      this.component(QueueComponent);
-
-      this.bootOptions["consumers"] = {
-        dirs: ["consumers"],
-        extensions: [".consumer.js"],
-        nested: true,
-      };
-    }
 
     // Mount authentication system
     this.component(AuthenticationComponent);
