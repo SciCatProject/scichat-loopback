@@ -43,15 +43,9 @@ Valid environment variables for the *.env* file.
 ### RabbitMQ
 
 - `RABBITMQ_ENABLED` [string] Toggles RabbitMQ consumer. Valid values are `"yes"` and `"no"`. Defaults to `"no"`.
-- `RABBITMQ_PROTOCOL` [string] The RabbitMQ protocol. Defaults to `"amqp"`.
 - `RABBITMQ_HOST` [string] The hostname/URL of your RabbitMQ. Defaults to `"localhost"`.
-- `RABBITMQ_PORT` [number] The port used to access RabbitMQ. Defaults to `5672`.
 - `RABBITMQ_USER` [string] Username of the RabbitMQ user.
 - `RABBITMQ_PASSWORD` [string] Password of the RabbitMQ user.
-- `RABBITMQ_VHOST` [string] The vhost of your RabbitMQ. Defaults to `"/"`.
-- `RABBITMQ_EXCHANGE` [string] The RabbitMQ exchange. Defaults to `"amq.direct"`.
-- `RABBITMQ_ROUTING_KEY` [string] The RabbitMQ routing key.
-- `RABBITMQ_QUEUE` [string] The queue that the RabbitMQ consumer should listen to.
 - `DEFAULT_PASSWORD` [string] The default password for new SciChat users created from the RabbitMQ message queue
 
 ### Synapse
