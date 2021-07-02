@@ -55,7 +55,7 @@
     "@loopback/authentication": "^7.3.0",
     "@loopback/boot": "^3.4.0",
     "@loopback/core": "^2.16.1",
-    "@loopback/repository": "^3.6.0",
+    "@loopback/repository": "^3.7.0",
     "@loopback/rest": "^9.3.0",
     "@loopback/rest-explorer": "^3.3.0",
     "@loopback/service-proxy": "^3.2.0",
