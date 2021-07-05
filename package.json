@@ -65,7 +65,7 @@
     "loopback-connector-mongodb": "^6.0.1",
     "loopback-connector-rest": "^4.0.1",
     "snyk": "^1.630.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@loopback/build": "^6.3.0",
