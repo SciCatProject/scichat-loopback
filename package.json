@@ -54,18 +54,18 @@
     "@esss-swap/duo-message-broker": "^1.0.5",
     "@loopback/authentication": "^7.3.2",
     "@loopback/boot": "^3.4.2",
-    "@loopback/core": "^2.16.1",
+    "@loopback/core": "^2.16.2",
     "@loopback/repository": "^3.7.1",
     "@loopback/rest": "^9.3.1",
     "@loopback/rest-explorer": "^3.3.2",
-    "@loopback/service-proxy": "^3.2.1",
+    "@loopback/service-proxy": "^3.2.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
     "loopback-connector-mongodb": "^6.0.1",
     "loopback-connector-rest": "^4.0.1",
     "snyk": "^1.680.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@loopback/build": "^6.3.0",
