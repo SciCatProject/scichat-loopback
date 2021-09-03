@@ -58,7 +58,7 @@
     "@loopback/repository": "^3.7.1",
     "@loopback/rest": "^9.3.1",
     "@loopback/rest-explorer": "^3.3.2",
-    "@loopback/service-proxy": "^3.2.1",
+    "@loopback/service-proxy": "^3.2.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
