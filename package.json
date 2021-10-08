@@ -52,7 +52,7 @@
   ],
   "dependencies": {
     "@esss-swap/duo-message-broker": "^1.0.6",
-    "@loopback/authentication": "^7.3.2",
+    "@loopback/authentication": "^7.3.3",
     "@loopback/boot": "^3.4.2",
     "@loopback/core": "^2.16.2",
     "@loopback/repository": "^3.7.1",
