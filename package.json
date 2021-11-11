@@ -64,7 +64,7 @@
     "jsonwebtoken": "^8.5.1",
     "loopback-connector-mongodb": "^6.1.0",
     "loopback-connector-rest": "^4.0.1",
-    "snyk": "^1.737.0",
+    "snyk": "^1.742.0",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
