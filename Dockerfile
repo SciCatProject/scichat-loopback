@@ -1,4 +1,4 @@
-FROM node:15-alpine
+FROM node:16-alpine
 
 # Prepare app directory
 WORKDIR /home/node/app
