@@ -1,4 +1,4 @@
-import { Queue, RabbitMQMessageBroker } from "@esss-swap/duo-message-broker";
+import { RabbitMQMessageBroker } from "@esss-swap/duo-message-broker";
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
 import { Member, ProposalAcceptedMessage } from "..";
 import { Utils } from "../utils";
@@ -33,7 +33,7 @@ export class RabbitMqObserver implements LifeCycleObserver {
         password: process.env.RABBITMQ_PASSWORD ?? "rabbitmq",
       });
 
-      rabbitMq.listenOn(Queue.PROPOSAL, async (type, message: unknown) => {
+      await rabbitMq.listenOnBroadcast(async (type, message: unknown) => {
         if (type === "PROPOSAL_ACCEPTED") {
           console.log("PROPOSAL_ACCEPTED", message);
           const proposalAcceptedMessage = message as ProposalAcceptedMessage;
