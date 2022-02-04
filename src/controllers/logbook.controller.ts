@@ -141,7 +141,7 @@ export class LogbookController {
           filter,
           accessToken,
         );
-        return Object.keys(rooms.join)
+        const logbooks = Object.keys(rooms.join)
           .map(
             (roomId) =>
               new Logbook({
@@ -153,6 +153,7 @@ export class LogbookController {
               }),
           )
           .filter((room) => room.roomId && room.name && room.messages);
+        return logbooks.map((logbook) => this.formatImageUrls(logbook));
       } catch (err) {
         if (
           err.error &&
@@ -273,7 +274,8 @@ export class LogbookController {
         const events: SynapseTimelineEvent[] =
           rooms.join[roomId].timeline.events;
         const messages = this.filterMessages(events, logbookFilter);
-        return new Logbook({ roomId, name, messages });
+        const logbook = new Logbook({ roomId, name, messages });
+        return this.formatImageUrls(logbook);
       } catch (err) {
         if (
           err.error &&
@@ -393,5 +395,29 @@ export class LogbookController {
       }
     }
     return messages;
+  };
+
+  formatImageUrls = (logbook: Logbook): Logbook => {
+    if (logbook?.messages) {
+      logbook.messages.forEach((message) => {
+        if (message.content.msgtype === "m.image") {
+          if (message.content.info?.thumbnail_url) {
+            const externalThumbnailUrl = message.content.info.thumbnail_url.replace(
+              "mxc://",
+              `${process.env.SYNAPSE_SERVER_HOST}/_matrix/media/r0/download/`,
+            );
+            message.content.info.thumbnail_url = externalThumbnailUrl;
+          }
+          if (message.content.url) {
+            const externalFullsizeUrl = message.content.url.replace(
+              "mxc://",
+              `${process.env.SYNAPSE_SERVER_HOST}/_matrix/media/r0/download/`,
+            );
+            message.content.url = externalFullsizeUrl;
+          }
+        }
+      });
+    }
+    return logbook;
   };
 }
