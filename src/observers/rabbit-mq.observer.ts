@@ -1,5 +1,5 @@
-import { RabbitMQMessageBroker } from "@esss-swap/duo-message-broker";
 import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
+import { RabbitMQMessageBroker } from "@user-office-software/duo-message-broker";
 import { Member, ProposalAcceptedMessage } from "..";
 import { Utils } from "../utils";
 
