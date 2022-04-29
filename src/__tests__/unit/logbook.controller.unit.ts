@@ -93,7 +93,8 @@ describe("LogbookController (unit)", () => {
     };
 
     createRoom = synapseService.createRoom as sinon.SinonStub;
-    fetchAllRoomsMessages = synapseService.fetchAllRoomsMessages as sinon.SinonStub;
+    fetchAllRoomsMessages =
+      synapseService.fetchAllRoomsMessages as sinon.SinonStub;
     fetchRoomIdByName = synapseService.fetchRoomIdByName as sinon.SinonStub;
     fetchRoomMessages = synapseService.fetchRoomMessages as sinon.SinonStub;
     sendMessage = synapseService.sendMessage as sinon.SinonStub;

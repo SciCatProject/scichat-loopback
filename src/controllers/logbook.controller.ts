@@ -402,10 +402,11 @@ export class LogbookController {
       logbook.messages.forEach((message) => {
         if (message.content.msgtype === "m.image") {
           if (message.content.info?.thumbnail_url) {
-            const externalThumbnailUrl = message.content.info.thumbnail_url.replace(
-              "mxc://",
-              `${process.env.SYNAPSE_SERVER_HOST}/_matrix/media/r0/download/`,
-            );
+            const externalThumbnailUrl =
+              message.content.info.thumbnail_url.replace(
+                "mxc://",
+                `${process.env.SYNAPSE_SERVER_HOST}/_matrix/media/r0/download/`,
+              );
             message.content.info.thumbnail_url = externalThumbnailUrl;
           }
           if (message.content.url) {
