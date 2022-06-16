@@ -53,9 +53,9 @@
   "dependencies": {
     "@loopback/authentication": "^7.3.4",
     "@loopback/boot": "^3.4.4",
-    "@loopback/core": "^2.18.0",
+    "@loopback/core": "^3.1.2",
     "@loopback/repository": "^3.7.3",
-    "@loopback/rest": "^9.3.1",
+    "@loopback/rest": "^11.1.2",
     "@loopback/rest-explorer": "^4.1.2",
     "@loopback/service-proxy": "^3.2.4",
     "@snyk/protect": "^1.939.0",
