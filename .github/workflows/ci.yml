@@ -38,17 +38,6 @@ jobs:
         run: |
           cp CI/ESS/Dockerfile.e2e ./Dockerfile
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ghcr.io/scicatproject/scichat-loopback
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=e2e,enable={{is_default_branch}}
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -68,7 +57,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/scicatproject/scichat-loopback:e2e
 
   buildprod:
     name: Build Docker image
