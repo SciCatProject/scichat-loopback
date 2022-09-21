@@ -2,6 +2,7 @@ import {Queue, RabbitMQMessageBroker} from "@esss-swap/duo-message-broker";
 import {genSalt, hash} from "bcryptjs";
 import {ApplicationConfig, ScichatLoopbackApplication} from "./application";
 import {UserRepository} from "./repositories";
+import {UserOffice} from "./useroffice";
 import {Utils} from "./utils";
 
 export * from "./application";
@@ -60,6 +61,7 @@ export async function main(options: ApplicationConfig = {}) {
   const rabbitMqEnabled = process.env.RABBITMQ_ENABLED ?? "no";
   if (rabbitMqEnabled === "yes") {
     const rabbitMq = new RabbitMQMessageBroker();
+    const userOffice = new UserOffice();
 
     await rabbitMq.setup({
       hostname: process.env.RABBITMQ_HOST ?? "localhost",
