@@ -1,4 +1,7 @@
-import { Queue, RabbitMQMessageBroker } from "@esss-swap/duo-message-broker";
+import {
+  Queue,
+  RabbitMQMessageBroker,
+} from "@user-office-software/duo-message-broker";
 import { genSalt, hash } from "bcryptjs";
 import { ApplicationConfig, ScichatLoopbackApplication } from "./application";
 import { UserRepository } from "./repositories";
