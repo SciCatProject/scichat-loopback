@@ -33,11 +33,7 @@ export class Utils {
         )
       : [];
     console.log("Creating new room", { name, invites });
-    return await this.synapseService.createRoom(
-      name,
-      formattedInvites,
-      accessToken,
-    );
+    return this.synapseService.createRoom(name, formattedInvites, accessToken);
   }
 
   async createUser(user: Member): Promise<SynapseAdminUserResponse> {
@@ -72,7 +68,7 @@ export class Utils {
           console.log(`User ${username} already exists`);
           return null;
         } catch (err) {
-          const errMessage = JSON.parse(err.message);
+          const errMessage = JSON.parse((err as Error).message);
           if (errMessage.errcode && errMessage.errcode === "M_NOT_FOUND") {
             return member;
           } else {

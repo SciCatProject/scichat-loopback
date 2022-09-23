@@ -1,5 +1,23 @@
 import { Model, model, property } from "@loopback/repository";
 
+export interface Message {
+  content: {
+    body: string;
+    info?: {
+      thumbnail_url?: string;
+    };
+    msgtype: string;
+    url?: string;
+  };
+  event_id: string;
+  origin_server_ts: number;
+  sender: string;
+  type: string;
+  unsigned: {
+    age: number;
+  };
+}
+
 @model()
 export class Logbook extends Model {
   @property({
@@ -19,7 +37,7 @@ export class Logbook extends Model {
     itemType: "object",
     required: true,
   })
-  messages: object[];
+  messages: Message[];
 
   constructor(data?: Partial<Logbook>) {
     super(data);
