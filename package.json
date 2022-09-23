@@ -51,7 +51,7 @@
     "!*/__tests__"
   ],
   "dependencies": {
-    "@esss-swap/duo-message-broker": "^1.0.4",
+    "@esss-swap/duo-message-broker": "^1.4.0",
     "@loopback/authentication": "^7.3.0",
     "@loopback/boot": "^3.4.0",
     "@loopback/core": "^2.16.0",
