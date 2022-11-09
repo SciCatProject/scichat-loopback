@@ -12,12 +12,14 @@ export interface Member {
   email: string;
 }
 
-export interface ProposalAcceptedMessage {
-  proposalId: number;
+export interface ProposalMessageData {
+  proposalPk: number;
   shortCode: string;
   title: string;
-  members: Member[];
-  proposer?: Member;
+  abstract: string;
+  newStatus?: string;
+  members: { firstName: string; lastName: string; email: string; id: string }[];
+  proposer?: { firstName: string; lastName: string; email: string; id: string };
 }
 
 export async function main(options: ApplicationConfig = {}) {
