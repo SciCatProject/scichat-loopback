@@ -42,7 +42,9 @@ export class Utils {
     });
     const accessToken = synapseToken?.access_token;
 
-    const username = user.firstName.toLowerCase() + user.lastName.toLowerCase();
+    const username =
+      user.firstName.toLowerCase().replace(/\s/g, "") +
+      user.lastName.toLowerCase().replace(/\s/g, "");
     const userId = `@${username}:${this.serverName}`;
     const password = this.defaultPassword;
     return this.synapseService.createUser(
@@ -61,7 +63,8 @@ export class Utils {
     const queriedMembers = await Promise.all(
       members.map(async (member) => {
         const username =
-          member.firstName.toLowerCase() + member.lastName.toLowerCase();
+          member.firstName.toLowerCase().replace(/\s/g, "") +
+          member.lastName.toLowerCase().replace(/\s/g, "");
         const userId = `@${username}:${this.serverName}`;
         try {
           await this.synapseService.queryUser(userId, accessToken);
