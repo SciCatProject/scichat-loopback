@@ -124,8 +124,8 @@ export class RabbitMqObserver implements LifeCycleObserver {
                   );
                   const invites = members.map(
                     (member) =>
-                      member.firstName.toLowerCase() +
-                      member.lastName.toLowerCase(),
+                      member.firstName.toLowerCase().replace(/\s/g, "") +
+                      member.lastName.toLowerCase().replace(/\s/g, ""),
                   );
                   const logbookDetails = await this.utils.createRoom(
                     proposalMessage.shortCode,
