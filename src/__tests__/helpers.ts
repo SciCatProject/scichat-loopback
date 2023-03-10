@@ -225,7 +225,22 @@ export function givenCreateRoomResponse(details: {
 }
 
 export function givenFetchRoomIdByNameResponse() {
-  return { room_id: "!123456abcdef:ess", servers: [] };
+  return {
+    offset: 0,
+    rooms: [
+      {
+        canonical_alias: "string",
+        name: "123456",
+        room_id: "!123456abcdef:ess",
+        creator: "string",
+        guest_access: "string",
+        history_visibility: "string",
+        join_rules: "string",
+        public: true,
+      },
+    ],
+    servers: [],
+  };
 }
 
 export function givenFetchRoomMessagesResponse() {

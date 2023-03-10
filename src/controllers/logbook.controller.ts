@@ -10,8 +10,7 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
-import "isomorphic-fetch";
-import { createClient, MatrixClient, Method } from "matrix-js-sdk";
+
 import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
 import { SynapseTokenRepository } from "../repositories";
@@ -106,8 +105,6 @@ export const sendMessageRequestBody = {
 @intercept(LogbookInterceptor.BINDING_KEY)
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
-  private client: MatrixClient;
-
   username = process.env.SYNAPSE_BOT_NAME ?? "";
   password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
@@ -117,11 +114,7 @@ export class LogbookController {
     public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
     @inject("utils") protected utils: Utils,
-  ) {
-    this.client = createClient({
-      baseUrl: process.env.SYNAPSE_SERVER_HOST ?? "",
-    });
-  }
+  ) {}
 
   @authenticate("jwt")
   @get("/Logbooks", {
@@ -270,23 +263,12 @@ export class LogbookController {
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
-        const result = await this.client.http.authedRequest(
-          Method.Get,
-          "/rooms",
-          { search_term: name },
-          undefined,
-          {
-            prefix: "/_synapse/admin/v1",
-            headers: {
-              accept: "application/json",
-              "content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
+        const allRooms = await this.synapseService.fetchRoomIdByName(
+          name,
+          accessToken,
         );
 
-        const response = result as { rooms: ChatRoom[] };
-        const roomId = response.rooms[0].room_id;
+        const roomId = allRooms.rooms[0].room_id;
 
         const defaultFilter: LogbookFilters = {
           textSearch: "",
@@ -307,6 +289,7 @@ export class LogbookController {
           rooms.join[roomId].timeline.events;
         const messages = this.filterMessages(events, logbookFilter);
         const logbook = new Logbook({ roomId, name, messages });
+
         return this.formatImageUrls(logbook);
       } catch (err) {
         if (
@@ -355,9 +338,13 @@ export class LogbookController {
         });
         const accessToken = synapseToken?.access_token;
         const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
-        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
+        const allRooms = await this.synapseService.fetchRoomIdByName(
           roomAlias,
+          accessToken,
         );
+
+        const roomId = allRooms.rooms[0].room_id;
+
         const { message } = data;
         return await this.synapseService.sendMessage(
           roomId,
