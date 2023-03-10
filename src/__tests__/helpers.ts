@@ -239,7 +239,7 @@ export function givenFetchRoomIdByNameResponse() {
         public: true,
       },
     ],
-    servers: [],
+    total_rooms: 1,
   };
 }
 
