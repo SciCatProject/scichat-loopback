@@ -10,6 +10,8 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
+import "isomorphic-fetch";
+import { createClient, MatrixClient, Method } from "matrix-js-sdk";
 import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
 import { SynapseTokenRepository } from "../repositories";
@@ -19,6 +21,17 @@ import { Utils } from "../utils";
 export type CreateLogbookDetails = {
   name: string;
   invites?: string[];
+};
+
+export type ChatRoom = {
+  canonical_alias: string;
+  name: string;
+  room_id: string;
+  creator: string;
+  guest_access: string;
+  history_visibility: string;
+  join_rules: string;
+  public: boolean;
 };
 
 export interface LogbookFilters {
@@ -93,17 +106,22 @@ export const sendMessageRequestBody = {
 @intercept(LogbookInterceptor.BINDING_KEY)
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
+  private client: MatrixClient;
+
   username = process.env.SYNAPSE_BOT_NAME ?? "";
   password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
   userId = `@${this.username}:${this.serverName}`;
-
   constructor(
     @repository(SynapseTokenRepository)
     public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
     @inject("utils") protected utils: Utils,
-  ) {}
+  ) {
+    this.client = createClient({
+      baseUrl: process.env.SYNAPSE_SERVER_HOST ?? "",
+    });
+  }
 
   @authenticate("jwt")
   @get("/Logbooks", {
@@ -252,10 +270,24 @@ export class LogbookController {
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
-        const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
-        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
-          roomAlias,
+        const result = await this.client.http.authedRequest(
+          Method.Get,
+          "/rooms",
+          { search_term: name },
+          undefined,
+          {
+            prefix: "/_synapse/admin/v1",
+            headers: {
+              accept: "application/json",
+              "content-type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
         );
+
+        const response = result as { rooms: ChatRoom[] };
+        const roomId = response.rooms[0].room_id;
+
         const defaultFilter: LogbookFilters = {
           textSearch: "",
           showBotMessages: true,
