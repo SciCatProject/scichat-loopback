@@ -10,6 +10,7 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
+
 import { LogbookInterceptor } from "../interceptors";
 import { Logbook } from "../models";
 import { SynapseTokenRepository } from "../repositories";
@@ -19,6 +20,17 @@ import { Utils } from "../utils";
 export type CreateLogbookDetails = {
   name: string;
   invites?: string[];
+};
+
+export type ChatRoom = {
+  canonical_alias: string;
+  name: string;
+  room_id: string;
+  creator: string;
+  guest_access: string;
+  history_visibility: string;
+  join_rules: string;
+  public: boolean;
 };
 
 export interface LogbookFilters {
@@ -97,7 +109,6 @@ export class LogbookController {
   password = process.env.SYNAPSE_BOT_PASSWORD ?? "";
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
   userId = `@${this.username}:${this.serverName}`;
-
   constructor(
     @repository(SynapseTokenRepository)
     public synapseTokenRepository: SynapseTokenRepository,
@@ -252,10 +263,13 @@ export class LogbookController {
           where: { user_id: this.userId },
         });
         const accessToken = synapseToken?.access_token;
-        const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
-        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
-          roomAlias,
+        const allRooms = await this.synapseService.fetchRoomIdByName(
+          name,
+          accessToken,
         );
+
+        const roomId = allRooms.rooms[0].room_id;
+
         const defaultFilter: LogbookFilters = {
           textSearch: "",
           showBotMessages: true,
@@ -275,6 +289,7 @@ export class LogbookController {
           rooms.join[roomId].timeline.events;
         const messages = this.filterMessages(events, logbookFilter);
         const logbook = new Logbook({ roomId, name, messages });
+
         return this.formatImageUrls(logbook);
       } catch (err) {
         if (
@@ -323,9 +338,13 @@ export class LogbookController {
         });
         const accessToken = synapseToken?.access_token;
         const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
-        const { room_id: roomId } = await this.synapseService.fetchRoomIdByName(
+        const allRooms = await this.synapseService.fetchRoomIdByName(
           roomAlias,
+          accessToken,
         );
+
+        const roomId = allRooms.rooms[0].room_id;
+
         const { message } = data;
         return await this.synapseService.sendMessage(
           roomId,

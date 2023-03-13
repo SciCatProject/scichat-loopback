@@ -81,14 +81,15 @@ const config = {
     {
       template: {
         method: "GET",
-        url: baseURL + "/_matrix/client/r0/directory/room/{!name:string}",
+        url: baseURL + "/_synapse/admin/v1/rooms?search_term={!name:string}",
         headers: {
           accept: "application/json",
           "content-type": "application/json",
+          Authorization: "Bearer {!accessToken:string}",
         },
       },
       functions: {
-        fetchRoomIdByName: ["name"],
+        fetchRoomIdByName: ["name", "accessToken"],
       },
     },
     {
