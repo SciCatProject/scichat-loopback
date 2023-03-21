@@ -12,6 +12,7 @@ export interface Message {
   event_id: string;
   origin_server_ts: number;
   sender: string;
+  senderName: string;
   type: string;
   unsigned: {
     age: number;

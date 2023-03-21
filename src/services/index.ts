@@ -7,6 +7,7 @@ export * from "./user.service";
 export interface SynapseEvent {
   type: string;
   sender: string;
+  senderName: string;
   origin_server_ts: number;
   unsigned: {
     age: number;
