@@ -13,6 +13,7 @@ import {
   givenCreateRoomResponse,
   givenFetchRoomIdByNameResponse,
   givenFetchRoomMessagesResponse,
+  givenGetMessagesWithDisplayNameResponse,
   givenLogbook,
   givenLogbooks,
   givenSynapseLoginResponse,
@@ -28,6 +29,7 @@ describe("LogbookController (unit)", () => {
   let fetchAllRoomsMessages: sinon.SinonStub;
   let fetchRoomIdByName: sinon.SinonStub;
   let fetchRoomMessages: sinon.SinonStub;
+  let getMessagesWithDisplayName: sinon.SinonStub;
   let sendMessage: sinon.SinonStub;
 
   beforeEach(givenMockSynapseServiceAndRepository);
@@ -38,8 +40,8 @@ describe("LogbookController (unit)", () => {
       fetchAllRoomsMessages.resolves(givenAllRoomsSyncResponse());
 
       const expected = givenLogbooks();
-
-      expect(await controller.find()).to.eql(expected);
+      const actual = await controller.find();
+      expect(actual).to.eql(expected);
     });
   });
 
@@ -50,8 +52,9 @@ describe("LogbookController (unit)", () => {
       createRoom.resolves(givenCreateRoomResponse(details));
 
       const expected = givenCreateRoomResponse(details);
+      const actual = await controller.create(details);
 
-      expect(await controller.create(details)).to.eql(expected);
+      expect(actual).to.eql(expected);
     });
   });
 
@@ -60,10 +63,12 @@ describe("LogbookController (unit)", () => {
       synapseTokenRepositry.stubs.findOne.resolves(givenSynapseLoginResponse());
       fetchRoomIdByName.resolves(givenFetchRoomIdByNameResponse());
       fetchRoomMessages.resolves(givenFetchRoomMessagesResponse());
-
+      getMessagesWithDisplayName.resolves(
+        givenGetMessagesWithDisplayNameResponse(),
+      );
       const expected = givenLogbook();
-
-      expect(await controller.findByName("123456")).to.eql(expected);
+      const actual = await controller.findByName("123456");
+      expect(actual).to.eql(expected);
     });
   });
 
@@ -74,9 +79,10 @@ describe("LogbookController (unit)", () => {
       fetchRoomIdByName.resolves(givenFetchRoomIdByNameResponse());
       sendMessage.resolves(expected);
 
-      expect(
-        await controller.sendMessage("123456", { message: "Test" }),
-      ).to.eql(expected);
+      const actual = await controller.sendMessage("123456", {
+        message: "Test",
+      });
+      expect(actual).to.eql(expected);
     });
   });
 
@@ -105,6 +111,10 @@ describe("LogbookController (unit)", () => {
       synapseTokenRepositry,
       synapseService,
       utils,
+    );
+    getMessagesWithDisplayName = sinon.stub(
+      controller,
+      "getMessagesWithDisplayName",
     );
   }
 });

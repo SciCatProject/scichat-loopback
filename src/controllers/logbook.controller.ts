@@ -12,7 +12,7 @@ import {
 } from "@loopback/rest";
 
 import { LogbookInterceptor } from "../interceptors";
-import { Logbook } from "../models";
+import { Logbook, Message } from "../models";
 import { SynapseTokenRepository } from "../repositories";
 import { SynapseService, SynapseTimelineEvent } from "../services";
 import { Utils } from "../utils";
@@ -288,7 +288,17 @@ export class LogbookController {
         const events: SynapseTimelineEvent[] =
           rooms.join[roomId].timeline.events;
         const messages = this.filterMessages(events, logbookFilter);
-        const logbook = new Logbook({ roomId, name, messages });
+
+        const messagesWithDisplayName = await this.getMessagesWithDisplayName(
+          messages,
+          accessToken,
+        );
+
+        const logbook = new Logbook({
+          roomId,
+          name,
+          messages: messagesWithDisplayName,
+        });
 
         return this.formatImageUrls(logbook);
       } catch (err) {
@@ -414,6 +424,26 @@ export class LogbookController {
       }
     }
     return messages;
+  };
+
+  getMessagesWithDisplayName = async (
+    messages: Message[],
+    token: string | undefined,
+  ) => {
+    const users = new Map();
+    const messagesWithDisplayName = await Promise.all(
+      messages.map(async (message) => {
+        if (!users.get(message.sender)) {
+          const { displayname, name: userId } =
+            await this.synapseService.queryUser(message.sender, token);
+
+          const modifiedUserId = userId.slice(1).replace(":ess", "");
+          users.set(message.sender, displayname ? displayname : modifiedUserId);
+        }
+        return { ...message, senderName: users.get(message.sender) };
+      }),
+    );
+    return messagesWithDisplayName;
   };
 
   formatImageUrls = (logbook: Logbook): Logbook => {

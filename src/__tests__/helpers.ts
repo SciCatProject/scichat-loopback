@@ -81,6 +81,7 @@ export function givenAllRoomsSyncResponse() {
               {
                 type: "m.room.message",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   msgtype: "m.text",
                   body: "Test Logbook entry.",
@@ -98,6 +99,7 @@ export function givenAllRoomsSyncResponse() {
               {
                 type: "m.room.name",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   name: "123456",
                 },
@@ -124,6 +126,7 @@ export function givenAllRoomsSyncResponse() {
               {
                 type: "m.room.message",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   msgtype: "m.text",
                   body: "Another test Logbook entry.",
@@ -141,6 +144,7 @@ export function givenAllRoomsSyncResponse() {
               {
                 type: "m.room.name",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   name: "654321",
                 },
@@ -180,6 +184,7 @@ export function givenLogbooks() {
         {
           type: "m.room.message",
           sender: "@testUser:ess",
+          senderName: "testUser",
           content: {
             msgtype: "m.text",
             body: "Test Logbook entry.",
@@ -199,6 +204,7 @@ export function givenLogbooks() {
         {
           type: "m.room.message",
           sender: "@testUser:ess",
+          senderName: "testUser",
           content: {
             msgtype: "m.text",
             body: "Another test Logbook entry.",
@@ -258,6 +264,7 @@ export function givenFetchRoomMessagesResponse() {
               {
                 type: "m.room.message",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   msgtype: "m.text",
                   body: "Test Logbook entry.",
@@ -275,6 +282,7 @@ export function givenFetchRoomMessagesResponse() {
               {
                 type: "m.room.name",
                 sender: "@testUser:ess",
+                senderName: "testUser",
                 content: {
                   name: "123456",
                 },
@@ -314,6 +322,7 @@ export function givenLogbook() {
       {
         type: "m.room.message",
         sender: "@testUser:ess",
+        senderName: "testUser",
         content: {
           msgtype: "m.text",
           body: "Test Logbook entry.",
@@ -326,4 +335,23 @@ export function givenLogbook() {
       },
     ],
   });
+}
+
+export function givenGetMessagesWithDisplayNameResponse() {
+  return [
+    {
+      type: "m.room.message",
+      sender: "@testUser:ess",
+      senderName: "testUser",
+      content: {
+        msgtype: "m.text",
+        body: "Test Logbook entry.",
+      },
+      origin_server_ts: 1574777701518,
+      unsigned: {
+        age: 42311635499,
+      },
+      event_id: "$abfde12345",
+    },
+  ];
 }
