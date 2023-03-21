@@ -336,3 +336,22 @@ export function givenLogbook() {
     ],
   });
 }
+
+export function givenGetMessagesWithDisplayNameResponse() {
+  return [
+    {
+      type: "m.room.message",
+      sender: "@testUser:ess",
+      senderName: "testUser",
+      content: {
+        msgtype: "m.text",
+        body: "Test Logbook entry.",
+      },
+      origin_server_ts: 1574777701518,
+      unsigned: {
+        age: 42311635499,
+      },
+      event_id: "$abfde12345",
+    },
+  ];
+}

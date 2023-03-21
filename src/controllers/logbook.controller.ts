@@ -436,6 +436,7 @@ export class LogbookController {
         if (!users.get(message.sender)) {
           const { displayname, name: userId } =
             await this.synapseService.queryUser(message.sender, token);
+
           const modifiedUserId = userId.slice(1).replace(":ess", "");
           users.set(message.sender, displayname ? displayname : modifiedUserId);
         }
