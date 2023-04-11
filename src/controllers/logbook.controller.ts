@@ -268,7 +268,7 @@ export class LogbookController {
           accessToken,
         );
 
-        const roomId = allRooms.rooms[0].room_id;
+        const roomId = (allRooms.rooms.pop() as ChatRoom).room_id;
 
         const defaultFilter: LogbookFilters = {
           textSearch: "",
@@ -353,7 +353,7 @@ export class LogbookController {
           accessToken,
         );
 
-        const roomId = allRooms.rooms[0].room_id;
+        const roomId = (allRooms.rooms.pop() as ChatRoom).room_id;
 
         const { message } = data;
         return await this.synapseService.sendMessage(
