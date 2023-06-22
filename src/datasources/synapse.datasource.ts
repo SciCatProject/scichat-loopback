@@ -1,5 +1,5 @@
-import {inject, lifeCycleObserver, LifeCycleObserver} from "@loopback/core";
-import {juggler} from "@loopback/repository";
+import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
+import { juggler } from "@loopback/repository";
 
 const baseURL = process.env.SYNAPSE_SERVER_HOST ?? "";
 
@@ -103,12 +103,13 @@ const config = {
 @lifeCycleObserver("datasource")
 export class SynapseDataSource
   extends juggler.DataSource
-  implements LifeCycleObserver {
+  implements LifeCycleObserver
+{
   static dataSourceName = "synapse";
   static readonly defaultConfig = config;
 
   constructor(
-    @inject("datasources.config.synapse", {optional: true})
+    @inject("datasources.config.synapse", { optional: true })
     dsConfig: object = config,
   ) {
     super(dsConfig);
