@@ -1,7 +1,6 @@
 import { AuthenticationStrategy, TokenService } from "@loopback/authentication";
 import { inject } from "@loopback/core";
 import { HttpErrors, Request } from "@loopback/rest";
-import { UserProfile } from "@loopback/security";
 import { TokenServiceBindings } from "../keys";
 
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
@@ -12,10 +11,14 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
     public tokenService: TokenService,
   ) {}
 
-  async authenticate(request: Request): Promise<UserProfile | undefined> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async authenticate(request: Request): Promise<any> {
     const token: string = this.extractCredentials(request);
-    const userProfile: UserProfile = await this.tokenService.verifyToken(token);
-    return userProfile;
+
+    // TODO: write some token validation logic here and return boolean instead of UserProfile
+    // also to replace above Promise<any> with correct one
+
+    return token.length > 0;
   }
 
   extractCredentials(request: Request): string {

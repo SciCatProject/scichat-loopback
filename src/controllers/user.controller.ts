@@ -5,7 +5,7 @@ import { api, post, requestBody, SchemaObject } from "@loopback/rest";
 import { SecurityBindings, UserProfile } from "@loopback/security";
 import { TokenServiceBindings, UserServiceBindings } from "../keys";
 import { UserRepository } from "../repositories";
-import { Credentials, SciChatUserService } from "../services";
+import { Credentials, SciChatUserService, SynapseService } from "../services";
 
 const credentialsSchema: SchemaObject = {
   type: "object",
@@ -30,8 +30,10 @@ export const credentialsRequestBody = {
 
 @api({ basePath: "/scichatapi" })
 export class UserController {
+  private synapseToken: string;
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE) public jwtService: TokenService,
+    @inject("services.Synapse") protected synapseService: SynapseService,
     @inject(UserServiceBindings.USER_SERVICE)
     public userService: SciChatUserService,
     @inject(SecurityBindings.USER, { optional: true }) public user: UserProfile,
@@ -60,9 +62,25 @@ export class UserController {
   async login(
     @requestBody(credentialsRequestBody) credentials: Credentials,
   ): Promise<{ token: string }> {
-    const user = await this.userService.verifyCredentials(credentials);
-    const userProfile = this.userService.convertToUserProfile(user);
-    const token = await this.jwtService.generateToken(userProfile);
-    return { token };
+    // TODO: remove below services and cleanup userService and userService related folders.
+    // Since we plan to avoid getting Token from MongoDB, userService is probabbly not needed anymore.
+
+    // const user = await this.userService.verifyCredentials(credentials);
+    // const userProfile = this.userService.convertToUserProfile(user);
+    // const token = await this.jwtService.generateToken(userProfile);
+
+    try {
+      if (this.synapseToken) {
+        return { token: this.synapseToken };
+      }
+      const tokenSynapse = await this.synapseService.login(
+        credentials.username,
+        credentials.password,
+      );
+      this.synapseToken = tokenSynapse.access_token;
+      return { token: this.synapseToken };
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
