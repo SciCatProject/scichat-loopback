@@ -182,52 +182,6 @@ export class LogbookController {
   }
 
   @authenticate("jwt")
-  @post("/Logbooks", {
-    responses: {
-      "200": {
-        description: "Create Room Response",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                room_id: {
-                  type: "string",
-                },
-                room_alias: {
-                  type: "string",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  })
-  async create(
-    @requestBody(createLogbookRequestBody) details: CreateLogbookDetails,
-  ): Promise<{ room_alias: string; room_id: string } | undefined> {
-    do {
-      try {
-        const { name, invites } = details;
-        return await this.utils.createRoom(name, invites);
-      } catch (err) {
-        if (
-          err.error &&
-          (err.error.errcode === "M_UNKNOWN_TOKEN" ||
-            err.error.errcode === "M_MISSING_TOKEN")
-        ) {
-          await this.utils.renewAccessToken();
-          continue;
-        } else {
-          console.error(err);
-        }
-      }
-      break;
-    } while (true);
-  }
-
-  @authenticate("jwt")
   @get("/Logbooks/{name}", {
     parameters: [
       {

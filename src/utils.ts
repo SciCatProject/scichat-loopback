@@ -2,7 +2,7 @@ import { inject } from "@loopback/core";
 import { repository } from "@loopback/repository";
 import { Member } from ".";
 import { SynapseTokenRepository } from "./repositories";
-import { SynapseAdminUserResponse, SynapseService } from "./services";
+import { SynapseService } from "./services";
 
 export class Utils {
   username = process.env.SYNAPSE_BOT_NAME ?? "";
@@ -16,44 +16,6 @@ export class Utils {
     public synapseTokenRepository: SynapseTokenRepository,
     @inject("services.Synapse") protected synapseService: SynapseService,
   ) {}
-
-  async createRoom(
-    name: string,
-    invites: string[] | undefined,
-  ): Promise<{ room_alias: string; room_id: string }> {
-    const synapseToken = await this.synapseTokenRepository.findOne({
-      where: { user_id: this.userId },
-    });
-    const accessToken = synapseToken?.access_token;
-    const formattedInvites = invites
-      ? invites.map((user) =>
-          user.startsWith("@") && user.indexOf(":") > 0
-            ? user
-            : `@${user}:${this.serverName}`,
-        )
-      : [];
-    console.log("Creating new room", { name, invites });
-    return this.synapseService.createRoom(name, formattedInvites, accessToken);
-  }
-
-  async createUser(user: Member): Promise<SynapseAdminUserResponse> {
-    const synapseToken = await this.synapseTokenRepository.findOne({
-      where: { user_id: this.userId },
-    });
-    const accessToken = synapseToken?.access_token;
-
-    const username =
-      user.firstName.toLowerCase().replace(/\s/g, "") +
-      user.lastName.toLowerCase().replace(/\s/g, "");
-    const userId = `@${username}:${this.serverName}`;
-    const password = this.defaultPassword;
-    return this.synapseService.createUser(
-      userId,
-      username,
-      password,
-      accessToken,
-    );
-  }
 
   async membersToCreate(members: Member[]): Promise<Member[]> {
     const synapseToken = await this.synapseTokenRepository.findOne({

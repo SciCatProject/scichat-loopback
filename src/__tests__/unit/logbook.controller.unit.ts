@@ -10,7 +10,6 @@ import { SynapseService } from "../../services";
 import { Utils } from "../../utils";
 import {
   givenAllRoomsSyncResponse,
-  givenCreateRoomResponse,
   givenFetchRoomIdByNameResponse,
   givenFetchRoomMessagesResponse,
   givenGetMessagesWithDisplayNameResponse,
@@ -25,7 +24,6 @@ describe("LogbookController (unit)", () => {
   let synapseTokenRepositry: StubbedInstanceWithSinonAccessor<SynapseTokenRepository>;
   let synapseService: SynapseService;
   let utils: Utils;
-  let createRoom: sinon.SinonStub;
   let fetchAllRoomsMessages: sinon.SinonStub;
   let fetchRoomIdByName: sinon.SinonStub;
   let fetchRoomMessages: sinon.SinonStub;
@@ -41,19 +39,6 @@ describe("LogbookController (unit)", () => {
 
       const expected = givenLogbooks();
       const actual = await controller.find();
-      expect(actual).to.eql(expected);
-    });
-  });
-
-  context("create", () => {
-    it("resolves in an object containing the room_alias and room_id", async () => {
-      const details = { name: "098765" };
-      synapseTokenRepositry.stubs.findOne.resolves(givenSynapseLoginResponse());
-      createRoom.resolves(givenCreateRoomResponse(details));
-
-      const expected = givenCreateRoomResponse(details);
-      const actual = await controller.create(details);
-
       expect(actual).to.eql(expected);
     });
   });
@@ -89,16 +74,13 @@ describe("LogbookController (unit)", () => {
   function givenMockSynapseServiceAndRepository() {
     synapseService = {
       login: sinon.stub(),
-      createRoom: sinon.stub(),
       fetchAllRoomsMessages: sinon.stub(),
       fetchRoomIdByName: sinon.stub(),
       fetchRoomMessages: sinon.stub(),
       sendMessage: sinon.stub(),
       queryUser: sinon.stub(),
-      createUser: sinon.stub(),
     };
 
-    createRoom = synapseService.createRoom as sinon.SinonStub;
     fetchAllRoomsMessages =
       synapseService.fetchAllRoomsMessages as sinon.SinonStub;
     fetchRoomIdByName = synapseService.fetchRoomIdByName as sinon.SinonStub;
