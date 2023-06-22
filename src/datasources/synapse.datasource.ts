@@ -1,5 +1,5 @@
-import { inject, lifeCycleObserver, LifeCycleObserver } from "@loopback/core";
-import { juggler } from "@loopback/repository";
+import {inject, lifeCycleObserver, LifeCycleObserver} from "@loopback/core";
+import {juggler} from "@loopback/repository";
 
 const baseURL = process.env.SYNAPSE_SERVER_HOST ?? "";
 
@@ -28,34 +28,6 @@ const config = {
       },
       functions: {
         login: ["username", "password"],
-      },
-    },
-    {
-      template: {
-        method: "POST",
-        url: baseURL + "/_matrix/client/r0/createRoom",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          Authorization: "Bearer {!accessToken:string}",
-        },
-        body: {
-          visibility: "private",
-          room_alias_name: "{!name:string}",
-          name: "{!name:string}",
-          invite: "{invites}",
-          topic: "Logbook for proposal {!name:string}",
-          creation_content: {
-            "m.federate": false,
-          },
-          power_level_content_override: {
-            state_key: "",
-            invite: 100,
-          },
-        },
-      },
-      functions: {
-        createRoom: ["name", "invites", "accessToken"],
       },
     },
     {
@@ -121,24 +93,6 @@ const config = {
         queryUser: ["userId", "accessToken"],
       },
     },
-    {
-      template: {
-        method: "PUT",
-        url: baseURL + "/_synapse/admin/v2/users/{!userId:string}",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          Authorization: "Bearer {!accessToken:string}",
-        },
-        body: {
-          password: "{!password:string}",
-          displayName: "{!username:string}",
-        },
-      },
-      functions: {
-        createUser: ["userId", "username", "password", "accessToken"],
-      },
-    },
   ],
 };
 
@@ -149,13 +103,12 @@ const config = {
 @lifeCycleObserver("datasource")
 export class SynapseDataSource
   extends juggler.DataSource
-  implements LifeCycleObserver
-{
+  implements LifeCycleObserver {
   static dataSourceName = "synapse";
   static readonly defaultConfig = config;
 
   constructor(
-    @inject("datasources.config.synapse", { optional: true })
+    @inject("datasources.config.synapse", {optional: true})
     dsConfig: object = config,
   ) {
     super(dsConfig);
