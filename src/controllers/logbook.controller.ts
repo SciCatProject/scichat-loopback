@@ -1,6 +1,4 @@
-import { authenticate } from "@loopback/authentication";
-import { inject, intercept } from "@loopback/core";
-import { repository } from "@loopback/repository";
+import { inject } from "@loopback/core";
 import {
   api,
   get,
@@ -10,11 +8,11 @@ import {
   requestBody,
   SchemaObject,
 } from "@loopback/rest";
+import { TokenServiceBindings } from "../keys";
 
-import { LogbookInterceptor } from "../interceptors";
 import { Logbook, Message } from "../models";
-import { SynapseTokenRepository } from "../repositories";
 import { SynapseService, SynapseTimelineEvent } from "../services";
+import { TokenServiceManager } from "../services/token.service";
 import { Utils } from "../utils";
 
 export type CreateLogbookDetails = {
@@ -102,7 +100,6 @@ export const sendMessageRequestBody = {
   },
 };
 
-@intercept(LogbookInterceptor.BINDING_KEY)
 @api({ basePath: "/scichatapi" })
 export class LogbookController {
   username = process.env.SYNAPSE_BOT_NAME ?? "";
@@ -110,13 +107,12 @@ export class LogbookController {
   serverName = process.env.SYNAPSE_SERVER_NAME ?? "ess";
   userId = `@${this.username}:${this.serverName}`;
   constructor(
-    @repository(SynapseTokenRepository)
-    public synapseTokenRepository: SynapseTokenRepository,
+    @inject(TokenServiceBindings.TOKEN_MANAGER)
+    private tokenServiceManager: TokenServiceManager,
     @inject("services.Synapse") protected synapseService: SynapseService,
     @inject("utils") protected utils: Utils,
   ) {}
 
-  @authenticate("jwt")
   @get("/Logbooks", {
     parameters: [
       {
@@ -142,10 +138,7 @@ export class LogbookController {
   async find(): Promise<Logbook[] | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepository.findOne({
-          where: { user_id: this.userId },
-        });
-        const accessToken = synapseToken?.access_token;
+        const accessToken = this.tokenServiceManager.getToken();
         const filter = this.createSynapseFilter();
         console.log("Fetching messages for all rooms");
         const { rooms } = await this.synapseService.fetchAllRoomsMessages(
@@ -181,7 +174,6 @@ export class LogbookController {
     } while (true);
   }
 
-  @authenticate("jwt")
   @get("/Logbooks/{name}", {
     parameters: [
       {
@@ -213,10 +205,7 @@ export class LogbookController {
   ): Promise<Logbook | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepository.findOne({
-          where: { user_id: this.userId },
-        });
-        const accessToken = synapseToken?.access_token;
+        const accessToken = this.tokenServiceManager.getToken();
         const allRooms = await this.synapseService.fetchRoomIdByName(
           name,
           accessToken,
@@ -271,7 +260,6 @@ export class LogbookController {
     } while (true);
   }
 
-  @authenticate("jwt")
   @post("/Logbooks/{name}/message", {
     responses: {
       "200": {
@@ -297,10 +285,7 @@ export class LogbookController {
   ): Promise<{ event_id: string } | undefined> {
     do {
       try {
-        const synapseToken = await this.synapseTokenRepository.findOne({
-          where: { user_id: this.userId },
-        });
-        const accessToken = synapseToken?.access_token;
+        const accessToken = this.tokenServiceManager.getToken();
         const roomAlias = encodeURIComponent(`#${name}:${this.serverName}`);
         const allRooms = await this.synapseService.fetchRoomIdByName(
           roomAlias,

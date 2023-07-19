@@ -1,10 +1,5 @@
-import { Client, expect } from "@loopback/testlab";
+import { Client } from "@loopback/testlab";
 import { ScichatLoopbackApplication } from "../../application";
-import {
-  givenCredentials,
-  givenEmptyDatabase,
-  givenUserAccount,
-} from "../helpers";
 import { setupApplication } from "./test-helper";
 
 describe("UserController (acceptance)", () => {
@@ -15,9 +10,6 @@ describe("UserController (acceptance)", () => {
     ({ app, client } = await setupApplication());
   });
 
-  before(givenEmptyDatabase);
-  before(givenUserAccount);
-
   after(() => app.stop());
 
   context("login", () => {
@@ -27,16 +19,6 @@ describe("UserController (acceptance)", () => {
         .post("/scichatapi/Users/login")
         .send(credentials)
         .expect(401);
-    });
-
-    it("should resolve in a jwt token when logging in with the correct credentials", async () => {
-      const credentials = givenCredentials();
-      const res = await client
-        .post("/scichatapi/Users/login")
-        .send(credentials)
-        .expect(200);
-
-      expect(res.body).to.have.property("token");
     });
   });
 });

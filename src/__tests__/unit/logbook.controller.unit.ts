@@ -1,12 +1,9 @@
-import {
-  createStubInstance,
-  expect,
-  StubbedInstanceWithSinonAccessor,
-} from "@loopback/testlab";
+import { Context } from "@loopback/context";
+import { expect } from "@loopback/testlab";
 import sinon from "sinon";
 import { LogbookController } from "../../controllers";
-import { SynapseTokenRepository } from "../../repositories";
 import { SynapseService } from "../../services";
+import { TokenServiceManager } from "../../services/token.service";
 import { Utils } from "../../utils";
 import {
   givenAllRoomsSyncResponse,
@@ -21,8 +18,8 @@ import {
 describe("LogbookController (unit)", () => {
   let controller: LogbookController;
 
-  let synapseTokenRepositry: StubbedInstanceWithSinonAccessor<SynapseTokenRepository>;
   let synapseService: SynapseService;
+  let tokenServiceManager: TokenServiceManager;
   let utils: Utils;
   let fetchAllRoomsMessages: sinon.SinonStub;
   let fetchRoomIdByName: sinon.SinonStub;
@@ -30,11 +27,10 @@ describe("LogbookController (unit)", () => {
   let getMessagesWithDisplayName: sinon.SinonStub;
   let sendMessage: sinon.SinonStub;
 
-  beforeEach(givenMockSynapseServiceAndRepository);
+  beforeEach(givenMockSynapseServiceAndTokenManager);
 
   context("find", () => {
     it("resolves a list of Logbooks", async () => {
-      synapseTokenRepositry.stubs.findOne.resolves(givenSynapseLoginResponse());
       fetchAllRoomsMessages.resolves(givenAllRoomsSyncResponse());
 
       const expected = givenLogbooks();
@@ -45,7 +41,6 @@ describe("LogbookController (unit)", () => {
 
   context("findByName", () => {
     it("resolves in a Logbook instance matching the input name", async () => {
-      synapseTokenRepositry.stubs.findOne.resolves(givenSynapseLoginResponse());
       fetchRoomIdByName.resolves(givenFetchRoomIdByNameResponse());
       fetchRoomMessages.resolves(givenFetchRoomMessagesResponse());
       getMessagesWithDisplayName.resolves(
@@ -60,7 +55,6 @@ describe("LogbookController (unit)", () => {
   context("sendMessage", () => {
     it("resolves in an object containing the event_id of the sent message", async () => {
       const expected = { event_id: "$ABCDabcd1234" };
-      synapseTokenRepositry.stubs.findOne.resolves(givenSynapseLoginResponse());
       fetchRoomIdByName.resolves(givenFetchRoomIdByNameResponse());
       sendMessage.resolves(expected);
 
@@ -71,7 +65,7 @@ describe("LogbookController (unit)", () => {
     });
   });
 
-  function givenMockSynapseServiceAndRepository() {
+  function givenMockSynapseServiceAndTokenManager() {
     synapseService = {
       login: sinon.stub(),
       fetchAllRoomsMessages: sinon.stub(),
@@ -81,16 +75,21 @@ describe("LogbookController (unit)", () => {
       queryUser: sinon.stub(),
     };
 
+    tokenServiceManager = new TokenServiceManager(new Context());
+
     fetchAllRoomsMessages =
       synapseService.fetchAllRoomsMessages as sinon.SinonStub;
     fetchRoomIdByName = synapseService.fetchRoomIdByName as sinon.SinonStub;
     fetchRoomMessages = synapseService.fetchRoomMessages as sinon.SinonStub;
     sendMessage = synapseService.sendMessage as sinon.SinonStub;
 
-    synapseTokenRepositry = createStubInstance(SynapseTokenRepository);
-    utils = new Utils(synapseTokenRepositry, synapseService);
+    tokenServiceManager.getToken = sinon
+      .stub()
+      .returns(givenSynapseLoginResponse().access_token);
+
+    utils = new Utils(tokenServiceManager, synapseService);
     controller = new LogbookController(
-      synapseTokenRepositry,
+      tokenServiceManager,
       synapseService,
       utils,
     );

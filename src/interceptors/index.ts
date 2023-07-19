@@ -1,1 +1,0 @@
-export * from "./logbook.interceptor";

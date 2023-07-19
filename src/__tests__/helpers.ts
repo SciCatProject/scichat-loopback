@@ -1,55 +1,5 @@
-import { genSalt, hash } from "bcryptjs";
-import { MongodbDataSource } from "../datasources";
-import { Logbook, SynapseToken, User, UserCredentials } from "../models";
-import { UserCredentialsRepository, UserRepository } from "../repositories";
+import { Logbook, SynapseToken } from "../models";
 import { SynapseSyncResponse } from "../services";
-import { testdbConfig } from "./fixtures/datasources/testdb.datasource";
-
-const testdb = new MongodbDataSource(testdbConfig);
-const userRepository = new UserRepository(
-  testdb,
-  async () => userCredentialsRepository,
-);
-const userCredentialsRepository = new UserCredentialsRepository(testdb);
-
-export async function givenEmptyDatabase() {
-  await userRepository.deleteAll();
-  await userCredentialsRepository.deleteAll();
-}
-
-export function givenUserData(data?: Partial<User>) {
-  return Object.assign(
-    {
-      username: "testUser",
-      email: "test@email.com",
-    },
-    data,
-  );
-}
-
-export async function givenUser(data?: Partial<User>) {
-  return userRepository.create(givenUserData(data));
-}
-
-export async function givenUserCredentialsData(
-  data?: Partial<UserCredentials>,
-) {
-  return Object.assign(
-    {
-      password: await hash("password", await genSalt()),
-    },
-    data,
-  );
-}
-
-export async function givenUserCredentials(data?: Partial<UserCredentials>) {
-  return userCredentialsRepository.create(await givenUserCredentialsData(data));
-}
-
-export async function givenUserAccount() {
-  const user = await givenUser();
-  return givenUserCredentials({ userId: user.id });
-}
 
 export function givenCredentials() {
   return { username: "testUser", password: "password" };
