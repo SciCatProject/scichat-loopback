@@ -44,7 +44,6 @@ export class ScichatLoopbackApplication extends BootMixin(
         nested: true,
       },
     };
-
     // Mount authentication system
     this.component(AuthenticationComponent);
 
@@ -56,6 +55,10 @@ export class ScichatLoopbackApplication extends BootMixin(
 
     this.bind(TokenServiceBindings.TOKEN_KEY)
       .to("")
+      .inScope(BindingScope.SINGLETON);
+
+    this.bind(TokenServiceBindings.TOKEN_STATUS)
+      .to(true)
       .inScope(BindingScope.SINGLETON);
   }
 }

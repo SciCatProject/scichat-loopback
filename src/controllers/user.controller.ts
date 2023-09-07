@@ -1,6 +1,7 @@
 import { inject } from "@loopback/core";
 import {
   api,
+  get,
   HttpErrors,
   post,
   requestBody,
@@ -38,8 +39,6 @@ export const credentialsRequestBody = {
 
 @api({ basePath: "/scichatapi" })
 export class UserController {
-  public synapseToken = undefined as string | undefined;
-
   constructor(
     @inject(TokenServiceBindings.TOKEN_MANAGER)
     private tokenServiceManager: TokenServiceManager,
@@ -69,18 +68,17 @@ export class UserController {
     @requestBody(credentialsRequestBody) credentials: Credentials,
   ): Promise<{ token: string | undefined }> {
     try {
-      const synapseToken = this.tokenServiceManager.getToken();
-      if (!synapseToken) {
-        const newSynapseToken = await this.synapseService.login(
-          credentials.username,
-          credentials.password,
-        );
-        this.tokenServiceManager.setToken(newSynapseToken.access_token);
+      const synapseToken = await this.synapseService.login(
+        credentials.username,
+        credentials.password,
+      );
+      this.tokenServiceManager.setToken(synapseToken.access_token);
 
-        return { token: newSynapseToken.access_token };
-      }
-
-      return { token: synapseToken };
+      // NOTE: setTokenStatus is used for setting whether the token should be renewd.
+      // by default tokenstatus is set to true. when it is true, login call will be executed and the token will be renewed
+      // otherwise, we use existing token. Doing so we can prevent rate limit Errors from excessive login
+      this.tokenServiceManager.setTokenStatus(false);
+      return { token: synapseToken.access_token };
     } catch (error) {
       if (error.statusCode === 403) {
         throw new HttpErrors.Unauthorized(
@@ -96,5 +94,15 @@ export class UserController {
       }
       throw new Error(error);
     }
+  }
+  @get("/Users/getTokenStatus", {
+    responses: {
+      "200": {
+        description: "Check whether the token is valid",
+      },
+    },
+  })
+  async getTokenStatus() {
+    return this.tokenServiceManager.getTokenStatus();
   }
 }
