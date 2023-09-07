@@ -228,6 +228,7 @@ export class LogbookController {
           synapseFilter,
           accessToken,
         );
+
         const events: SynapseTimelineEvent[] =
           rooms.join[roomId].timeline.events;
         const messages = this.filterMessages(events, logbookFilter);

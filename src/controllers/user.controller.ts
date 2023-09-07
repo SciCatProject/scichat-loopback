@@ -70,7 +70,6 @@ export class UserController {
   ): Promise<{ token: string | undefined }> {
     try {
       const synapseToken = this.tokenServiceManager.getToken();
-
       if (!synapseToken) {
         const newSynapseToken = await this.synapseService.login(
           credentials.username,

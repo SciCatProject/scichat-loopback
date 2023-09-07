@@ -52,7 +52,6 @@ export class ScichatLoopbackApplication extends BootMixin(
 
     this.bind(TokenServiceBindings.TOKEN_MANAGER)
       .toClass(TokenServiceManager)
-      //
       .inScope(BindingScope.SINGLETON);
 
     this.bind(TokenServiceBindings.TOKEN_KEY)
