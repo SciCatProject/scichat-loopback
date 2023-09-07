@@ -20,8 +20,8 @@ describe("LogbookController (acceptance)", () => {
         await client.get("/scichatapi/Logbooks");
       } catch (error) {
         expect(error.statusCode).equal(401);
+        done();
       }
-      done();
     });
   });
 
@@ -31,8 +31,8 @@ describe("LogbookController (acceptance)", () => {
         await client.get("/scichatapi/Logbooks/123456");
       } catch (error) {
         expect(error.statusCode).equal(401);
+        done();
       }
-      done();
     });
   });
 
@@ -42,8 +42,8 @@ describe("LogbookController (acceptance)", () => {
         await client.post("/scichatapi/Logbooks/123456/message");
       } catch (error) {
         expect(error.statusCode).equal(401);
+        done();
       }
-      done();
     });
   });
 });
