@@ -15,35 +15,23 @@ describe("LogbookController (acceptance)", () => {
   });
 
   context("find", () => {
-    it("should resolve in a 401 code with unauthenticated user", async (done) => {
-      try {
-        await client.get("/scichatapi/Logbooks");
-      } catch (error) {
-        expect(error.statusCode).equal(401);
-        done();
-      }
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      const result = await client.get("/scichatapi/Logbooks");
+      expect(result.statusCode).equal(401);
     });
   });
 
   context("findByName", () => {
-    it("should resolve in a 401 code with unauthenticated user", async (done) => {
-      try {
-        await client.get("/scichatapi/Logbooks/123456");
-      } catch (error) {
-        expect(error.statusCode).equal(401);
-        done();
-      }
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      const result = await client.get("/scichatapi/Logbooks/123456");
+      expect(result.statusCode).equal(401);
     });
   });
 
   context("sendMessage", () => {
-    it("should resolve in a 401 code with unauthenticated user", async (done) => {
-      try {
-        await client.post("/scichatapi/Logbooks/123456/message");
-      } catch (error) {
-        expect(error.statusCode).equal(401);
-        done();
-      }
+    it("should resolve in a 401 code with unauthenticated user", async () => {
+      const result = await client.post("/scichatapi/Logbooks/123456/message");
+      expect(result.statusCode).equal(401);
     });
   });
 });
