@@ -3,6 +3,7 @@ import {
   api,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   post,
   requestBody,
@@ -167,6 +168,9 @@ export class LogbookController {
           await this.utils.renewAccessToken();
           continue;
         } else {
+          if (err.statusCode === 401) {
+            throw new HttpErrors.Unauthorized(err.message);
+          }
           console.error(err);
         }
       }
@@ -254,6 +258,9 @@ export class LogbookController {
           await this.utils.renewAccessToken();
           continue;
         } else {
+          if (err.statusCode === 401) {
+            throw new HttpErrors.Unauthorized(err.message);
+          }
           console.error(err);
         }
       }

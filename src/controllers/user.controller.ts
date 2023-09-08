@@ -74,25 +74,22 @@ export class UserController {
       );
       this.tokenServiceManager.setToken(synapseToken.access_token);
 
-      // NOTE: setTokenStatus is used for setting whether the token should be renewd.
+      // NOTE: TokenStatus is used to determine whether the token should be renewd.
       // by default tokenstatus is set to true. when it is true, login call will be executed and the token will be renewed
       // otherwise, we use existing token. Doing so we can prevent rate limit Errors from excessive login
       this.tokenServiceManager.setTokenStatus(false);
       return { token: synapseToken.access_token };
     } catch (error) {
-      if (error.statusCode === 403) {
-        throw new HttpErrors.Unauthorized(
-          `Invalid username or password: ${error}`,
-        );
-      }
       if (error.statusCode === 429) {
-        throw new Error(
+        console.error(
           `Rate Limit Exceeded, retry after ${
             Number(JSON.parse(error.message).retry_after_ms) / 1000
           } seconds`,
         );
       }
-      throw new Error(error);
+      throw new HttpErrors.Unauthorized(
+        `Please check synapse credentials: ${error}`,
+      );
     }
   }
   @get("/Users/getTokenStatus", {
