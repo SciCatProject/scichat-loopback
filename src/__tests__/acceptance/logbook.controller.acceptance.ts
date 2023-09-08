@@ -18,6 +18,7 @@ describe("LogbookController (acceptance)", () => {
     it("should resolve in a 401 code with unauthenticated user", async function () {
       const result = await client.get("/scichatapi/Logbooks");
       expect(result.statusCode).equal(401);
+      await testDone();
     }).timeout(10000);
   });
 
