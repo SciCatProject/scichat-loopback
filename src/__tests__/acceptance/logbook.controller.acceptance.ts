@@ -1,11 +1,11 @@
 import { Client, expect } from "@loopback/testlab";
 import { ScichatLoopbackApplication } from "../../application";
 import { setupApplication } from "./test-helper";
-
 describe("LogbookController (acceptance)", () => {
   let app: ScichatLoopbackApplication;
   let client: Client;
-
+  const testDone = (ms = 0) =>
+    new Promise((resolve) => setTimeout(resolve, 2000));
   before("setupApplication", async () => {
     ({ app, client } = await setupApplication());
   });
@@ -15,11 +15,9 @@ describe("LogbookController (acceptance)", () => {
   });
 
   context("find", () => {
-    it("should resolve in a 401 code with unauthenticated user", async (done) => {
-      await client.get("/scichatapi/Logbooks").then((res) => {
-        expect(res.statusCode).equal(401);
-      });
-      done();
+    it("should resolve in a 401 code with unauthenticated user", async function () {
+      const result = await client.get("/scichatapi/Logbooks");
+      expect(result.statusCode).equal(401);
     }).timeout(10000);
   });
 
