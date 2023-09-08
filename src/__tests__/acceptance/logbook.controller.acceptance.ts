@@ -1,4 +1,4 @@
-import { Client } from "@loopback/testlab";
+import { Client, expect } from "@loopback/testlab";
 import { ScichatLoopbackApplication } from "../../application";
 import { setupApplication } from "./test-helper";
 
@@ -16,13 +16,16 @@ describe("LogbookController (acceptance)", () => {
 
   context("find", () => {
     it("should resolve in a 401 code with unauthenticated user", async () => {
-      await client.get("/scichatapi/Logbooks").expect(401);
+      await client.get("/scichatapi/Logbooks").then((res) => {
+        expect(res.statusCode).equal(401);
+      });
     });
   });
 
   context("findByName", () => {
     it("should resolve in a 401 code with unauthenticated user", async () => {
-      await client.get("/scichatapi/Logbooks/123456").expect(401);
+      const result = await client.get("/scichatapi/Logbooks/123456");
+      expect(result.statusCode).equal(401);
     });
   });
 
