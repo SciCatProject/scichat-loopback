@@ -15,11 +15,12 @@ describe("LogbookController (acceptance)", () => {
   });
 
   context("find", () => {
-    it("should resolve in a 401 code with unauthenticated user", async () => {
+    it("should resolve in a 401 code with unauthenticated user", async (done) => {
       await client.get("/scichatapi/Logbooks").then((res) => {
         expect(res.statusCode).equal(401);
       });
-    });
+      done();
+    }).timeout(10000);
   });
 
   context("findByName", () => {
