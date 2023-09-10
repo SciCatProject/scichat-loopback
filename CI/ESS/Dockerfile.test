@@ -24,7 +24,7 @@ RUN chmod +x /home/node/app/wait.sh
 RUN npm run build
 
 # Bind to all network interfaces so that it can be mapped to the host OS
-ENV HOST=0.0.0.0 PORT=3050
+ENV HOST=0.0.0.0 PORT=3030
 
 EXPOSE ${PORT}
 CMD [ "./wait.sh" ]
