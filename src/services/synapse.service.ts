@@ -1,9 +1,8 @@
-import {inject, Provider} from "@loopback/core";
-import {getService} from "@loopback/service-proxy";
-import {SynapseAdminUserResponse, SynapseSyncResponse} from ".";
-import {ChatRoom} from "../controllers";
-import {SynapseDataSource} from "../datasources";
-import {SynapseToken} from "../models";
+import { inject, Provider } from "@loopback/core";
+import { SynapseAdminUserResponse, SynapseSyncResponse } from ".";
+import { ChatRoom } from "../controllers";
+import { SynapseDataSource } from "../datasources";
+import { SynapseToken } from "../models";
 
 export interface SynapseService {
   login(username: string, password: string): Promise<SynapseToken>;
@@ -14,7 +13,7 @@ export interface SynapseService {
   fetchRoomIdByName(
     name: string,
     accessToken: string | undefined,
-  ): Promise<{offset: number; rooms: ChatRoom[]; total_rooms: number}>;
+  ): Promise<{ offset: number; rooms: ChatRoom[]; total_rooms: number }>;
   fetchRoomMessages(
     filter: string,
     accessToken: string | undefined,
@@ -23,7 +22,7 @@ export interface SynapseService {
     roomId: string,
     message: string,
     accessToken: string | undefined,
-  ): Promise<{event_id: string}>;
+  ): Promise<{ event_id: string }>;
   queryUser(
     userId: string,
     accessToken: string | undefined,
@@ -35,9 +34,9 @@ export class SynapseProvider implements Provider<SynapseService> {
     // synapse must match the name property in the datasource json file
     @inject("datasources.synapse")
     protected dataSource: SynapseDataSource = new SynapseDataSource(),
-  ) { }
+  ) {}
 
-  value(): Promise<SynapseService> {
-    return getService(this.dataSource);
+  value(): any {
+    return console.log("--check");
   }
 }
