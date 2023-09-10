@@ -63,6 +63,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
+    "limiter": "^2.1.0",
     "loopback-connector-mongodb": "^6.2.0",
     "loopback-connector-rest": "^4.0.1",
     "tslib": "^2.4.0"
