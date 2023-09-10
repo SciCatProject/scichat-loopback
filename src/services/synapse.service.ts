@@ -1,4 +1,5 @@
 import { inject, Provider } from "@loopback/core";
+import { getService } from "@loopback/service-proxy";
 import { SynapseAdminUserResponse, SynapseSyncResponse } from ".";
 import { ChatRoom } from "../controllers";
 import { SynapseDataSource } from "../datasources";
@@ -36,7 +37,7 @@ export class SynapseProvider implements Provider<SynapseService> {
     protected dataSource: SynapseDataSource = new SynapseDataSource(),
   ) {}
 
-  value(): any {
-    return console.log("--check");
+  value(): Promise<SynapseService> {
+    return getService(this.dataSource);
   }
 }
