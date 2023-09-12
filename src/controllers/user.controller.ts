@@ -72,11 +72,9 @@ export class UserController {
         credentials.username,
         credentials.password,
       );
+
       this.tokenServiceManager.setToken(synapseToken.access_token);
 
-      // NOTE: TokenStatus is used to determine whether the token should be renewd.
-      // by default tokenstatus is set to true. when it is true, login call will be executed and the token will be renewed
-      // otherwise, we use existing token. Doing so we can prevent rate limit Errors from excessive login
       this.tokenServiceManager.setTokenStatus(false);
       return { token: synapseToken.access_token };
     } catch (error) {
@@ -100,6 +98,9 @@ export class UserController {
     },
   })
   async getTokenStatus() {
+    // NOTE: TokenStatus is used to determine whether the token should be renewd.
+    // by default tokenstatus is set to true. Login request should only be sent if token status is true
+    // Doing so we can prevent rate limit Errors from excessive login
     return this.tokenServiceManager.getTokenStatus();
   }
 }

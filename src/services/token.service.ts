@@ -18,6 +18,7 @@ export class TokenServiceManager {
   setTokenStatus(status: boolean): void {
     this.context.bind(TokenServiceManager.TOKEN_STATUS).to(status);
   }
+
   getTokenStatus(): boolean {
     return this.context.getSync(TokenServiceManager.TOKEN_STATUS);
   }
