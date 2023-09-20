@@ -7,11 +7,6 @@ import { SynapseToken } from "../models";
 
 export interface SynapseService {
   login(username: string, password: string): Promise<SynapseToken>;
-  createRoom(
-    name: string,
-    invites: string[],
-    accessToken: string | undefined,
-  ): Promise<{ room_alias: string; room_id: string }>;
   fetchAllRoomsMessages(
     filter: string,
     accessToken: string | undefined,
@@ -31,12 +26,6 @@ export interface SynapseService {
   ): Promise<{ event_id: string }>;
   queryUser(
     userId: string,
-    accessToken: string | undefined,
-  ): Promise<SynapseAdminUserResponse>;
-  createUser(
-    userId: string,
-    username: string,
-    password: string,
     accessToken: string | undefined,
   ): Promise<SynapseAdminUserResponse>;
 }

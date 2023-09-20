@@ -1,11 +1,14 @@
-import { TokenService } from "@loopback/authentication";
 import { inject } from "@loopback/core";
-import { repository } from "@loopback/repository";
-import { api, post, requestBody, SchemaObject } from "@loopback/rest";
-import { SecurityBindings, UserProfile } from "@loopback/security";
-import { TokenServiceBindings, UserServiceBindings } from "../keys";
-import { UserRepository } from "../repositories";
-import { Credentials, SciChatUserService } from "../services";
+import {
+  api,
+  HttpErrors,
+  post,
+  requestBody,
+  SchemaObject,
+} from "@loopback/rest";
+import { TokenServiceBindings } from "../keys";
+import { SynapseService } from "../services";
+import { TokenServiceManager } from "../services/token.service";
 
 const credentialsSchema: SchemaObject = {
   type: "object",
@@ -20,6 +23,11 @@ const credentialsSchema: SchemaObject = {
   },
 };
 
+export type Credentials = {
+  username: string;
+  password: string;
+};
+
 export const credentialsRequestBody = {
   description: "The input of login function",
   required: true,
@@ -31,11 +39,9 @@ export const credentialsRequestBody = {
 @api({ basePath: "/scichatapi" })
 export class UserController {
   constructor(
-    @inject(TokenServiceBindings.TOKEN_SERVICE) public jwtService: TokenService,
-    @inject(UserServiceBindings.USER_SERVICE)
-    public userService: SciChatUserService,
-    @inject(SecurityBindings.USER, { optional: true }) public user: UserProfile,
-    @repository(UserRepository) protected userRepository: UserRepository,
+    @inject(TokenServiceBindings.TOKEN_MANAGER)
+    private tokenServiceManager: TokenServiceManager,
+    @inject("services.Synapse") protected synapseService: SynapseService,
   ) {}
 
   @post("/Users/login", {
@@ -59,10 +65,29 @@ export class UserController {
   })
   async login(
     @requestBody(credentialsRequestBody) credentials: Credentials,
-  ): Promise<{ token: string }> {
-    const user = await this.userService.verifyCredentials(credentials);
-    const userProfile = this.userService.convertToUserProfile(user);
-    const token = await this.jwtService.generateToken(userProfile);
-    return { token };
+  ): Promise<{ token: string | undefined }> {
+    try {
+      const synapseToken = await this.synapseService.login(
+        credentials.username,
+        credentials.password,
+      );
+
+      this.tokenServiceManager.setToken(synapseToken.access_token);
+
+      console.debug("Request for Synapse token successful");
+
+      return { token: synapseToken.access_token };
+    } catch (error) {
+      if (error.statusCode === 429) {
+        console.error(
+          `Rate Limit Exceeded, retry after ${
+            Number(JSON.parse(error.message).retry_after_ms) / 1000
+          } seconds`,
+        );
+      }
+      throw new HttpErrors.Unauthorized(
+        `Please check synapse credentials: ${error}`,
+      );
+    }
   }
 }

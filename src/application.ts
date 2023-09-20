@@ -1,6 +1,6 @@
 import { AuthenticationComponent } from "@loopback/authentication";
 import { BootMixin } from "@loopback/boot";
-import { ApplicationConfig } from "@loopback/core";
+import { ApplicationConfig, BindingScope } from "@loopback/core";
 import { RepositoryMixin } from "@loopback/repository";
 import { RestApplication } from "@loopback/rest";
 import {
@@ -9,10 +9,10 @@ import {
 } from "@loopback/rest-explorer";
 import { ServiceMixin } from "@loopback/service-proxy";
 import path from "path";
-import { MongodbDataSource } from "./datasources";
-import { JWTAuthenticationComponent } from "./jwt-authentication-component";
-import { UserServiceBindings, UtilsBindings } from "./keys";
+import { UserController } from "./controllers/user.controller";
+import { TokenServiceBindings, UtilsBindings } from "./keys";
 import { MySequence } from "./sequence";
+import { TokenServiceManager } from "./services/token.service";
 import { Utils } from "./utils";
 
 export { ApplicationConfig };
@@ -45,14 +45,36 @@ export class ScichatLoopbackApplication extends BootMixin(
         nested: true,
       },
     };
-
     // Mount authentication system
     this.component(AuthenticationComponent);
-    // Mount jwt component
-    this.component(JWTAuthenticationComponent);
-    // Bind datasource
-    this.dataSource(MongodbDataSource, UserServiceBindings.DATASOURCE_NAME);
 
     this.bind(UtilsBindings.UTILS).toClass(Utils);
+
+    this.bind(TokenServiceBindings.TOKEN_MANAGER)
+      .toClass(TokenServiceManager)
+      .inScope(BindingScope.SINGLETON);
+
+    this.bind(TokenServiceBindings.TOKEN_KEY)
+      .to("")
+      .inScope(BindingScope.SINGLETON);
+  }
+  async boot(test = false) {
+    await super.boot();
+
+    const username = process.env.SYNAPSE_BOT_NAME;
+    const password = process.env.SYNAPSE_BOT_PASSWORD;
+
+    if (!test) {
+      if (!username || !password) {
+        throw new Error(
+          "SCICHAT_BOT credential environment variable not defined",
+        );
+      }
+
+      const userController = await this.get<UserController>(
+        "controllers.UserController",
+      );
+      await userController.login({ username, password });
+    }
   }
 }
