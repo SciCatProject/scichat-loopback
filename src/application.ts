@@ -9,6 +9,7 @@ import {
 } from "@loopback/rest-explorer";
 import { ServiceMixin } from "@loopback/service-proxy";
 import path from "path";
+import { UserController } from "./controllers/user.controller";
 import { TokenServiceBindings, UtilsBindings } from "./keys";
 import { MySequence } from "./sequence";
 import { TokenServiceManager } from "./services/token.service";
@@ -56,9 +57,22 @@ export class ScichatLoopbackApplication extends BootMixin(
     this.bind(TokenServiceBindings.TOKEN_KEY)
       .to("")
       .inScope(BindingScope.SINGLETON);
+  }
+  async boot() {
+    await super.boot();
 
-    this.bind(TokenServiceBindings.TOKEN_STATUS)
-      .to(true)
-      .inScope(BindingScope.SINGLETON);
+    const username = process.env.SYNAPSE_BOT_NAME;
+    const password = process.env.SYNAPSE_BOT_PASSWORD;
+
+    if (!username || !password) {
+      throw new Error(
+        "SCICHAT_BOT credential environment variable not defined",
+      );
+    }
+
+    const userController = await this.get<UserController>(
+      "controllers.UserController",
+    );
+    await userController.login({ username, password });
   }
 }

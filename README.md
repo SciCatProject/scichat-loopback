@@ -6,39 +6,24 @@
 
 Loopback API for communication between SciChat and Catamel.
 
-
 ## Get started
 
 1. `git clone https://github.com/SciCatProject/scichat-loopback.git`
 2. `npm install`
-3. Add *.env* file to project root folder. See [Environment Variables](#environment-variables).
+3. Add _.env_ file to project root folder. See [Environment Variables](#environment-variables).
 4. `npm start`
-
 
 ## Test the app
 
 `npm run test`
 
-
 ## Environment Variables
 
-Valid environment variables for the *.env* file.
+Valid environment variables for the _.env_ file.
 
 ### SciChat-LoopBack
 
-- `JWT_SECRET` [string] The secret for your JWT token, used for authorization.
-- `JWT_EXPIRES_IN` [string] How long, in seconds, the JWT token is valid.
 - `PORT` [number] The port that this service should be exposed on. Defaults to `3000` if value is not set.
-- `SCICHAT_USER` [string] The username of the user for this service. The app will create a user account with this username if this is the first time you run the app. If this is value is not set, the app will not start.
-- `SCICHAT_PASSWORD` [string] The password of the user for this service. The app will create a user account with this password if this is the first time you run the app.
-
-### MongoDB
-
-- `MONGODB_HOST` [string] The hostname/URL of your MongoDB.
-- `MONGODB_PORT` [number] The port used to access MongoDB.
-- `MONGODB_DB_NAME` [string] The name of the database where data from the app is stored.
-- `MONGODB_USER` [string] Username for the MongoDB user. Leave out or set to empty string if you don't have MongoDB authorization set up.
-- `MONGODB_PASSWORD` [string] Password for the MongoDB user. Leave out or set to empty string if you don't have MongoDB authorization set up.
 
 ### RabbitMQ
 

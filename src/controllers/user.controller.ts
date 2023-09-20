@@ -1,7 +1,6 @@
 import { inject } from "@loopback/core";
 import {
   api,
-  get,
   HttpErrors,
   post,
   requestBody,
@@ -75,7 +74,8 @@ export class UserController {
 
       this.tokenServiceManager.setToken(synapseToken.access_token);
 
-      this.tokenServiceManager.setTokenStatus(false);
+      console.debug("Request for Synapse token successful");
+
       return { token: synapseToken.access_token };
     } catch (error) {
       if (error.statusCode === 429) {
@@ -89,18 +89,5 @@ export class UserController {
         `Please check synapse credentials: ${error}`,
       );
     }
-  }
-  @get("/Users/getTokenStatus", {
-    responses: {
-      "200": {
-        description: "Check whether the token is valid",
-      },
-    },
-  })
-  async getTokenStatus() {
-    // NOTE: TokenStatus is used to determine whether the token should be renewd.
-    // by default tokenstatus is set to true. Login request should only be sent if token status is true
-    // Doing so we can prevent rate limit Errors from excessive login
-    return this.tokenServiceManager.getTokenStatus();
   }
 }
