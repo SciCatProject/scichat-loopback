@@ -5,3 +5,6 @@ services:
     build:
       context: .
       dockerfile: CI/ESS/Dockerfile.test
+    environment:
+      SYNAPSE_BOT_NAME: "BotNameGoesHere"
+      SYNAPSE_BOT_PASSWORD: "BotPasswordGoesHere"
