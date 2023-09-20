@@ -19,6 +19,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: test
+        env:
+          SYNAPSE_BOT_NAME: "BotNameGoesHere"
+          SYNAPSE_BOT_PASSWORD: "BotPasswordGoesHere"
         run: |
           cp CI/ESS/docker-compose.test.yaml docker-compose.yaml
           docker-compose down --remove-orphans
