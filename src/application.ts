@@ -58,21 +58,23 @@ export class ScichatLoopbackApplication extends BootMixin(
       .to("")
       .inScope(BindingScope.SINGLETON);
   }
-  async boot() {
+  async boot(test = false) {
     await super.boot();
 
     const username = process.env.SYNAPSE_BOT_NAME;
     const password = process.env.SYNAPSE_BOT_PASSWORD;
 
-    if (!username || !password) {
-      throw new Error(
-        "SCICHAT_BOT credential environment variable not defined",
-      );
-    }
+    if (!test) {
+      if (!username || !password) {
+        throw new Error(
+          "SCICHAT_BOT credential environment variable not defined",
+        );
+      }
 
-    const userController = await this.get<UserController>(
-      "controllers.UserController",
-    );
-    await userController.login({ username, password });
+      const userController = await this.get<UserController>(
+        "controllers.UserController",
+      );
+      await userController.login({ username, password });
+    }
   }
 }

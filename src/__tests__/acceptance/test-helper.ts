@@ -13,12 +13,13 @@ export async function setupApplication(): Promise<AppWithClient> {
     // host: process.env.HOST,
     // port: +process.env.PORT,
   });
+  const isTest = true;
 
   const app = new ScichatLoopbackApplication({
     rest: restConfig,
   });
 
-  await app.boot();
+  await app.boot(isTest);
 
   await app.start();
 
