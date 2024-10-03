@@ -141,7 +141,6 @@ export class LogbookController {
       try {
         const accessToken = this.tokenServiceManager.getToken();
         const filter = this.createSynapseFilter();
-        console.log("Fetching messages for all rooms");
         const { rooms } = await this.synapseService.fetchAllRoomsMessages(
           filter,
           accessToken,
@@ -214,9 +213,12 @@ export class LogbookController {
           name,
           accessToken,
         );
+        const roomId = (allRooms.rooms.pop() as ChatRoom)?.room_id;
 
-        const roomId = (allRooms.rooms.pop() as ChatRoom).room_id;
-
+        if (!roomId) {
+          console.log(`Room - ${name} do not exist`);
+          return undefined;
+        }
         const defaultFilter: LogbookFilters = {
           textSearch: "",
           showBotMessages: true,
