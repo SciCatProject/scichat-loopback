@@ -21,10 +21,10 @@ jobs:
       - name: test
         run: |
           cp CI/ESS/docker-compose.test.yaml docker-compose.yaml
-          docker-compose down --remove-orphans
-          docker-compose pull
-          docker-compose up --build --exit-code-from scichat-loopback
-          docker-compose down
+          docker compose down --remove-orphans
+          docker compose pull
+          docker compose up --build --exit-code-from scichat-loopback
+          docker compose down
 
   builde2e:
     name: Build E2E Docker image
