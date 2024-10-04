@@ -64,7 +64,7 @@
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
     "loopback-connector-rest": "^4.0.1",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.1"
   },
   "devDependencies": {
     "@loopback/build": "^9.0.1",
